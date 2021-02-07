@@ -26,6 +26,7 @@ type MyResponse<T> = {
   data: T;
   msg: string
 }
+type SelectOptions = { label: string; value: string | number }[]
 
 type Window = {
   ga: (

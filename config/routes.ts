@@ -43,9 +43,25 @@
     component: './TableList',
   },
   {
+    path: '/sys',
+    icon: "smile",
+    routes: [
+      {
+        path: '/sys/user',
+        component: './Sys/user',
+        icon: 'smile'
+      },
+      {
+        path: '/sys/user/:id',
+        component: './Sys/user/detail'
+      }
+    ]
+  },
+  {
     path: '/',
     redirect: '/main/datacenter',
   },
+
   {
     component: './404',
   },

@@ -7,8 +7,10 @@ import { history } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import type { RequestOptionsInit, ResponseError } from 'umi-request';
-import { queryCurrent, queryRouters } from './services/user';
+import { queryCurrent, queryRouters } from './services/Sys/user';
 import { sleep } from '@/utils/utils';
+import { reject } from 'lodash';
+// import * as Icons from '@ant-design/icons';
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -31,9 +33,16 @@ export async function getInitialState(): Promise<{
     return undefined;
   };
 
+  // const IconBc = (name: string) =>
+  //   React.createElement(Icons && (Icons as any)[name], {
+  //     style: { fontSize: '16px' },
+  //   });
   const fetchRouters = async () => {
     try {
-      return await queryRouters();
+      const r = (await queryRouters())?.data;
+      return r.map((item: any) => ({
+        ...item,
+      }));
     } catch (error) {
       history.push('/user/login');
     }
@@ -41,9 +50,11 @@ export async function getInitialState(): Promise<{
   };
   // 如果是登录页面，不执行
   if (history.location.pathname !== '/user/login') {
-    const currentUser = (await fetchUserInfo())?.data || {};
-    currentUser.name = currentUser?.RealName;
-    const menuData = (await fetchRouters())?.data || [];
+    const currentUser = (await fetchUserInfo())?.data;
+    if (currentUser) {
+      currentUser.name = currentUser?.RealName;
+    }
+    const menuData = (await fetchRouters()) || [];
     return {
       menuData,
       fetchUserInfo,
@@ -112,8 +123,7 @@ const errorHandler = (error: ResponseError) => {
 
   if (!response) {
     notification.error({
-      description: '您的网络发生异常，无法连接服务器',
-      message: '网络异常',
+      message: error.message,
     });
   }
   throw error;
@@ -130,7 +140,11 @@ const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
 };
 /** 响应拦截 增加延时 */
 const demoResponseInterceptors = async (response: Response) => {
-  await sleep(500);
+  await sleep(100);
+  const data = await response.clone().json();
+  if (data.code !== 0) {
+    throw new Error(data.msg);
+  }
   return response;
 };
 

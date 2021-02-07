@@ -4,11 +4,11 @@ import type { ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import ProCard from '@ant-design/pro-card';
 import styles from './index.less';
-import { ModalForm, ProFormText } from '@ant-design/pro-form';
-import { request } from 'umi';
+import { history } from 'umi';
 import { Button, message } from 'antd';
-import { delUser, queryUsers, updUser } from '@/services/user';
+import { delUser, queryUsers, updUser } from '@/services/Sys/user';
 import { PlusOutlined } from '@ant-design/icons';
+import { queryDepTreelist } from '@/services/Sys/dep';
 
 type DepDataType = {
   DepName: string;
@@ -27,32 +27,32 @@ type DepTableProps = {
   onChange: (DepId: number) => void;
 };
 
-const Form = () => {
-  return (
-    <ModalForm<{ name: string; company: string }>
-      key="ModelForm"
-      title="修改用户"
-      trigger={
-        <Button type="primary">
-          <PlusOutlined />
-          新建
-        </Button>
-      }
-      modalProps={{
-        onCancel: () => {},
-      }}
-      onFinish={async (values) => {
-        message.success(values);
-        return true;
-      }}
-    >
-      <ProFormText width="md" name="UserName" label="账号名称" />
-      <ProFormText width="md" name="Mobile" label="手机号码" />
-      <ProFormText width="md" name="Email" label="邮箱" />
-      <ProFormText width="md" name="RealName" label="真实姓名" />
-    </ModalForm>
-  );
-};
+// const Form = () => {
+//   return (
+//     <ModalForm<{ name: string; company: string }>
+//       key="ModelForm"
+//       title="修改用户"
+//       trigger={
+//         <Button type="primary">
+//           <PlusOutlined />
+//           新建
+//         </Button>
+//       }
+//       modalProps={{
+//         onCancel: () => {},
+//       }}
+//       onFinish={async (values) => {
+//         message.success(values);
+//         return true;
+//       }}
+//     >
+//       <ProFormText width="md" name="UserName" label="账号名称" />
+//       <ProFormText width="md" name="Mobile" label="手机号码" />
+//       <ProFormText width="md" name="Email" label="邮箱" />
+//       <ProFormText width="md" name="RealName" label="真实姓名" />
+//     </ModalForm>
+//   );
+// };
 const DepTable: React.FC<DepTableProps> = (props) => {
   const { DepId, onChange } = props;
   const [queryFilter, setQueryFilter] = useState({
@@ -105,15 +105,12 @@ const DepTable: React.FC<DepTableProps> = (props) => {
         };
       }}
       request={async (params = {}) => {
-        const response = await request('/sys/dep/treelist', {
-          method: 'POST',
-          data: {
-            DepName: params.DepName,
-          },
+        const response = await queryDepTreelist({
+          DepName: params.DepName,
         });
         return {
           data: response.data.rows,
-          success: response.msg,
+          success: response.msg === 'success',
           total: response.data.total,
         };
       }}
@@ -141,8 +138,9 @@ const UserTable: React.FC<UserTableProps> = (props) => {
       dataIndex: 'Mobile',
     },
     {
-      title: '用户类型',
+      title: '用户角色',
       dataIndex: 'UserTypeName',
+      search: false,
       editable: false,
     },
     {
@@ -168,13 +166,14 @@ const UserTable: React.FC<UserTableProps> = (props) => {
       title: '状态',
       dataIndex: 'State',
       valueType: 'select',
+      initialValue: ['0'],
       valueEnum: () => {
         return {
-          0: {
+          '0': {
             text: '正常',
             status: 'Success',
           },
-          1: {
+          '1': {
             text: '禁用',
             status: 'Error',
           },
@@ -187,14 +186,24 @@ const UserTable: React.FC<UserTableProps> = (props) => {
       valueType: 'option',
       render: (_, entity, _index, action) => {
         return [
-          <a
+          <Button
+            type="primary"
             key="editable"
             onClick={() => {
-              action.startEditable?.(entity.UserId);
+              action.startEditable?.(entity.UserId as number);
             }}
           >
             编辑
-          </a>,
+          </Button>,
+          <Button
+            type="link"
+            key="editable"
+            onClick={() => {
+              history.push(`/sys/user/${entity.UserId}`);
+            }}
+          >
+            查看
+          </Button>,
         ];
       },
     },
@@ -203,7 +212,17 @@ const UserTable: React.FC<UserTableProps> = (props) => {
     <ProTable<API.CurrentUser, { DepId: number }>
       params={{ DepId }}
       rowKey="UserId"
-      toolBarRender={() => [<Form />]}
+      toolBarRender={() => [
+        <Button
+          type="primary"
+          onClick={() => {
+            history.push('/sys/user/new');
+          }}
+        >
+          <PlusOutlined />
+          新建
+        </Button>,
+      ]}
       editable={{
         onDelete: async (key) => {
           await delUser([key]).catch;
@@ -213,6 +232,12 @@ const UserTable: React.FC<UserTableProps> = (props) => {
           await updUser(row);
           message.success('修改数据成功。');
         },
+      }}
+      postData={(dataSource) => {
+        return dataSource.map((item) => ({
+          ...item,
+          State: String(item.State),
+        }));
       }}
       request={async (params) => {
         const response = await queryUsers({

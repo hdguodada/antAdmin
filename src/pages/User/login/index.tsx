@@ -58,22 +58,22 @@ const Login: React.FC = () => {
   };
 
   const fetchRouters = async () => {
-    const menuData = await initialState?.fetchRouters?.()
-    if(menuData) {
+    const menuData = await initialState?.fetchRouters?.();
+    if (menuData) {
       setInitialState({
         ...initialState,
-        menuData: menuData.data
-      })
+        menuData: menuData.data,
+      });
     }
-  }
+  };
 
   const handleSubmit = async (values: LoginParamsType) => {
     setSubmitting(true);
     try {
       // 登录
       const msg = await fakeAccountLogin({ ...values, type });
-      const {token} = msg.loginResultInfo
-      localStorage.setItem('token', token)
+      const { token } = msg.loginResultInfo;
+      localStorage.setItem('token', token);
       if (msg.code === 0) {
         message.success('登录成功！');
         await fetchUserInfo();
