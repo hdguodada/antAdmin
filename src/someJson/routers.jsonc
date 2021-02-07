@@ -1,0 +1,726 @@
+[
+  {
+    "name": "home",
+    "path": "/main/home",
+    "redirect": "/main/home",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "home",
+      "icon": "dashboard",
+      "fun": [1]
+    },
+    "children": [
+      {
+        "name": "home",
+        "path": "/main/home",
+        "component": "/main/home",
+        "meta": {
+          "title": "home",
+          "icon": "",
+          "fun": [1]
+        }
+      },
+      {
+        "name": "modifyPwd",
+        "path": "/main/ModifyPwd",
+        "component": "/main/modifyPwd",
+        "meta": {
+          "title": "modifyPwd",
+          "icon": "",
+          "fun": [1, 3]
+        }
+      }
+    ]
+  },
+  {
+    "name": "cust",
+    "path": "/cust",
+    "redirect": "/cust/custList",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "cust",
+      "icon": "el-icon-s-custom",
+      "fun": [1]
+    },
+    "children": [
+      {
+        "name": "custList",
+        "path": "/cust/custList",
+        "component": "/cust/custList",
+        "meta": {
+          "title": "custList",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "custType",
+        "path": "/cust/custtype",
+        "component": "/cust/custtype",
+        "meta": {
+          "title": "custType",
+          "icon": "",
+          "fun": [1, 2, 3]
+        }
+      },
+      {
+        "name": "custArea",
+        "path": "/cust/custarea",
+        "component": "/cust/custarea",
+        "meta": {
+          "title": "custArea",
+          "icon": "",
+          "fun": [1, 2, 3]
+        }
+      },
+      {
+        "name": "custLevel",
+        "path": "/cust/custlevel",
+        "component": "/cust/custlevel",
+        "meta": {
+          "title": "custLevel",
+          "icon": "",
+          "fun": [1, 2, 3]
+        }
+      },
+      {
+        "name": "custRelList",
+        "path": "/cust/custRelList",
+        "component": "/cust/custRelList",
+        "meta": {
+          "title": "custRelList",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "custRecord",
+        "path": "/cust/custRecord",
+        "component": "/cust/custRecord",
+        "meta": {
+          "title": "custRecord",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      }
+    ]
+  },
+  {
+    "name": "productionManagement",
+    "path": "production",
+    "redirect": "/production/newInboundList",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "productionManagement",
+      "icon": "el-icon-star-on",
+      "fun": [1]
+    },
+    "children": [
+      {
+        "name": "newInboundList",
+        "path": "/production/newInboundList",
+        "component": "/production/newInboundList",
+        "meta": {
+          "title": "newInboundList",
+          "icon": "",
+          "fun": [1]
+        }
+      },
+      {
+        "name": "inboundList",
+        "path": "/production/inboundList",
+        "component": "/production/inboundList",
+        "meta": {
+          "title": "inboundList",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "inBoundDetail",
+        "path": "/production/inBoundDetail",
+        "component": "/production/inBoundDetail",
+        "meta": {
+          "title": "inBoundDetail",
+          "icon": "",
+          "fun": [1]
+        }
+      }
+    ]
+  },
+  {
+    "name": "personnel",
+    "path": "personnel",
+    "redirect": "/bas/post",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "personnel",
+      "icon": "peoples",
+      "fun": [1]
+    },
+    "children": [
+      {
+        "name": "post",
+        "path": "/bas/post",
+        "component": "/bas/post",
+        "meta": {
+          "title": "post",
+          "icon": "",
+          "fun": [1, 2, 3]
+        }
+      },
+      {
+        "name": "employlist",
+        "path": "/bas/employ",
+        "component": "/bas/employlist",
+        "meta": {
+          "title": "employlist",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      }
+    ]
+  },
+  {
+    "name": "purchase",
+    "path": "/purchase",
+    "redirect": "/purchase/paydetails",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "purchase",
+      "icon": "shopping",
+      "fun": [1]
+    },
+    "children": [
+      {
+        "name": "paydetails",
+        "path": "/purchase/paydetails",
+        "component": "/purchase/paydetails",
+        "meta": {
+          "title": "paydetails",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "psummary1",
+        "path": "purchase/summary1",
+        "component": "purchase/summary1",
+        "meta": {
+          "title": "psummary1",
+          "icon": "",
+          "fun": [1]
+        }
+      },
+      {
+        "name": "psummary2",
+        "path": "/purchase/summary2",
+        "component": "/purchase/summary2",
+        "meta": {
+          "title": "psummary2",
+          "icon": "",
+          "fun": [1]
+        }
+      },
+      {
+        "name": "pdetails",
+        "path": "/purchase/details",
+        "component": "/purchase/details",
+        "meta": {
+          "title": "pdetails",
+          "icon": "",
+          "fun": [1]
+        }
+      },
+      {
+        "name": "porders",
+        "path": "/purchase/orders",
+        "component": "/purchase/orders",
+        "meta": {
+          "title": "porders",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "preturn",
+        "path": "/purchase/return",
+        "component": "/purchase/return",
+        "meta": {
+          "title": "preturn",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "bookOrders",
+        "path": "/purchase/bookOrders",
+        "component": "/purchase/bookOrders",
+        "meta": {
+          "title": "bookOrders",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      }
+    ]
+  },
+  {
+    "name": "sale",
+    "path": "/sale",
+    "redirect": "/sale/orders",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "sale",
+      "icon": "money",
+      "fun": [1]
+    },
+    "children": [
+      {
+        "name": "orders",
+        "path": "/sale/orders",
+        "component": "/sale/orders",
+        "meta": {
+          "title": "orders",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "saleOrders",
+        "path": "/sale/saleOrders",
+        "component": "/sale/saleOrders",
+        "meta": {
+          "title": "saleOrders",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "details",
+        "path": "/sale/details",
+        "component": "/sale/details",
+        "meta": {
+          "title": "details",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "return",
+        "path": "/sale/return",
+        "component": "/sale/return",
+        "meta": {
+          "title": "return",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "collectionDetails",
+        "path": "/sale/collectionDetails",
+        "component": "/sale/collectionDetails",
+        "meta": {
+          "title": "collectionDetails",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "summary1",
+        "path": "",
+        "component": "/sale/summary1",
+        "meta": {
+          "title": "summary1",
+          "icon": "",
+          "fun": [1]
+        }
+      },
+      {
+        "name": "summary2",
+        "path": "/sale/summary2",
+        "component": "/sale/summary2",
+        "meta": {
+          "title": "summary2",
+          "icon": "",
+          "fun": [1]
+        }
+      },
+      {
+        "name": "summary3",
+        "path": "/sale/summary3",
+        "component": "/sale/summary3",
+        "meta": {
+          "title": "summary3",
+          "icon": "",
+          "fun": [1]
+        }
+      }
+    ]
+  },
+  {
+    "name": "inventory",
+    "path": "/inventory",
+    "redirect": "/inventory/out",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "inventory",
+      "icon": "component",
+      "fun": [1]
+    },
+    "children": [
+      {
+        "name": "out",
+        "path": "/inventory/out",
+        "component": "/inventory/out",
+        "meta": {
+          "title": "out",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "in",
+        "path": "/inventory/in",
+        "component": "/inventory/in",
+        "meta": {
+          "title": "in",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "transfer",
+        "path": "inventory/transfer",
+        "component": "inventory/transfer",
+        "meta": {
+          "title": "transfer",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "库存初始化",
+        "path": "",
+        "component": "",
+        "meta": {
+          "title": "库存初始化",
+          "icon": "",
+          "fun": [1, 2, 4]
+        }
+      },
+      {
+        "name": "check",
+        "path": "/inventory/check",
+        "component": "/inventory/check",
+        "meta": {
+          "title": "check",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "warn",
+        "path": "/inventory/warn",
+        "component": "/inventory/warn",
+        "meta": {
+          "title": "warn",
+          "icon": "",
+          "fun": [1]
+        }
+      },
+      {
+        "name": "flow",
+        "path": "/inventory/flow",
+        "component": "/inventory/flow",
+        "meta": {
+          "title": "flow",
+          "icon": "",
+          "fun": [1]
+        }
+      },
+      {
+        "name": "ledger",
+        "path": "/inventory/ledger",
+        "component": "/inventory/ledger",
+        "meta": {
+          "title": "ledger",
+          "icon": "",
+          "fun": [1]
+        }
+      }
+    ]
+  },
+  {
+    "name": "product",
+    "path": "/product",
+    "redirect": "/product/data",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "product",
+      "icon": "f-bag",
+      "fun": [1]
+    },
+    "children": [
+      {
+        "name": "data",
+        "path": "/product/data",
+        "component": "/product/data",
+        "meta": {
+          "title": "data",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "cate",
+        "path": "/bas/cate",
+        "component": "/bas/cate",
+        "meta": {
+          "title": "cate",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "brand",
+        "path": "/bas/brand",
+        "component": "/bas/brand",
+        "meta": {
+          "title": "brand",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "unit",
+        "path": "/bas/unit",
+        "component": "/bas/unit",
+        "meta": {
+          "title": "unit",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      }
+    ]
+  },
+  {
+    "name": "bas",
+    "path": "/bas",
+    "redirect": "/bas/supplier",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "bas",
+      "icon": "bas",
+      "fun": [1]
+    },
+    "children": [
+      {
+        "name": "supplierlist",
+        "path": "/bas/supplier",
+        "component": "/bas/supplierlist",
+        "meta": {
+          "title": "supplierlist",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "suppRel",
+        "path": "/bas/supprel",
+        "component": "/bas/supprel",
+        "meta": {
+          "title": "suppRel",
+          "icon": "",
+          "fun": [1, 2, 3]
+        }
+      },
+      {
+        "name": "supptypelist",
+        "path": "/bas/suppType",
+        "component": "/bas/supptypelist",
+        "meta": {
+          "title": "supptypelist",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "storelist",
+        "path": "/bas/storelist",
+        "component": "/bas/storelist",
+        "meta": {
+          "title": "storelist",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      }
+    ]
+  },
+  {
+    "name": "sys",
+    "path": "/sys",
+    "redirect": "/sys/user",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "sys",
+      "icon": "el-icon-setting",
+      "fun": [1]
+    },
+    "children": [
+      {
+        "name": "user",
+        "path": "/sys/user",
+        "component": "/sys/user",
+        "meta": {
+          "title": "user",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "dep",
+        "path": "/sys/dep",
+        "component": "/sys/dep",
+        "meta": {
+          "title": "dep",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "role",
+        "path": "/sys/role",
+        "component": "/sys/role",
+        "meta": {
+          "title": "role",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      },
+      {
+        "name": "ParmsEdit",
+        "path": "/sys/ParmsEdit",
+        "component": "/sys/parmsEdit",
+        "meta": {
+          "title": "ParmsEdit",
+          "icon": "",
+          "fun": [1, 3]
+        }
+      },
+      {
+        "name": "CompanyEdit",
+        "path": "/sys/CompanyEdit",
+        "component": "/sys/companyEdit",
+        "meta": {
+          "title": "CompanyEdit",
+          "icon": "",
+          "fun": [1, 3]
+        }
+      },
+      {
+        "name": "log",
+        "path": "/init/log",
+        "component": "/init/log",
+        "meta": {
+          "title": "log",
+          "icon": "",
+          "fun": [1]
+        }
+      },
+      {
+        "name": "coderule",
+        "path": "/sys/coderule",
+        "component": "/sys/coderule",
+        "meta": {
+          "title": "coderule",
+          "icon": "",
+          "fun": [1, 2, 3, 4]
+        }
+      }
+    ]
+  },
+  {
+    "name": "init",
+    "path": "/init",
+    "redirect": "/init/ver",
+    "component": "Layout",
+    "alwaysShow": true,
+    "meta": {
+      "title": "init",
+      "icon": "form",
+      "fun": []
+    },
+    "children": [
+      {
+        "name": "ver",
+        "path": "/init/ver",
+        "component": "/init/ver",
+        "meta": {
+          "title": "ver",
+          "icon": "",
+          "fun": []
+        }
+      },
+      {
+        "name": "exception",
+        "path": "/init/exception",
+        "component": "/init/exception",
+        "meta": {
+          "title": "exception",
+          "icon": "",
+          "fun": []
+        }
+      },
+      {
+        "name": "dictDef",
+        "path": "/init/dictdef",
+        "component": "/init/dictdef",
+        "meta": {
+          "title": "dictDef",
+          "icon": "",
+          "fun": []
+        }
+      },
+      {
+        "name": "fun",
+        "path": "/init/fun",
+        "component": "/init/fun",
+        "meta": {
+          "title": "fun",
+          "icon": "",
+          "fun": []
+        }
+      },
+      {
+        "name": "module",
+        "path": "/init/module",
+        "component": "/init/module",
+        "meta": {
+          "title": "module",
+          "icon": "",
+          "fun": []
+        }
+      },
+      {
+        "name": "dictType",
+        "path": "/init/dicttype",
+        "component": "/init/dicttype",
+        "meta": {
+          "title": "dictType",
+          "icon": "",
+          "fun": []
+        }
+      }
+    ]
+  }
+]
