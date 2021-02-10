@@ -1,16 +1,16 @@
 declare namespace API {
   export type Dep = {
-    DepId: number;
+    DepId?: number;
     DepName: string;
-    PDepId: number;
+    PDepId?: number;
     PDepName: string | null;
     Leader: string;
     Phone: string;
-    Level: number;
+    Level?: number;
     Memo: string;
     SortNum: number;
     State: number;
-    StateName: string;
+    StateName?: string;
   };
   export type DepList = {
     rows: Dep[];

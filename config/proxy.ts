@@ -10,7 +10,7 @@ console.log(BASE_URL)
 export default {
   dev: {
     [BASE_URL as string]: {
-      target: 'http://api.yhkamani.com/',
+      target: 'https://erp.zjqsa.com',
       changeOrigin: true,
       pathRewrite: { ['^' + BASE_URL]: '' },
     },

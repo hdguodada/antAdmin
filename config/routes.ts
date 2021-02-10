@@ -49,12 +49,27 @@
       {
         path: '/sys/user',
         component: './Sys/user',
-        icon: 'smile'
       },
       {
         path: '/sys/user/:id',
         component: './Sys/user/detail'
-      }
+      },
+      {
+        path: '/sys/dep',
+        component: './Sys/dep',
+      },
+      {
+        path: '/sys/dep/:id',
+        component: './Sys/dep/detail'
+      },
+      {
+        path: '/sys/role',
+        component: './Sys/role',
+      },
+      {
+        path: '/sys/role/:id',
+        component: './Sys/role/detail'
+      },
     ]
   },
   {

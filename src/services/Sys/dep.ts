@@ -1,7 +1,8 @@
 import { request } from 'umi';
 
-interface DepFilters {
-  DepName: string
+export interface DepFilters {
+  DepName: string;
+  Phone: string;
 }
 export async function queryDepList(options: DepFilters | any): Promise<MyResponse<API.DepList>> {
   return request('/sys/dep/list', {
@@ -20,9 +21,24 @@ export async function queryDepTreelist(options: DepFilters): Promise<MyResponse<
 
 
 
-export async function queryDepTreeSelect(options): Promise<MyResponse<SelectOptions>> {
+export async function queryDepTreeSelect(options: any): Promise<MyResponse<SelectOptions>> {
   return request('/sys/dep/treeselect', {
     method: 'POST',
     data: options
+  });
+}
+
+export async function queryDepInfo(id: number | string): Promise<MyResponse<API.Dep>> {
+  return request('/sys/dep/info', {
+    method: 'POST',
+    params: { id }
+  });
+}
+
+
+export async function updDep(data: API.Dep): Promise<MyResponse<API.Dep>> {
+  return request('/sys/dep/treeselect', {
+    method: 'POST',
+    data
   });
 }

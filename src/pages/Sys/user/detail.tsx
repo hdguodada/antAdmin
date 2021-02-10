@@ -11,7 +11,6 @@ import { message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
-import { result } from 'lodash';
 
 const User: React.FC = () => {
   const params = useParams<{ id: string | 'new' }>();

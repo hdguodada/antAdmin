@@ -26,6 +26,25 @@ type MyResponse<T> = {
   data: T;
   msg: string
 }
+
+type RowResponse<T> = {
+  code: 0;
+  data: {
+    rows: T[];
+    total: number;
+    pageSize: number;
+    pageNumber: number;
+  }
+  msg: string
+}
+
+type InfoResponse<T> = {
+  code: 0;
+  data: T
+  msg: string
+}
+
+type MyRequest<T> = { pageSize?: number; pageNumber?: number; } & Partial<T>
 type SelectOptions = { label: string; value: string | number }[]
 
 type Window = {
