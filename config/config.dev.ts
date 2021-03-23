@@ -1,5 +1,6 @@
 // https://umijs.org/config/
 import { defineConfig } from 'umi';
+const { BASE_URL } = process.env;
 
 export default defineConfig({
   plugins: [
@@ -11,5 +12,8 @@ export default defineConfig({
     exclude: [],
     babelPlugins: [],
     babelOptions: {},
+  },
+  define: {
+    BASE_URL: BASE_URL,
   },
 });

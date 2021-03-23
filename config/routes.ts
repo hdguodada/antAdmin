@@ -1,5 +1,10 @@
 ﻿export default [
   {
+    path: '/',
+    redirect: '/welcome',
+  },
+  // 用户登录
+  {
     path: '/user',
     layout: false,
     routes: [
@@ -16,67 +21,136 @@
     ],
   },
   {
-    path: '/welcome',
-    name: 'welcome',
+    path: '/desktop',
+    name: 'desktop',
     icon: 'smile',
-    component: './Welcome',
+    component: './Desktop',
   },
   {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    component: './Admin',
+    name: 'purchase',
+    icon: 'ShoppingCartOutlined',
+    path: '/purchase',
     routes: [
       {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        icon: 'smile',
-        component: './Welcome',
+        name: 'purchase',
+        path: '/purchase',
+        component: './Purchase/purchase',
       },
     ],
   },
   {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
+    name: 'bas',
+    icon: 'SafetyOutlined',
+    path: '/bas',
+    routes: [
+      {
+        name: 'customer',
+        path: 'customer',
+        component: './Bas/customer',
+      },
+      {
+        name: 'product',
+        path: 'product',
+        component: './Bas/product',
+      },
+      {
+        name: 'productDetail',
+        path: 'product/:id',
+        component: './Bas/product/detail',
+        hideInMenu: true,
+      },
+      {
+        name: 'customerDetail',
+        path: 'customer/:id',
+        component: './Bas/customer/detail',
+        hideInMenu: true,
+      },
+      {
+        name: 'supplier',
+        path: 'supplier',
+        component: './Bas/supplier',
+      },
+      {
+        name: 'employ',
+        path: 'employ',
+        component: './Bas/employ',
+      },
+      {
+        name: 'basOthers',
+        path: 'basOthers',
+        component: './Bas/basOthers',
+      },
+    ],
   },
   {
     path: '/sys',
-    icon: "smile",
+    icon: 'GlobalOutlined',
+    name: 'sys',
     routes: [
       {
+        name: 'user',
         path: '/sys/user',
         component: './Sys/user',
       },
       {
-        path: '/sys/user/:id',
-        component: './Sys/user/detail'
-      },
-      {
+        name: 'dep',
         path: '/sys/dep',
         component: './Sys/dep',
       },
       {
-        path: '/sys/dep/:id',
-        component: './Sys/dep/detail'
-      },
-      {
+        name: 'role',
         path: '/sys/role',
         component: './Sys/role',
       },
+
       {
-        path: '/sys/role/:id',
-        component: './Sys/role/detail'
+        path: '/sys/coderule',
+        component: './Sys/coderule',
       },
-    ]
+      {
+        name: 'CompanyEdit',
+        path: '/sys/CompanyEdit',
+        component: './Sys/company',
+      },
+    ],
   },
   {
-    path: '/',
-    redirect: '/main/datacenter',
+    name: 'init',
+    icon: 'SettingFilled',
+    path: '/init',
+    routes: [
+      {
+        name: 'log',
+        path: '/init/log',
+        component: './Sys/log',
+      },
+      {
+        name: 'ver',
+        path: '/init/ver',
+        component: './Sys/ver',
+      },
+      {
+        name: 'exception',
+        path: '/init/exception',
+        component: './Sys/exception',
+      },
+      {
+        name: 'dictDef',
+        path: '/init/dictDef',
+        component: './Sys/dict(def)',
+      },
+      {
+        name: 'fun',
+        path: '/init/fun',
+        component: './Sys/fun',
+      },
+      {
+        name: 'module',
+        path: '/init/module',
+        component: './Sys/module',
+      },
+    ],
   },
-
   {
     component: './404',
   },

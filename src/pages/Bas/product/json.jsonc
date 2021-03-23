@@ -1,0 +1,586 @@
+{
+  "list": {
+    "code": 0,
+    "data": {
+      "rows|10": [
+        {
+          "spuId": "@id",
+          "albumList": "", // 是否传albumList中的第一个?
+          "spuName": "商品名称",
+          "barCode": "商品编码",
+          "prodTag": [], // 商品标签
+          "cateName": "cateIdName",
+          "spec": "规格型号",
+          "unitName": "个,箱(1:5)", // 后台生成
+          "storeName": "首选仓库的名称", // 暂无
+          "基准价格": "500",
+          "memo": "备注",
+          "stateName": "状态",
+          "mulspecList|5": [
+            {
+              "skuId": "@id",
+              "skuName": "@cname",
+              "code": "@id",
+              "imgUrl": "@image('400x400')",
+              "priceList | 4": [
+                {
+                  "discount": 60,
+                  "levelId": 1,
+                  "levelName": "普通客户",
+                  "unitPrices": [
+                    { "price": 5, "unitId": 3 },
+                    { "price": 5, "unitId": 4 },
+                    { "price": 5, "unitId": 5 }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "msg": "success",
+    "total": 50
+  },
+  "skulist": {
+    "code": 0,
+    "data": {
+      "rows|10": [
+        {
+          "spuId": "@id",
+          "skuId": "@id",
+          "spuName": "商品名称",
+          "code": "sku商品编码",
+          "storeId": "@id", // 首选仓库id
+          "storeName": "首选仓库的名称", // 首选仓库的名称
+          "unitList": [
+            //单位列表
+            {
+              "value": "68562850", //基本单位
+              "label": "辆",
+              "rate": 1
+            },
+            {
+              "value": "68562844",
+              "label": "盒",
+              "rate": 5
+            },
+            {
+              "value": "68562842",
+              "label": "快",
+              "rate": 10
+            }
+          ]
+        }
+      ]
+    },
+    "msg": "success",
+    "total": 50
+  },
+  "add": {
+    "spuName": "新增产品名称",
+    "cateId": "分类Id",
+    "brandId": "品牌Id",
+    "prodTag": [1, 2, 3, 5],
+    "keywords": "搜索关键字",
+    "isMulSpec": "0|1", //是否多规格
+    "baseUnit": {
+      "value": "68562850", //基本单位
+      "label": "辆",
+      "rate": 1
+    },
+    "unitList": [
+      //单位列表
+      {
+        "value": "68562850", //基本单位
+        "label": "辆",
+        "rate": 1
+      },
+      {
+        "value": "68562844",
+        "label": "盒",
+        "rate": 5
+      },
+      {
+        "value": "68562842",
+        "label": "快",
+        "rate": 10
+      }
+    ],
+    "attrList": [{ "attrId": 19, "attrValues": [75, 76, 77] }], //选中的规格
+    "status": "0|1", //上架或者下架
+
+    "albumList": [
+      //图片列表
+      {
+        "type": 0,
+        "imgName": "1.jpg",
+        "imgUrl": "8a53ca78-2acc-4796-9036-41b416a78de7.jpg",
+        "size": 141203
+      }
+    ],
+    "desc": "", //富文本描述
+    "costPrice": 500, //基本价格
+    // 多单位生成的代理商价格列表
+    "priceList": [
+      {
+        "levelId": 7218545,
+        "levelName": "普通",
+        "discount": 50, // 代理商折扣 自动生成unitPrices里的价格使用
+        "unitPrices": [
+          // 跟 unitList格式相同,多一个价格
+          //单位列表
+          {
+            "value": "68562850", //基本单位
+            "label": "辆",
+            "rate": 1,
+            "price": 2.5
+          },
+          {
+            "value": "68562844",
+            "label": "盒",
+            "rate": 5,
+            "price": 12.5
+          },
+          {
+            "value": "68562842",
+            "label": "快",
+            "rate": 10,
+            "price": 25
+          }
+        ],
+        "minQuantity": 0 // 最小起订量
+      },
+      {
+        "levelId": 7277919,
+        "levelName": "待签代理",
+        "unitPrices": [
+          {
+            "unitId": "68562850",
+            "unitName": "辆",
+            "rate": 1,
+
+            "marketPrice": 10,
+            "orderPrice": 10
+          },
+          {
+            "unitId": "68562844",
+            "unitName": "盒",
+            "rate": 5,
+
+            "marketPrice": 50,
+            "orderPrice": 50
+          },
+          {
+            "unitId": "68562842",
+            "unitName": "袋",
+            "rate": 10,
+
+            "marketPrice": 100,
+            "orderPrice": 100
+          }
+        ],
+        "minQuantity": 0
+      },
+      {
+        "levelId": 7277918,
+        "levelName": "三级代理",
+        "unitPrices": [
+          {
+            "unitId": "68562850",
+            "unitName": "辆",
+            "rate": 1,
+            "marketPrice": 10,
+            "orderPrice": 9
+          },
+          {
+            "unitId": "68562844",
+            "unitName": "盒",
+            "rate": 5,
+
+            "marketPrice": 50,
+            "orderPrice": 45
+          },
+          {
+            "unitId": "68562842",
+            "unitName": "袋",
+            "rate": 10,
+
+            "marketPrice": 100,
+            "orderPrice": 90
+          }
+        ],
+        "minQuantity": 0
+      },
+      {
+        "levelId": 7218700,
+        "levelName": "二级代理",
+
+        "unitPrices": [
+          {
+            "unitId": "68562850",
+            "unitName": "辆",
+            "rate": 1,
+
+            "marketPrice": 10,
+            "orderPrice": 8
+          },
+          {
+            "unitId": "68562844",
+            "unitName": "盒",
+            "rate": 5,
+
+            "marketPrice": 50,
+            "orderPrice": 40
+          },
+          {
+            "unitId": "68562842",
+            "unitName": "袋",
+            "rate": 10,
+
+            "marketPrice": 100,
+            "orderPrice": 80
+          }
+        ],
+        "minQuantity": 0
+      },
+      {
+        "levelId": 7218701,
+        "levelName": "一级代理",
+
+        "unitPrices": [
+          {
+            "unitId": "68562850",
+            "unitName": "辆",
+            "rate": 1,
+
+            "marketPrice": 10,
+            "orderPrice": 7
+          },
+          {
+            "unitId": "68562844",
+            "unitName": "盒",
+            "rate": 5,
+
+            "marketPrice": 50,
+            "orderPrice": 35
+          },
+          {
+            "unitId": "68562842",
+            "unitName": "袋",
+            "rate": 10,
+
+            "marketPrice": 100,
+            "orderPrice": 70
+          }
+        ],
+        "minQuantity": 0
+      }
+    ],
+    // 多规格与多单位生成的价格列表
+    "mulspecList": [
+      {
+        "code": "P2158853929", // 商品编码
+        "priceList": [
+          {
+            "levelId": 7218545,
+            "levelName": "普通",
+            "discount": 50, // 代理商折扣 自动生成unitPrices里的价格使用
+            "unitPrices": [
+              // 跟 unitList格式相同,多一个价格
+              //单位列表
+              {
+                "value": "68562850", //基本单位
+                "label": "辆",
+                "rate": 1,
+                "price": 2.5
+              },
+              {
+                "value": "68562844",
+                "label": "盒",
+                "rate": 5,
+                "price": 12.5
+              },
+              {
+                "value": "68562842",
+                "label": "快",
+                "rate": 10,
+                "price": 25
+              }
+            ],
+            "minQuantity": 0 // 最小起订量
+          },
+          {
+            "levelId": 7277919,
+            "levelName": "待签代理",
+            "unitPrices": [
+              {
+                "unitId": "68562850",
+                "unitName": "辆",
+                "rate": 1,
+
+                "marketPrice": 10,
+                "orderPrice": 10
+              },
+              {
+                "unitId": "68562844",
+                "unitName": "盒",
+                "rate": 5,
+
+                "marketPrice": 50,
+                "orderPrice": 50
+              },
+              {
+                "unitId": "68562842",
+                "unitName": "袋",
+                "rate": 10,
+
+                "marketPrice": 100,
+                "orderPrice": 100
+              }
+            ],
+            "minQuantity": 0
+          },
+          {
+            "levelId": 7277918,
+            "levelName": "三级代理",
+            "unitPrices": [
+              {
+                "unitId": "68562850",
+                "unitName": "辆",
+                "rate": 1,
+                "marketPrice": 10,
+                "orderPrice": 9
+              },
+              {
+                "unitId": "68562844",
+                "unitName": "盒",
+                "rate": 5,
+
+                "marketPrice": 50,
+                "orderPrice": 45
+              },
+              {
+                "unitId": "68562842",
+                "unitName": "袋",
+                "rate": 10,
+
+                "marketPrice": 100,
+                "orderPrice": 90
+              }
+            ],
+            "minQuantity": 0
+          },
+          {
+            "levelId": 7218700,
+            "levelName": "二级代理",
+
+            "unitPrices": [
+              {
+                "unitId": "68562850",
+                "unitName": "辆",
+                "rate": 1,
+
+                "marketPrice": 10,
+                "orderPrice": 8
+              },
+              {
+                "unitId": "68562844",
+                "unitName": "盒",
+                "rate": 5,
+
+                "marketPrice": 50,
+                "orderPrice": 40
+              },
+              {
+                "unitId": "68562842",
+                "unitName": "袋",
+                "rate": 10,
+
+                "marketPrice": 100,
+                "orderPrice": 80
+              }
+            ],
+            "minQuantity": 0
+          },
+          {
+            "levelId": 7218701,
+            "levelName": "一级代理",
+
+            "unitPrices": [
+              {
+                "unitId": "68562850",
+                "unitName": "辆",
+                "rate": 1,
+
+                "marketPrice": 10,
+                "orderPrice": 7
+              },
+              {
+                "unitId": "68562844",
+                "unitName": "盒",
+                "rate": 5,
+
+                "marketPrice": 50,
+                "orderPrice": 35
+              },
+              {
+                "unitId": "68562842",
+                "unitName": "袋",
+                "rate": 10,
+
+                "marketPrice": 100,
+                "orderPrice": 70
+              }
+            ],
+            "minQuantity": 0
+          }
+        ],
+        "attrId": 15,
+        "attrValueId": 75
+      },
+      {
+        "code": "P158853932",
+        "unitPrices": [
+          {
+            "barcode": "P158853932-1",
+            "unitId": "68562850",
+            "unitName": "辆",
+            "marketPrice": 10
+          },
+          {
+            "barcode": "P158853932-2",
+            "unitId": "68562844",
+            "unitName": "盒",
+            "marketPrice": 50
+          },
+          {
+            "barcode": "P158853932-3",
+            "unitId": "68562842",
+            "unitName": "袋",
+            "marketPrice": 100
+          }
+        ],
+        "mulspec1Name": "规格1",
+        "mulspec1Value": "规格1-value1",
+        "mulspec2Name": "规格2",
+        "mulspec2Value": "g2-v2"
+      },
+      {
+        "code": "P2458797299",
+        "unitPrices": [
+          {
+            "barcode": "P2458797299-1",
+            "unitId": "68562850",
+            "unitName": "辆",
+            "marketPrice": 10
+          },
+          {
+            "barcode": "P2458797299-2",
+            "unitId": "68562844",
+            "unitName": "盒",
+            "marketPrice": 50
+          },
+          {
+            "barcode": "P2458797299-3",
+            "unitId": "68562842",
+            "unitName": "袋",
+            "marketPrice": 100
+          }
+        ],
+        "mulspec1Name": "规格1",
+        "mulspec1Value": "规1-v2",
+        "mulspec2Name": "规格2",
+        "mulspec2Value": "规2-v1"
+      },
+      {
+        "code": "P6458797300",
+        "unitPrices": [
+          {
+            "barcode": "P6458797300-1",
+            "unitId": "68562850",
+            "unitName": "辆",
+            "marketPrice": 10
+          },
+          {
+            "barcode": "P6458797300-2",
+            "unitId": "68562844",
+            "unitName": "盒",
+            "marketPrice": 50
+          },
+          {
+            "barcode": "P6458797300-3",
+            "unitId": "68562842",
+            "unitName": "袋",
+            "marketPrice": 100
+          }
+        ],
+        "mulspec1Name": "规格1",
+        "mulspec1Value": "规1-v2",
+        "mulspec2Name": "规格2",
+        "mulspec2Value": "g2-v2"
+      }
+    ]
+  },
+  "myadd": {
+    "spuName": "商品名称",
+    "brandId": 93,
+    "cateId": 2,
+    "locationId": "首选仓库",
+    "keyword": "搜索关键字",
+    "isMulSpec": true,
+    "isMulUnit": true,
+    "prodTag": 1,
+    "unitList": [
+      { "autoId": 1615448665239, "rate": 1, "unitId": 3 },
+      { "autoId": 1615448665239, "rate": 1, "unitId": 4 },
+      { "autoId": 1615448665239, "rate": 1, "unitId": 5 }
+    ],
+    "mulspecList": [
+      {
+        "autoId": 1615448665799,
+        "code": "CP2021031100238",
+        "imgUrl": "imageUrl",
+        "priceList": [
+          {
+            "discount": 60,
+            "levelId": 1,
+            "levelName": "普通客户",
+            "unitPrices": [{ "price": 5, "unitId": 3 }]
+          }
+        ]
+      }
+    ]
+  },
+  "attrList": [
+    [{ "attrId": 1, "attrValueId": 75 }],
+    [{ "attrId": 1, "attrValueId": 76 }],
+    [{ "attrId": 1, "attrValueId": 77 }]
+  ],
+  "attrList2": [
+    [
+      { "attrId": 1, "attrValueId": 75 },
+      { "attrId": 2, "attrValueId": 1 }
+    ],
+    [
+      { "attrId": 1, "attrValueId": 75 },
+      { "attrId": 2, "attrValueId": 2 }
+    ],
+    [
+      { "attrId": 1, "attrValueId": 76 },
+      { "attrId": 2, "attrValueId": 1 }
+    ],
+    [
+      { "attrId": 1, "attrValueId": 76 },
+      { "attrId": 2, "attrValueId": 2 }
+    ]
+  ],
+  "test1": [
+    { "attrId": 1, "attrValueId": 75 },
+    { "attrId": 1, "attrValueId": 76 }
+  ],
+  "test2": [
+    { "attrId": 2, "attrValueId": 1 },
+    { "attrId": 2, "attrValueId": 2 }
+  ]
+}

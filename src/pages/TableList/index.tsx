@@ -3,7 +3,7 @@ import { Button, message, Input, Drawer } from 'antd';
 import React, { useState, useRef } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
@@ -93,7 +93,7 @@ const TableList: React.FC = () => {
   /** 国际化配置 */
   const intl = useIntl();
 
-  const columns: ProColumns<TableListItem>[] = [
+  const columns: ProColumnType<TableListItem>[] = [
     {
       title: (
         <FormattedMessage

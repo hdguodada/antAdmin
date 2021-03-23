@@ -48,23 +48,33 @@ const Login: React.FC = () => {
   const intl = useIntl();
 
   const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      setInitialState({
-        ...initialState,
-        currentUser: userInfo.data,
-      });
-    }
+    return await initialState?.fetchUserInfo?.();
+    // if (userInfo) {
+    //   setInitialState({
+    //     ...initialState,
+    //     currentUser: userInfo.data,
+    //   });
+    // }
   };
 
   const fetchRouters = async () => {
-    const menuData = await initialState?.fetchRouters?.();
-    if (menuData) {
-      setInitialState({
-        ...initialState,
-        menuData: menuData.data,
-      });
-    }
+    return await initialState?.fetchRouters?.();
+    // if (menuData) {
+    //   setInitialState({
+    //     ...initialState,
+    //     menuData: menuData.data,
+    //   });
+    // }
+  };
+
+  const fetchGlobalData = async () => {
+    return await initialState?.fetchGlobalData?.();
+    // if (globalData) {
+    //   setInitialState({
+    //     ...initialState,
+    //     globalData,
+    //   });
+    // }
   };
 
   const handleSubmit = async (values: LoginParamsType) => {
@@ -76,8 +86,15 @@ const Login: React.FC = () => {
       localStorage.setItem('token', token);
       if (msg.code === 0) {
         message.success('登录成功！');
-        await fetchUserInfo();
-        await fetchRouters();
+        const userInfo = await fetchUserInfo();
+        const menuData = await fetchRouters();
+        const globalData = await fetchGlobalData();
+        setInitialState({
+          ...initialState,
+          currentUser: userInfo?.data,
+          menuData: menuData?.data,
+          globalData,
+        });
         goto();
         return;
       }

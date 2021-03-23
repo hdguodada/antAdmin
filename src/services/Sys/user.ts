@@ -4,7 +4,7 @@ import { request } from 'umi';
  * 获取用户列表
  * @param options
  */
-export async function queryUsers<T>(options: T) {
+export async function queryUsers(options: MyRequest<API.CurrentUser>) {
   return request<MyResponse<API.UserList>>('/sys/user/list', {
     method: 'POST',
     data: options,
@@ -14,12 +14,14 @@ export async function queryUsers<T>(options: T) {
  * 根据id 获取用户详情
  * @param options
  */
-export async function queryUserInfo(id: number | string): Promise<MyResponse<API.CurrentUser>> {
+export async function queryUserInfo(
+  id: API.CurrentUser['userId'],
+): Promise<MyResponse<API.CurrentUser>> {
   return request('/sys/user/info', {
     method: 'POST',
     params: {
-      id
-    }
+      id,
+    },
   });
 }
 
@@ -37,6 +39,19 @@ export async function updUser(params: API.CurrentUser) {
   });
 }
 
+export async function addUser(params: API.CurrentUser) {
+  return request('/sys/user/add', {
+    method: 'POST',
+    data: params,
+  });
+}
+
+export async function resetPassword(): Promise<MyResponse<unknown>> {
+  return request('/sys/user/initpwd', {
+    method: 'POST',
+  });
+}
+
 export async function queryCurrent() {
   return request<MyResponse<API.CurrentUser>>('/sys/user/current', {
     method: 'POST',
@@ -49,11 +64,11 @@ export async function queryRouters(): Promise<any> {
   });
 }
 
-export async function queryUserTypes(options: {
-  pageNumber: number
+export async function queryUserRoles(options: {
+  pageNumber: number;
 }): Promise<MyResponse<API.UserRoleList>> {
   return request('/sys/role/list', {
     method: 'POST',
-    data: options
+    data: options,
   });
 }

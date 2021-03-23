@@ -5,17 +5,18 @@ const Settings: LayoutSettings & {
   logo?: string;
 } = {
   navTheme: 'light',
-  // 拂晓蓝
-  primaryColor: '#1890ff',
+  primaryColor: '#13C2C2',
   layout: 'mix',
   contentWidth: 'Fluid',
   fixedHeader: false,
   fixSiderbar: true,
-  colorWeak: false,
-  title: 'Ant Design Pro',
+  title: '全释爱',
   pwa: false,
-  logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
   iconfontUrl: '',
+  menu: {
+    locale: true,
+  },
+  headerHeight: 48,
 };
 
 export default Settings;

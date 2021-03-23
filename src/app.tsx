@@ -8,8 +8,7 @@ import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import type { RequestOptionsInit, ResponseError } from 'umi-request';
 import { queryCurrent, queryRouters } from './services/Sys/user';
-import { sleep } from '@/utils/utils';
-import { reject } from 'lodash';
+import { queryRegionTree } from './services/Sys';
 // import * as Icons from '@ant-design/icons';
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
@@ -20,13 +19,28 @@ export const initialStateConfig = {
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
+  globalData?: globalData;
   fetchUserInfo?: () => Promise<MyResponse<API.CurrentUser> | undefined>;
   fetchRouters?: () => Promise<MyResponse<API.Routers> | undefined>;
+  fetchGlobalData?: () => Promise<globalData | undefined>;
   menuData?: API.Routers;
+  globalDataLoaded?: boolean;
 }> {
   const fetchUserInfo = async () => {
     try {
       return await queryCurrent();
+    } catch (error) {
+      history.push('/user/login');
+    }
+    return undefined;
+  };
+
+  const fetchGlobalData = async (): Promise<globalData | undefined> => {
+    try {
+      const globalDataList = await Promise.all([queryRegionTree()]);
+      return {
+        RegionTree: globalDataList[0].data.rows,
+      };
     } catch (error) {
       history.push('/user/login');
     }
@@ -52,25 +66,30 @@ export async function getInitialState(): Promise<{
   if (history.location.pathname !== '/user/login') {
     const currentUser = (await fetchUserInfo())?.data;
     if (currentUser) {
-      currentUser.name = currentUser?.RealName;
+      currentUser.name = currentUser?.realName;
     }
+    const globalData = await fetchGlobalData();
     const menuData = (await fetchRouters()) || [];
     return {
       menuData,
       fetchUserInfo,
       currentUser,
+      globalData,
       settings: {},
+      globalDataLoaded: false,
     };
   }
   return {
     fetchUserInfo,
     fetchRouters,
+    fetchGlobalData,
     settings: {},
   };
 }
 
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
+    breadcrumbRender: false,
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     footerRender: () => <Footer />,
@@ -81,8 +100,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         history.push('/user/login');
       }
     },
-    menuDataRender: (menuData) => initialState?.menuData || menuData,
-    menuHeaderRender: undefined,
+    menuDataRender: (menuData) => menuData,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     ...initialState?.settings,
@@ -133,17 +151,26 @@ const errorHandler = (error: ResponseError) => {
 const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
   const token = localStorage.getItem('token');
   const authHeader = { Authorization: `Bearer ${token}` };
+  let endUrl;
+  if (options?.data?.dev) {
+    endUrl = `/dev${url}`;
+  } else {
+    endUrl = BASE_URL + url;
+  }
   return {
-    url: BASE_URL + url,
+    url: endUrl,
     options: { ...options, interceptors: true, headers: authHeader },
   };
 };
 /** 响应拦截 增加延时 */
 const demoResponseInterceptors = async (response: Response) => {
-  await sleep(100);
   const data = await response.clone().json();
+
   if (data.code !== 0) {
-    throw new Error(data.msg);
+    if (data.code === -2) {
+      history.push('/user/login');
+    }
+    return Promise.reject(new Error(data.msg || 'Error'));
   }
   return response;
 };

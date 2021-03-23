@@ -1,14 +1,16 @@
 // https://umijs.org/config/
+import aliyunTheme from '@ant-design/aliyun-theme';
 import { defineConfig } from 'umi';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 
-const { REACT_APP_ENV, BASE_URL } = process.env;
+const { REACT_APP_ENV, BASE_URL, STATIC_URL } = process.env;
 
 export default defineConfig({
+  publicPath: './',
   history: {
-    type: "hash"
+    type: 'hash',
   },
   hash: true,
   antd: {},
@@ -35,20 +37,22 @@ export default defineConfig({
   },
   // umi routes: https://umijs.org/docs/routing
   // Theme for antd: https://ant.design/docs/react/customize-theme-cn
-  theme: {
-    'primary-color': defaultSettings.primaryColor,
-  },
+  // theme: {
+  //   'primary-color': defaultSettings.primaryColor,
+  // },
+  theme: aliyunTheme,
   // esbuild is father build tools
   // https://umijs.org/plugins/plugin-esbuild
   esbuild: {},
   title: false,
-  routes,
+  routes: routes,
   ignoreMomentLocale: true,
   proxy: proxy[REACT_APP_ENV || 'dev'],
   manifest: {
     basePath: '/',
   },
   define: {
-    BASE_URL: BASE_URL
-  }
+    BASE_URL: '',
+    STATIC_URL: STATIC_URL,
+  },
 });

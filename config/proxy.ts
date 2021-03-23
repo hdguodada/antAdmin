@@ -5,8 +5,8 @@
  * For details, please see
  * https://pro.ant.design/docs/deploy
  */
-const { BASE_URL } = process.env
-console.log(BASE_URL)
+const { BASE_URL } = process.env;
+console.log(BASE_URL);
 export default {
   dev: {
     [BASE_URL as string]: {
@@ -14,12 +14,17 @@ export default {
       changeOrigin: true,
       pathRewrite: { ['^' + BASE_URL]: '' },
     },
+    '/dev': {
+      target: 'https://www.hengdianworld.xyz/mock/18',
+      changeOrigin: true,
+      pathRewrite: { ['^' + '/dev']: '' },
+    },
   },
   test: {
-    '/api/': {
-      target: 'https://preview.pro.ant.design',
+    '/dev': {
+      target: 'https://www.hengdianworld.xyz/mock/18',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: { ['^' + '/dev']: '' },
     },
   },
   pre: {
