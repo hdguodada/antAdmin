@@ -1,0 +1,55 @@
+{
+Address: "广东省广州市黄埔区大沙地西7号"
+CreditLevelId: 1
+CreditLevelName: "高"
+CrtDate: "2020-07-20 08:26:33"
+CrtId: null
+CrtName: null
+CustAreaId: 3
+CustAreaName: "华南区域"
+CustCd: "K000124"
+CustId: 1
+CustLevelId: 2
+CustLevelName: "一级代理"
+CustName: "杭州天下娃贸易有限公司"
+CustShort: "天下娃2"
+CustTags: "态度好"
+CustTypeId: 5
+CustTypeName: "实体批发"
+DelFlag: null
+DepId: 14
+DepName: "杭州分公司"
+Email: "xxxxx@xyz.com"
+Fax: null
+HotDesc: "热点"
+HotTypeId: 1
+IndustryId: 0
+Intro: null
+IsHot: 1
+IsPerson: 0
+MainRelId: 7
+Memo: "测试测试ddd123123"
+PcustId: 0
+RegionName: "江苏省 苏州市 吴江市"
+Regioncd: "01320584"
+RelLevelId: 1
+RelLevelName: "一般"
+RelMobile: "13422556856"
+RelName: "张某某"
+RelTel: null
+Salesman: "郭靖"
+SalesmanId: 23
+SeaId: 0
+Share: null
+SortNum: 0
+SourceId: 2
+SourceName: "客户介绍"
+Spell: "GZYTWHFZYXGS"
+State: 0
+Tel: "0571-88666682"
+UpdDate: "2020-09-11 09:40:11"
+UpdId: 1
+UpdName: "张妙权"
+Www: "www.baidu.com"
+ZipCode: "510000"
+}

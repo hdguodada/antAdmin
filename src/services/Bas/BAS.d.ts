@@ -1,0 +1,45 @@
+declare namespace BAS {
+  export type Customer = {
+    CustId: string; // 客户Id
+    PCustId: string; // 上级客户
+    IsPerson: string; // 个人客户
+    CustCd: string; // 客户编号
+    CustName: string; // 客户名称
+    CustShort: string; // 客户简称
+    Spell: string; // 助记码
+    CustLevelId: string; // 客户等级
+    CustTypeId: string; // 客户类别
+    CustTags: string; // 客户标签
+    DepId: string; // 所属部门Id
+    SalesmanId: string; // 所属业务员Id
+    CustAreaId: string; // 所属区域Id
+    Share: string; // 共享给
+    SourceId: string; // 客户来源
+    CreditLevelId: string; // 信用等级
+    RelLevelId: string; // 关系等级
+    Tel: string; // 公司电话
+    Fax: string; // 公司传真
+    Regioncd: string; // 所在地区
+    Address: string; // 详细地址
+    ZipCode: string; // 邮政编码
+    WWW: string; // 公司网址
+    Email: string; // 公司邮箱
+    IndustryId: string; // 所属行业
+    Intro: string; // 公司简介
+    IsHot: string; // 热点客户
+    HotTypeId: string; // 热点分类
+    HotDesc: string; // 热点说明
+    MainRelId: string; // 主联系人Id
+    SortNum: string; // 显示顺序
+    SeaId: string; // 所属公海
+    Memo: string; // 备注
+    State: string; // 状态
+    DelFlag: string; // 删除标志
+    CrtId: string; // 添加人Id
+    CrtName: string; // 添加人
+    CrtDate: string; // 添加日期
+    UpdId: string; // 修改人Id
+    UpdName: string; // 修改人
+    UpdDate: string; // 修改日期
+  };
+}
