@@ -1,8 +1,9 @@
-import { inBalance } from '@/services/Store/serNum';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import React, { useState } from 'react';
+import { purchaseOrderListByDetail as inBalance } from '@/services/Purchase';
+
 import {
   baseUnitIdColumns,
   cateIdColumns,
@@ -12,7 +13,7 @@ import {
   secondUnitColumns,
   skuIdColumns,
 } from '@/utils/columns';
-import { useModel } from '@@/plugin-model/useModel';
+import { useModel } from 'umi';
 
 export default () => {
   const { valueEnum } = useModel('store', (model) => ({ valueEnum: model.valueEnum }));

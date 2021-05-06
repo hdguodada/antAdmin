@@ -8,9 +8,8 @@ import { TreeSelect } from 'antd';
 import { queryPdRecordList } from '@/services/Store';
 import { DatePicker } from 'antd';
 import moment from 'moment';
-import { useModel } from '@@/plugin-model/useModel';
 import GlobalWrapper from '@/components/GlobalWrapper';
-import { history } from 'umi';
+import { history, useModel } from 'umi';
 import { BussTypeComponentUrl } from '@/pages/Purchase/components';
 
 export const InventoryTable: React.FC = () => {

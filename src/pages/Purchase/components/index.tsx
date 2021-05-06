@@ -44,11 +44,7 @@ import { getCurrentStock, getSkuStock } from '@/services/Store';
 import CustomerSelect from '@/pages/Bas/customer/customerSelect';
 
 export const CheckAudit = ({ checkStatus }: { checkStatus: boolean }) => {
-  return checkStatus ? (
-    <img src={AuditImage} style={{ position: 'absolute', right: '200px', top: '100px' }} alt="" />
-  ) : (
-    <div />
-  );
+  return checkStatus ? <img src={AuditImage} alt="" style={{ marginRight: '100px' }} /> : <div />;
 };
 
 export const SupplierSelect: React.FC<{
@@ -939,8 +935,13 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
         };
         if ([BussType.购货单, BussType.购货退货单].indexOf(bussType) > -1) {
           const { srcGhddBillId, srcGhdBillId } = (location as any).query;
-          if (srcGhddBillId || srcGhdBillId) {
-            const ttt = srcGhddBillId ? '/bis/purcOrder/infoUnStockIn' : '/bis/purchase/infoReturn';
+          // srcGhddBillId, srcGhdBillId 只存在一个,
+          if (srcGhddBillId) {
+            // 如果当前页面是购货单,则是生成购货单, 如果是退货单,则是从购货订单生成退货单
+            const ttt =
+              bussType === BussType.购货单
+                ? '/bis/purcOrder/infoUnStockIn'
+                : '/bis/purcOrder/infoReturnable';
             const srcGhdd = (
               await queryPurchaseUnStockIn(srcGhddBillId || srcGhdBillId, undefined, ttt)
             ).data;
@@ -950,6 +951,32 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
               srcGhddBillNo: [
                 {
                   billId: srcGhddBillId,
+                  billNo: srcGhdd.billNo,
+                },
+              ],
+              srcDtlId: i.dtlId,
+            }));
+            setEditableKeys(entries?.map((i) => i.autoId));
+            res = {
+              ...res,
+              ...srcGhdd,
+              entries,
+              billNo,
+              bussType,
+            };
+          }
+          if (srcGhdBillId) {
+            // 从购货单生成退货单
+            const ttt = '/bis/purchase/infoReturn';
+            const srcGhdd = (
+              await queryPurchaseUnStockIn(srcGhddBillId || srcGhdBillId, undefined, ttt)
+            ).data;
+            const entries = srcGhdd.entries?.map((i) => ({
+              ...i,
+              autoId: +(Math.random() * 1000000).toFixed(0),
+              srcGhdBillNo: [
+                {
+                  billId: srcGhdBillId,
                   billNo: srcGhdd.billNo,
                 },
               ],
@@ -1007,6 +1034,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
       title={initValues.title}
       loading={loading}
       footer={[
+        <CheckAudit checkStatus={checked} key={'checkImg'} />,
         <Space key="action">
           {isInfo ? (
             <>
@@ -1039,7 +1067,6 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
         />,
         <Button key="refresh" type={'dashed'} onClick={refresh} children={'刷新'} />,
       ]}
-      extra={<CheckAudit checkStatus={checked} />}
       content={
         <ProForm<PUR.Purchase>
           onFinish={async (values) => {

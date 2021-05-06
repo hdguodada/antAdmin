@@ -131,7 +131,10 @@ export async function queryPurchaseInfo(
 export async function queryPurchaseUnStockIn(
   id: React.Key,
   headers = { modId: mapModId.purchaseGhdd },
-  url: '/bis/purcOrder/infoUnStockIn' | '/bis/purchase/infoReturn',
+  url:
+    | '/bis/purcOrder/infoUnStockIn'
+    | '/bis/purchase/infoReturn'
+    | '/bis/purcOrder/infoReturnable',
 ): Promise<InfoResponse<PUR.Purchase>> {
   return request(url, { method: 'GET', params: { id }, headers });
 }
