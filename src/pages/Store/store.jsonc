@@ -1,0 +1,107 @@
+{
+  "deliverDetail": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "rows|5": [
+        {
+          "date": "2021-03-31",
+          "in": {
+            "qty": "5", // 入库数量
+            "baseInQty": "50", // 基本单位数量
+            "cost": "3,500.00", //成本
+            "unitCost": "70.00" // 单位成本
+          },
+          "out": {
+            "qty": "5", // 入库数量
+            "baseOutQty": "50", // 基本单位数量
+            "cost": "3,500.00", //成本
+            "unitCost": "70.00" // 单位成本
+          },
+          "total": {
+            // 结存
+            "unitCost": "70.00", // 单位成本
+            "cost": "3,500.00", //成本
+            "qty": "50" // 数量
+          },
+          "spec": "MacBook Air",
+          "skuName": "示例(笔记本)",
+          "billNo": "GH20210331001",
+          "code": "SL001768",
+          "suppName": "800008 供应商(示例)",
+          "storeCd": "CK001",
+          "unitName": "盒(10个)",
+          "cateName": "默认分类",
+          "storeName": "默认仓库",
+          "memo": ""
+        }
+      ]
+    }
+  },
+  "库存余额表": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "rows|5": [
+        {
+          "code": "SL001768",
+          "skuName": "示例(笔记本)",
+          "cateName": "默认分类",
+          "spec": "MacBook Air",
+          "baseUnitName": "个",
+          "secondUnit": "1箱=10盒=100个",
+          "baseUnitId": "@id",
+          "storeList|3": [
+            {
+              "storeCd": "@id",
+              "storeName": "@cname",
+              "qty": 1550,
+              "secondQty": "15箱5盒",
+              "inunitCost": "70.00",
+              "cost": "108,500.00"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "其他入库单": {
+    "date": "2021-03-31",
+    "billNo": "@id",
+    "checkName": "",
+    "checked": 0, // 审核人
+    "memo": "", // 备注
+    "autoId": "@id",
+    "totalAmount": 300, // 金额
+    "totalQty": 10, // 数量
+    "transType": 150706, // 业务类别还是有用的,
+    "transTypeName": "其他入库",
+    "crtName": "guo", // 制单人,
+    "entries": [
+      // skuList
+      {
+        "skuId": "330000199602166348",
+        "skuImageUrl": "http://dummyimage.com/400x400",
+        "skuName": "贺霞",
+        "unitId": 6, // 入库单位
+        "rate": 10,
+        "unitList": [
+          { "rate": 1, "unitId": 3, "unitName": "武秀英" },
+          { "rate": 10, "unitId": 6, "unitName": "张娜" }
+        ],
+        "storeCd": "C01", // 仓库id
+        "price": 5, // 购货单价 对应所选单位unitId
+        "qty": 5, //入库数量
+        "basQty": 50, //基本数量 qty * rate 此时rate === 10
+        "amount": 47.5, // 购货金额price  * rate -   price * rate * 0.05
+        "serNumList|5": [
+          {
+            "autoId": "@id",
+            "serNum": "@id",
+            "desc": "@cname"
+          }
+        ]
+      }
+    ]
+  }
+}

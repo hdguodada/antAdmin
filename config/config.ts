@@ -5,7 +5,7 @@ import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 
-const { REACT_APP_ENV, BASE_URL, STATIC_URL } = process.env;
+const { REACT_APP_ENV, STATIC_URL } = process.env;
 
 export default defineConfig({
   publicPath: './',

@@ -5,8 +5,8 @@ export default () => {
   const [list, setList] = useState<BAS.CustArea[]>([]);
   const [tree, setTreeList] = useState<BAS.CustArea[]>([]);
   const [treeDataSimpleMode, setTreeDataSimpleMode] = useState<TreeData>([]);
-  const queryCustArea = useCallback(async (options) => {
-    const response = await query(options);
+  const queryCustArea = useCallback(async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
+    const response = await query(data, headers);
     setList(response.data.rows);
     setTreeDataSimpleMode(
       response.data.rows.map((i) => ({
@@ -18,11 +18,14 @@ export default () => {
     );
     return response;
   }, []);
-  const queryCustAreaTree = useCallback(async (options) => {
-    const response = await queryTree(options);
-    setTreeList(response.data.rows);
-    return response;
-  }, []);
+  const queryCustAreaTree = useCallback(
+    async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
+      const response = await queryTree(data, headers);
+      setTreeList(response.data.rows);
+      return response;
+    },
+    [],
+  );
 
   return {
     list,

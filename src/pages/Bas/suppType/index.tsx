@@ -2,18 +2,22 @@ import React, { useRef, useState } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { useModel } from 'umi';
-import DelPopconfirm from '@/components/DelPopconfirm';
 import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import CustTypeForm from './form';
+import CateType from './form';
 import { delSuppType } from '@/services/Bas';
+import { dateColumns, optionColumns, stateColumns } from '@/utils/columns';
 
 const SuppType: React.FC<{
   columns?: ProColumns<BAS.SuppType>[];
 }> = () => {
   const actionRef = useRef<ActionType>();
+  const { tree, queryTree } = useModel('suppType', (model) => ({
+    tree: model.tree,
+    queryTree: model.queryTree,
+  }));
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<BAS.CustType>>({});
+  const [modalFormInit, setModalFormInit] = useState<Partial<BAS.SuppType>>({});
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const columns: ProColumns<BAS.SuppType>[] = [
     {
@@ -21,91 +25,59 @@ const SuppType: React.FC<{
       dataIndex: 'suppTypeName',
       search: false,
     },
-    {
-      title: '状态',
-      dataIndex: 'state',
-      valueType: 'select',
-      valueEnum: () => {
-        return new Map([
-          [1, { text: '正常', status: 'Success' }],
-          [0, { text: '禁用', status: 'Error' }],
-        ]);
+    stateColumns,
+    dateColumns(),
+    optionColumns({
+      modify: async ({ record }) => {
+        setFormAction('upd');
+        setModalFormInit(record);
+        setModalVisit(true);
       },
-    },
+      del: async ({ record }) => {
+        await delSuppType([record.suppTypeId]).then(() => {
+          queryTree();
+        });
+      },
+      fixed: 'right',
+    }),
   ];
-  columns.push({
-    title: '操作',
-    key: 'action',
-    valueType: 'option',
-    render: (_, entity, _index, action) => {
-      return [
-        <a
-          key="editable"
-          onClick={() => {
-            setFormAction('upd');
-            setModalFormInit(entity);
-            setModalVisit(true);
-          }}
-        >
-          修改
-        </a>,
-        <DelPopconfirm
-          key="del"
-          onConfirm={async () => {
-            await delSuppType([entity.suppTypeId]);
-            action.reload();
-          }}
-        />,
-      ];
-    },
-  });
-  const { query, queryTree } = useModel('suppType', (model) => ({
-    query: model.query,
-    queryTree: model.queryTree,
-  }));
+
   return (
     <>
-      <ProTable<BAS.SuppType>
-        size="small"
-        expandable={{
-          defaultExpandAllRows: true,
-        }}
-        pagination={false}
-        search={false}
-        rowKey="suppTypeId"
-        actionRef={actionRef}
-        bordered
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            onClick={() => {
-              setFormAction('add');
-              setModalFormInit({});
-              setModalVisit(true);
-            }}
-          >
-            <PlusOutlined />
-            新建
-          </Button>,
-        ]}
-        columns={columns}
-        request={async () => {
-          query({ pageNumber: -1 });
-          const response = await queryTree();
-          return {
-            data: response.data.rows,
-            success: response.code === 0,
-            total: response.data.total,
-          };
-        }}
-        postData={(values) => values[0].children}
-      />
-      <CustTypeForm
+      {tree.length > 0 && (
+        <ProTable<BAS.SuppType>
+          pagination={false}
+          search={false}
+          rowKey="suppTypeId"
+          actionRef={actionRef}
+          toolBarRender={() => [
+            <Button
+              type="primary"
+              onClick={() => {
+                setFormAction('add');
+                setModalFormInit({});
+                setModalVisit(true);
+              }}
+            >
+              <PlusOutlined />
+              新建
+            </Button>,
+          ]}
+          expandable={{
+            defaultExpandAllRows: true,
+          }}
+          dataSource={tree[0].children}
+          columns={columns}
+          options={false}
+        />
+      )}
+
+      <CateType
         action={formAction}
         visible={modalVisit}
         actionRef={actionRef}
         setVisible={setModalVisit}
-        initialValues={modalFormInit}
+        initialValues={modalFormInit as BAS.SuppType}
       />
     </>
   );

@@ -1,33 +1,29 @@
 import { PageContainer } from '@ant-design/pro-layout';
 import React from 'react';
-import Cust from './cust';
-import Store from '@/pages/Bas/store';
 import Product from './product';
+import SuppType from '../suppType';
+import Cust from './cust';
 
 export default () => {
   return (
     <PageContainer
-      title={false}
       tabList={[
         {
-          tab: '客戶',
-          key: 'level',
+          tab: '客户辅助资料',
+          key: 'Cust',
           children: <Cust />,
         },
         {
-          tab: '产品',
-          key: 'product',
+          tab: '商品辅助资料',
+          key: 'Brand',
           children: <Product />,
         },
         {
-          tab: '仓库',
-          key: 'store',
-          children: <Store />,
+          tab: '供应商类别',
+          key: 'SuppType',
+          children: <SuppType />,
         },
       ]}
-      tabProps={{
-        defaultActiveKey: 'product',
-      }}
     />
   );
 };

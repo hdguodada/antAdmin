@@ -1,38 +1,45 @@
-import React, { useState, useRef } from 'react';
-import ProCard from '@ant-design/pro-card';
+import React, { useRef } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { querySuppliers, querySuppliersInfo } from '@/services/Bas';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import SupplierForm from './form';
-import { transformRegionCd } from '@/utils/utils';
-import { useModel } from '@/.umi/plugin-model/useModel';
+import { delSupplier, querySuppliers } from '@/services/Bas';
+import { PageContainer } from '@ant-design/pro-layout';
+import {
+  baseSearch,
+  checkStatus,
+  indexColumns,
+  stateColumns,
+  tableAlertOptionRenderDom,
+} from '@/utils/columns';
+import { history } from 'umi';
+import BatchDel from '@/components/DelPopconfirm';
+import { useState } from 'react';
+import AddSuppForm from './addForm';
+import { Button, message } from 'antd';
+import { check } from '@/services';
+import { mapModId } from '@/utils/utils';
 
 export const Supplier: React.FC<{
   select: boolean;
-  onChange?: (value: { label: string; value: React.Key }) => void;
-}> = ({ select, onChange }) => {
+  onChange?: (value: BAS.Supplier) => void;
+  selectParams?: { state: number; checkStatus: number };
+}> = ({ select, onChange, selectParams }) => {
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<BAS.Supplier>>({});
+  const [modalFormInit, setModalFormInit] = useState<BAS.Supplier>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
-  const { options } = useModel('suppType', (model) => ({ options: model.options }));
   const columns: ProColumns<BAS.Supplier>[] = [
-    {
-      dataIndex: 'index',
-      valueType: 'index',
-      width: 50,
-    },
+    indexColumns,
     {
       dataIndex: 'suppId',
       title: '供应商类别',
       valueType: 'select',
       hideInTable: true,
-      request: async () => options,
+      render: (_, record) => <div>{record.suppTypeName}</div>,
+      search: false,
     },
     {
       dataIndex: 'keyword',
-      title: '关键字',
+      title: '快速查询',
       hideInTable: true,
     },
     {
@@ -50,18 +57,12 @@ export const Supplier: React.FC<{
       dataIndex: 'mainRelId',
       title: '首要联系人',
       search: false,
+      render: (_, record) => <div>{record.relName}</div>,
     },
     {
       key: 'relMobile',
       dataIndex: 'relMobile',
       title: '手机',
-      search: false,
-      hideInTable: select,
-    },
-    {
-      key: 'tel',
-      dataIndex: 'tel',
-      title: '座机',
       search: false,
       hideInTable: select,
     },
@@ -86,52 +87,31 @@ export const Supplier: React.FC<{
       search: false,
       hideInTable: select,
     },
-    {
-      title: '状态',
-      dataIndex: 'state',
-      valueType: 'select',
-      search: false,
-      hideInTable: select,
-      valueEnum: () => {
-        return new Map([
-          [1, { text: '正常', status: 'Success' }],
-          [0, { text: '禁用', status: 'Error' }],
-        ]);
-      },
-    },
+    checkStatus(undefined),
+    stateColumns,
   ];
   columns.push({
     title: '操作',
     key: 'action',
     valueType: 'option',
-    width: 150,
-    render: (_, entity) => {
+    width: 120,
+    render: (_, record) => {
       return !select
         ? [
             <a
               key="editable"
-              onClick={async () => {
-                setFormAction('upd');
-                const res = (await querySuppliersInfo(entity.suppId)).data;
-                res.regioncdMid = transformRegionCd(res.regioncd);
-                setModalFormInit(res);
-                setModalVisit(true);
+              onClick={() => {
+                history.push(`/bas/supplier/${record.suppId}`);
               }}
             >
-              修改
-            </a>,
-            <a key="del" className="error-color">
-              删除
+              视图
             </a>,
           ]
         : [
             <a
               key="editable"
               onClick={async () => {
-                onChange?.({
-                  label: entity.suppName,
-                  value: entity.suppId,
-                });
+                onChange?.(record);
               }}
             >
               选择
@@ -141,28 +121,30 @@ export const Supplier: React.FC<{
   });
   return (
     <>
-      <SupplierForm
-        action={formAction}
+      <AddSuppForm
         visible={modalVisit}
-        actionRef={actionRef}
-        setVisible={setModalVisit}
         initialValues={modalFormInit}
+        action={formAction}
+        setVisible={setModalVisit}
       />
-      <ProTable<BAS.Supplier>
-        pagination={{
-          pageSize: 10,
-        }}
+      <ProTable<BAS.Supplier, { state: number; checkStatus: number }>
         rowKey="suppId"
         actionRef={actionRef}
-        bordered
+        options={false}
+        search={baseSearch({
+          fn: () => {
+            setFormAction('add');
+            setModalFormInit(undefined);
+            setModalVisit(true);
+          },
+        })}
         columns={columns}
+        params={selectParams}
         request={async (params) => {
           const response = await querySuppliers({
             ...params,
             pageNumber: params.current,
-            queryFilter: {
-              ...params,
-            },
+            queryFilter: params,
           });
           return {
             data: response.data.rows,
@@ -170,17 +152,64 @@ export const Supplier: React.FC<{
             total: response.data.total,
           };
         }}
+        rowSelection={select ? false : {}}
+        tableAlertOptionRender={({ selectedRowKeys, selectedRows }) => {
+          return tableAlertOptionRenderDom([
+            <BatchDel
+              key="del"
+              onConfirm={async () => {
+                await delSupplier(selectedRowKeys);
+                actionRef.current?.reload();
+              }}
+            />,
+            <Button
+              key="check"
+              onClick={async () => {
+                const ids: React.Key[] = [];
+                selectedRows.forEach((i) => {
+                  if (i.checkStatus !== 2) {
+                    ids.push(i.suppId);
+                  }
+                });
+                await check({
+                  url: '/bas/supplier/check',
+                  data: {
+                    ids,
+                    checkStatus: 2,
+                  },
+                  headers: { modId: mapModId.supplier },
+                });
+                message.success('审核成功');
+                actionRef.current?.reload();
+              }}
+            >
+              审核
+            </Button>,
+            <Button
+              key="uncheck"
+              type="dashed"
+              onClick={async () => {
+                await check({
+                  url: '/bas/supplier/check',
+                  data: {
+                    ids: selectedRowKeys,
+                    checkStatus: 3,
+                  },
+                  headers: { modId: mapModId.supplier },
+                });
+                message.success('反审核成功');
+                actionRef.current?.reload();
+              }}
+            >
+              反审核
+            </Button>,
+          ]);
+        }}
       />
     </>
   );
 };
 
 export default () => {
-  return (
-    <PageHeaderWrapper title={false}>
-      <ProCard split="vertical">
-        <Supplier select={false} />
-      </ProCard>
-    </PageHeaderWrapper>
-  );
+  return <PageContainer content={<Supplier select={false} />} />;
 };

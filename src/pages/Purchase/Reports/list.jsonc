@@ -1,0 +1,555 @@
+{
+  "purchaseGhdd": {
+    "code": 0,
+    "data": {
+      "rows": [
+        {
+          // sku行,根据skuId排序
+          "autoId": "@id", // 唯一key
+          "code": "@id", // sku编号
+          "spuName": "@cname",
+          "skuName": "@cname",
+          "unitNameName": "@cname",
+          "date": "@date", // 订单日期
+          "billNo": "@id", // 采购订单编号
+          "suppName": "@cname", //代理商名称
+          "storeName": "入库仓库",
+          "status": "部分入库", // 入库状态
+          "qty": "100", //订单数量
+          "price": "10", // 单价
+          "amount": "1000", // 采购总金额
+          "unQty": "100", //未入库数量
+          "unAmount": "1000", // 未入库金额
+          "deliveryDate": "@date", // 预计交货日期
+          "inDate": "@date", // 入库日期
+          "memo": "@csentence",
+          "baseQty": 100
+        },
+        {
+          // sku行,根据skuId排序
+          "autoId": "@id",
+          "code": "@id", // sku编号
+          "skuName": "@cname",
+          "spuName": "@cname",
+          "unitNameName": "@cname",
+          "date": "@date", // 订单日期
+          "billNo": "@id", // 采购订单编号
+          "suppName": "@cname", //代理商名称
+          "storeName": "入库仓库",
+          "status": "部分入库", // 入库状态
+          "qty": "100", //订单数量
+          "price": "10", // 单价
+          "amount": "1000", // 采购总金额
+          "unQty": "100", //未入库数量
+          "unAmount": "1000", // 未入库金额
+          "deliveryDate": "@date", // 预计交货日期
+          "inDate": "@date", // 入库日期
+          "memo": "@csentence",
+          "baseQty": 100
+        },
+        {
+          // sku行,根据skuId排序
+          "autoId": "@id",
+          "code": "@id", // sku编号
+          "skuName": "@cname",
+          "spuName": "@cname",
+          "unitNameName": "@cname",
+          "date": "@date", // 订单日期
+          "billNo": "@id", // 采购订单编号
+          "suppName": "@cname", //代理商名称
+          "storeName": "入库仓库",
+          "status": "部分入库", // 入库状态
+          "qty": "100", //订单数量
+          "price": "10", // 单价
+          "amount": "1000", // 采购总金额
+          "unQty": "100", //未入库数量
+          "unAmount": "1000", // 未入库金额
+          "deliveryDate": "@date", // 预计交货日期
+          "inDate": "@date", // 入库日期
+          "memo": "@csentence",
+          "baseQty": 100
+        },
+
+        {
+          "autoId": "@id",
+          "status": "小计", // 小计行, 对上方的skuId的统计行
+          "qty": "201.0000000000",
+          "amount": "10.00",
+          "unQty": "-79.0000000000",
+          "unAmount": "10.00"
+        },
+        {
+          // sku行,根据skuId排序
+          "autoId": "@id",
+          "code": "@id", // sku编号
+          "skuName": "@cname",
+          "spuName": "@cname",
+          "unitNameName": "@cname",
+          "date": "@date", // 订单日期
+          "billNo": "@id", // 采购订单编号
+          "suppName": "@cname", //代理商名称
+          "storeName": "入库仓库",
+          "status": "部分入库", // 入库状态
+          "qty": "100", //订单数量
+          "price": "10", // 单价
+          "amount": "1000", // 采购总金额
+          "unQty": "100", //未入库数量
+          "unAmount": "1000", // 未入库金额
+          "deliveryDate": "@date", // 预计交货日期
+          "inDate": "@date", // 入库日期
+          "memo": "@csentence",
+          "baseQty": 100
+        },
+        {
+          // sku行,根据skuId排序
+          "autoId": "@id",
+          "code": "@id", // sku编号
+          "skuName": "@cname",
+          "spuName": "@cname",
+          "unitNameName": "@cname",
+          "date": "@date", // 订单日期
+          "billNo": "@id", // 采购订单编号
+          "suppName": "@cname", //代理商名称
+          "storeName": "入库仓库",
+          "status": "部分入库", // 入库状态
+          "qty": "100", //订单数量
+          "price": "10", // 单价
+          "amount": "1000", // 采购总金额
+          "unQty": "100", //未入库数量
+          "unAmount": "1000", // 未入库金额
+          "deliveryDate": "@date", // 预计交货日期
+          "inDate": "@date", // 入库日期
+          "memo": "@csentence",
+          "baseQty": 100
+        },
+        {
+          // sku行,根据skuId排序
+          "autoId": "@id",
+          "code": "@id", // sku编号
+          "skuName": "@cname",
+          "spuName": "@cname",
+          "unitNameName": "@cname",
+          "date": "@date", // 订单日期
+          "billNo": "@id", // 采购订单编号
+          "suppName": "@cname", //代理商名称
+          "storeName": "入库仓库",
+          "status": "部分入库", // 入库状态
+          "qty": "100", //订单数量
+          "price": "10", // 单价
+          "amount": "1000", // 采购总金额
+          "unQty": "100", //未入库数量
+          "unAmount": "1000", // 未入库金额
+          "deliveryDate": "@date", // 预计交货日期
+          "inDate": "@date", // 入库日期
+          "memo": "@csentence",
+          "baseQty": 100
+        },
+
+        {
+          "autoId": "@id",
+          "status": "小计", // 小计行, 对上方的skuId的统计行
+          "qty": "201.0000000000",
+          "amount": "10.00",
+          "unQty": "-79.0000000000",
+          "unAmount": "10.00"
+        },
+        {
+          "autoId": "@id",
+          "status": "合计", // 总计行 对所有的统计行
+          "qty": "40,835.0000000000",
+          "amount": "103,418.69",
+          "unQty": "40,189.0000000000",
+          "unAmount": "99,470.07"
+        }
+      ]
+    }
+  },
+  "purchaseOrderListByDetail": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "rows": [
+        {
+          "date": "2021-03-03",
+          "billNo": "GHD2021030300001",
+          "suppName": "002 双龙电瓶",
+          "code": "000001",
+          "skuName": "电焊机",
+          "unitNameName": "台",
+          "skuId": 0,
+          "storeName": "松亚",
+          "storeId": "00001",
+          "qty": "5.000",
+          "baseQty": "5.000",
+          "price": "11,000.0000",
+          "amount": "55,000.00",
+
+          "tax": "",
+          "taxPrice": "11,000.0000",
+          "taxAmount": "55,000.00",
+          "taxRate": "",
+          "baseUnitNameName": "台",
+          "srcGhddBillNo": "@id"
+        },
+        {
+          "date": "2021-03-15",
+          "billNo": "GHD2021031500001",
+          "suppName": "001 万洋电瓶",
+          "code": "001",
+          "skuName": "苹果",
+          "cateName": "日用品",
+          "unitName": "斤",
+          "skuId": 0,
+          "storeName": "总仓1",
+          "storeId": "0000001",
+          "qty": "30.000",
+          "baseQty": "30.000",
+          "price": "12.0000",
+          "amount": "360.00",
+          "tax": "",
+          "taxPrice": "12.0000",
+          "taxAmount": "360.00",
+          "taxRate": "",
+          "baseUnitName": "斤",
+          "srcGhddBillNo": 79139242987490
+        },
+        {
+          "date": "2021-03-15",
+          "billNo": "GHD2021031500001",
+          "billId": 79139242987491,
+          "billType": "PUR",
+          "suppName": "001 万洋电瓶",
+          "code": "001",
+          "invNo": "(1001)223339",
+          "skuName": "香蕉",
+          "cateName": "日用品",
+          "unitName": "斤",
+          "skuId": 0,
+          "secondUnit": "",
+          "secondQty": "",
+          "storeName": "总仓1",
+          "storeId": "0000001",
+          "qty": "20.000",
+          "baseQty": "20.000",
+          "price": "14.0000",
+          "amount": "280.00",
+
+          "transType": "购货",
+          "tax": "",
+          "taxPrice": "14.0000",
+          "taxAmount": "280.00",
+          "taxRate": "",
+
+          "baseUnitName": "斤",
+          "srcGhddBillNo": 79139242987490,
+          "srcOrderNo": "CGDD20210315001"
+        },
+        {
+          "date": "2021-03-17",
+          "billNo": "CG20210317001",
+          "billId": 79139242987499,
+          "billType": "PUR",
+          "suppName": "GYS-0001 老李花市",
+          "code": "GYS-0001",
+          "invNo": "SP-0001",
+          "skuName": "玫瑰花",
+          "cateName": "",
+          "spec": "MG-0001",
+          "unitName": "朵",
+          "skuId": 0,
+          "secondUnit": "",
+          "secondQty": "",
+          "storeName": "沧州仓库",
+          "storeId": "CK0001",
+          "qty": "-200.000",
+          "baseQty": "-200.000",
+          "price": "9.0000",
+          "amount": "-1,800.00",
+
+          "transType": "退货",
+          "tax": "",
+          "taxPrice": "9.0000",
+          "taxAmount": "-1,800.00",
+          "taxRate": "",
+
+          "baseUnitName": "朵",
+          "srcGhddBillNo": 0
+        },
+        {
+          "date": "2021-03-17",
+          "billNo": "GHD2021031700001",
+          "billId": 79139242987495,
+          "billType": "PUR",
+          "suppName": "GYS-0001 老李花市",
+          "code": "GYS-0001",
+          "invNo": "SP-0001",
+          "skuName": "玫瑰花",
+          "cateName": "",
+          "spec": "MG-0001",
+          "unitName": "朵",
+          "skuId": 0,
+          "secondUnit": "",
+          "secondQty": "",
+          "storeName": "沧州仓库",
+          "storeId": "CK0001",
+          "qty": "1,000.000",
+          "baseQty": "1,000.000",
+          "price": "9.0000",
+          "amount": "9,000.00",
+
+          "transType": "购货",
+          "tax": "900.00",
+          "taxPrice": "9.9000",
+          "taxAmount": "9,900.00",
+          "taxRate": "10.00",
+
+          "baseUnitName": "朵",
+          "srcGhddBillNo": 79139242987494,
+          "srcOrderNo": "CGDD20210317001"
+        },
+        {
+          "date": "2021-03-29",
+          "billNo": "GHD2021032900002",
+          "billId": 79139242987518,
+          "billType": "PUR",
+          "suppName": "s001 中集",
+          "code": "s001",
+          "invNo": "(1001)2233372",
+          "skuName": "模具",
+          "cateName": "",
+          "skuId": 0,
+          "secondUnit": "",
+          "secondQty": "",
+          "storeName": "总仓1",
+          "storeId": "0000001",
+          "qty": "100.000",
+          "baseQty": "100.000",
+          "price": "200.0000",
+          "amount": "20,000.00",
+
+          "transType": "购货",
+          "tax": "",
+          "taxPrice": "200.0000",
+          "taxAmount": "20,000.00",
+          "taxRate": "",
+
+          "srcGhddBillNo": 79139242987517,
+          "srcOrderNo": "CGDD20210329002"
+        },
+        {
+          // 总计行
+          "amount": "82,840.00",
+          "baseQty": "955.000",
+          "qty": "955.000",
+          "tax": "900.00",
+          "taxAmount": "83,740.00",
+          "price": "86.7435"
+        }
+      ]
+    }
+  },
+  "sku": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "rows": [
+        {
+          "autoId": "@id",
+          "code": "@id",
+          "skuName": "模具",
+          "cateName": "@cname",
+          "skuId": "@id",
+          "storeName": "@cname",
+          "storeCd": "@id",
+          "spec": "规格型号",
+          "secondUnit": "1箱=10盒=100个", // 单位比例
+          "secondQty": "10箱5盒", // 仓库各副单位的状况,不需要展示基本单位的数量
+          "baseUnitName": "个",
+          "baseQty": "100.000",
+          "price": "200.0000",
+          "amount": "20,000.00",
+          "tax": "",
+          "taxPrice": "",
+          "taxAmount": "20,000.00",
+          "taxRate": ""
+        },
+        {
+          "autoId": "@id",
+          "suppTypeName": "日用品",
+          "billId": 0,
+          "billType": "PUR",
+          "invNo": "(1001)223338",
+          "skuName": "苹果",
+          "cateName": "",
+          "unit": "斤",
+          "skuId": 0,
+          "spec": "规格型号",
+          "secondUnit": "1箱=10盒=100个", // 单位比例
+          "secondQty": "10箱5盒", // 仓库各副单位的状况,不需要展示基本单位的数量
+          "storeName": "总仓1",
+          "storeCd": "0000001",
+          "qty": "30.000",
+          "price": "12.0000",
+          "amount": "360.00",
+
+          "tax": "",
+          "taxPrice": "",
+          "taxAmount": "360.00",
+          "taxRate": "",
+
+          "baseUnit": "斤"
+        },
+        {
+          "autoId": "@id",
+          "suppTypeName": "日用品",
+          "billId": 0,
+          "billType": "PUR",
+          "invNo": "(1001)223339",
+          "skuName": "香蕉",
+          "cateName": "",
+          "unit": "斤",
+          "skuId": 0,
+          "secondUnit": "",
+          "secondQty": "",
+          "storeName": "总仓1",
+          "storeCd": "0000001",
+          "qty": "20.000",
+          "price": "14.0000",
+          "amount": "280.00",
+
+          "tax": "",
+          "taxPrice": "",
+          "taxAmount": "280.00",
+          "taxRate": "",
+
+          "baseUnit": "斤"
+        },
+        {
+          "autoId": "@id",
+          "billId": 0,
+          "billType": "PUR",
+          "invNo": "000001",
+          "skuName": "电焊机",
+          "cateName": "",
+          "spec": "400TX",
+          "unit": "台",
+          "skuId": 0,
+          "secondUnit": "",
+          "secondQty": "",
+          "storeName": "松亚",
+          "storeCd": "00001",
+          "qty": "5.000",
+          "price": "11,000.0000",
+          "amount": "55,000.00",
+
+          "tax": "",
+          "taxPrice": "",
+          "taxAmount": "55,000.00",
+          "taxRate": "",
+
+          "baseUnit": "台"
+        },
+        {
+          "autoId": "@id",
+          "billId": 0,
+          "billType": "PUR",
+          "invNo": "SP-0001",
+          "skuName": "玫瑰花",
+          "cateName": "",
+          "spec": "MG-0001",
+          "unit": "朵",
+          "skuId": 0,
+          "secondUnit": "",
+          "secondQty": "",
+          "storeName": "沧州仓库",
+          "storeCd": "CK0001",
+          "qty": "800.000",
+          "price": "9.0000",
+          "amount": "7,200.00",
+
+          "tax": "900.00",
+          "taxPrice": "",
+          "taxAmount": "8,100.00",
+          "taxRate": "",
+
+          "baseUnit": "朵"
+        },
+        {
+          "cateName": "合计",
+          "autoId": "@id",
+          // 统计行
+          "amount": 82840,
+          "qty": 955,
+          "tax": 900,
+          "taxAmount": 83740,
+          "taxPrice": 0,
+          "taxRate": 0,
+          "price": 86.7435
+        }
+      ]
+    }
+  },
+  "supp": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "rows": [
+        {
+          "autoId": "@id",
+          "suppTypeName": "勾庄冷冻食品市场",
+          "suppName": "001 万洋电瓶",
+          "code": "001",
+          "skuName": "@cname",
+          "cateName": "@cname",
+          "skuId": "@id",
+          "storeName": "总仓1",
+          "storeCd": "0000001",
+          "basQty": "50.000",
+          "baseUnitName": "个",
+          "spec": "规格型号",
+          "secondUnit": "1箱=10盒=100个", // 单位比例
+          "secondQty": "10箱5盒", // 仓库各副单位的状况,不需要展示基本单位的数量
+          "price": "3.0000",
+          "amount": "150.00",
+          "tax": "",
+          "taxPrice": "",
+          "taxAmount": "150.00",
+          "taxRate": ""
+        },
+        {
+          // 小计行
+          "autoId": "@id",
+          "location": "小计",
+          "qty": "100.000",
+          "baseQty": "",
+          "unitPrice": "7.9000",
+          "amount": "790.00",
+          "tax": "",
+          "taxPrice": "",
+          "taxAmount": "790.00",
+          "taxRate": "",
+          "secondUnit": "1箱=10盒=100个",
+          "secondQty": "10箱5盒"
+        },
+        {
+          // 总计行
+          "autoId": "@id",
+          "billId": 0,
+          "billType": "PUR",
+          "cateName": "",
+          "skuId": 0,
+          "secondUnit": "",
+          "secondQty": "",
+          "qty": "1,005.000",
+          "baseQty": "",
+          "unitPrice": "82.5771",
+          "amount": "82,990.00",
+          "tax": "900.00",
+          "taxPrice": "",
+          "taxAmount": "83,890.00",
+          "taxRate": ""
+        }
+      ]
+    }
+  }
+}

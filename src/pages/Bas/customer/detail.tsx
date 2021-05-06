@@ -4,201 +4,137 @@ import {
   queryCustomerInfo,
   queryCustomerRel,
   updCustomerRel,
+  queryCustomerFinanceInfo,
 } from '@/services/Bas';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
-import React, { useEffect, useRef, useState } from 'react';
-import { useModel, useParams } from 'umi';
-import { PageLoading } from '@ant-design/pro-layout';
-import ProCard from '@ant-design/pro-card';
 import { EditableProTable } from '@ant-design/pro-table';
-import { message } from 'antd';
+import React, { useRef, useState } from 'react';
+import { useModel, useParams } from 'umi';
+import ProCard from '@ant-design/pro-card';
+import { Divider } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import CustRecord from './custRecord';
 import CustDoc from './custDoc';
 import ProDescriptions from '@ant-design/pro-descriptions';
+import EditFilledForm from './updForm';
+import { indexColumns } from '@/utils/columns';
+import { useRequest } from 'umi';
+import CustomerFinanceForm from './custFinanceForm';
 
-export default (): React.ReactNode => {
-  const { id } = useParams<{ id: string }>();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [detail, setDetail] = useState<BAS.Customer>();
-  const custRelActionRef = useRef<ActionType>();
-  const columns: ProColumns<BAS.CustRel>[] = [
-    {
-      dataIndex: 'index',
-      valueType: 'indexBorder',
-    },
-    {
-      dataIndex: 'relName',
-      title: '姓名',
-      render: (_) => <a>{_}</a>,
-    },
-    {
-      dataIndex: 'job',
-      title: '职位',
-      search: false,
-    },
-    {
-      dataIndex: 'sex',
-      title: '性别',
-      search: false,
-      valueType: 'select',
-      valueEnum: () =>
-        new Map([
-          [0, { text: '男', status: 'Default' }],
-          [1, { text: '女', status: 'Warning' }],
-        ]),
-    },
-    {
-      dataIndex: 'birthday',
-      title: '出生日期',
-      search: false,
-      valueType: 'date',
-    },
-    {
-      dataIndex: 'relMobile',
-      title: '手机',
-      search: false,
-      copyable: true,
-    },
-    {
-      dataIndex: 'relEmail',
-      title: '邮箱',
-      search: false,
-      copyable: true,
-    },
-    {
-      dataIndex: 'relWeiXin',
-      title: '微信',
-      search: false,
-      copyable: true,
-    },
-    {
-      dataIndex: 'relMemo',
-      title: '备注',
-      search: false,
-    },
-  ];
-  columns.push({
+export const relColumns: ProColumns<BAS.Rel>[] = [
+  indexColumns,
+
+  {
+    dataIndex: 'relName',
+    title: '联系人',
+  },
+  {
+    dataIndex: 'relMobile',
+    title: '手机',
+    search: false,
+    copyable: true,
+  },
+  {
+    dataIndex: 'relEmail',
+    title: '邮箱',
+    search: false,
+    copyable: true,
+  },
+  {
+    dataIndex: 'relWeiXin',
+    title: '微信',
+    search: false,
+    copyable: true,
+  },
+  {
+    dataIndex: 'relMemo',
+    title: '备注',
+    search: false,
+  },
+  {
+    dataIndex: 'isMain',
+    title: '首要联系人',
+    search: false,
+    width: 80,
+    valueType: 'select',
+    valueEnum: new Map([
+      [0, '否'],
+      [1, '是'],
+    ]),
+  },
+  {
     key: 'action',
     valueType: 'option',
-    width: 75,
+    width: 150,
     align: 'center',
+    title: '操作',
     render: (_, entity, _index, action) => {
       return [
         <EllipsisOutlined
+          key={'edit'}
           onClick={() => {
             action.startEditable(entity.relId);
           }}
         />,
       ];
     },
-  });
-  const { queryOptions } = useModel('options', (model) => ({ queryOptions: model.queryOptions }));
-  useEffect(() => {
-    queryOptions();
-  }, [queryOptions]);
-  useEffect(() => {
-    queryCustomerInfo(id).then((res) => {
-      setLoading(false);
-      setDetail(res.data);
+  },
+];
+export default (): React.ReactNode => {
+  const { id } = useParams<{ id: string }>();
+  const [detail, setDetail] = useState<BAS.Customer>();
+  const custRelActionRef = useRef<ActionType>();
+  const { data, loading, refresh } = useRequest(async () => {
+    const customerRel = await queryCustomerRel({
+      pageNumber: -1,
+      queryFilter: {
+        custId: id,
+      },
     });
-  }, [id]);
+    const customerInfo = await queryCustomerInfo(id);
+    setDetail(customerInfo.data);
+    const finance = await queryCustomerFinanceInfo(id);
+    return {
+      data: {
+        customerInfo: customerInfo.data,
+        customerRel: customerRel.data.rows,
+        finance: finance.data,
+      },
+      success: customerInfo.code === 0,
+    };
+  });
+  const { valueEnum } = useModel('options', (model) => ({
+    valueEnum: model.valueEnum,
+  }));
   return (
-    <PageContainer title={detail?.custName}>
-      {loading ? (
-        <PageLoading />
-      ) : (
-        <ProCard split="vertical" ghost>
-          <ProCard colSpan={18} direction="column">
-            <PageContainer
-              title={false}
-              tabList={[
-                {
-                  tab: '行动记录',
-                  key: 'record',
-                  children: <ProCard>{detail ? <CustRecord customer={detail} /> : ''}</ProCard>,
-                },
-                {
-                  tab: '客户联系人',
-                  key: 'rel',
-                  children: (
-                    <ProCard>
-                      <EditableProTable<BAS.CustRel>
-                        bordered
-                        rowKey="relId"
-                        actionRef={custRelActionRef}
-                        columns={columns}
-                        params={{ custId: id }}
-                        recordCreatorProps={{
-                          record: {
-                            relId: (Math.random() * 1000000).toFixed(0),
-                            action: 'add',
-                          } as BAS.CustRel,
-                        }}
-                        editable={{
-                          onSave: async (key, values) => {
-                            if (values.action === 'add') {
-                              await addCustomerRel({
-                                ...values,
-                                custId: id,
-                              });
-                              message.success('新增联系人成功');
-                            } else {
-                              await updCustomerRel(values);
-                              message.success('修改成功');
-                            }
-                            custRelActionRef?.current?.reload();
-                          },
-                          onDelete: async (key, values) => {
-                            await delCustomerRel([key as number]);
-                            message.success(`删除${values.relName}成功`);
-                            custRelActionRef?.current?.reload();
-                          },
-                        }}
-                        request={async (params) => {
-                          const response = await queryCustomerRel({
-                            ...params,
-                            pageNumber: -1,
-                            queryFilter: {
-                              ...params,
-                            },
-                          });
-                          return {
-                            data: response.data.rows,
-                            success: response.code === 0,
-                            total: response.data.total,
-                          };
-                        }}
-                      ></EditableProTable>
-                    </ProCard>
-                  ),
-                },
-                {
-                  tab: '客户附件',
-                  key: 'doc',
-                  children: <ProCard>{detail ? <CustDoc customer={detail} /> : ''}</ProCard>,
-                },
-              ]}
-              tabProps={{
-                defaultActiveKey: 'doc',
-              }}
-            ></PageContainer>
-          </ProCard>
-          <ProCard title="基本信息" colSpan={6}>
-            <ProDescriptions
-              bordered
-              dataSource={detail}
-              column={1}
+    <PageContainer
+      loading={loading}
+      title={detail?.custName}
+      content={
+        <>
+          <ProCard
+            title="基本信息"
+            collapsible
+            extra={[
+              <EditFilledForm key="edit" initialValues={detail} refresh={refresh} action="upd" />,
+            ]}
+          >
+            <ProDescriptions<BAS.Customer>
               columns={[
                 { title: '客户编号', dataIndex: 'custCd', editable: false },
                 {
                   title: '客户名称',
                   dataIndex: 'custName',
                 },
-                { title: '等级', dataIndex: 'custLevelId', valueType: 'select' },
-                { title: '类型', dataIndex: 'custTypeName' },
-                { title: '标签', dataIndex: 'custTags' },
+                {
+                  title: '等级',
+                  dataIndex: 'custLevelName',
+                },
+                {
+                  title: '类型',
+                  dataIndex: 'custTypeName',
+                },
                 { title: '所属部门', dataIndex: 'depName' },
                 { title: '持有人', dataIndex: 'salesman' },
                 { title: '区域', dataIndex: 'custAreaName' },
@@ -210,10 +146,154 @@ export default (): React.ReactNode => {
                 { title: '邮箱', dataIndex: 'email' },
                 { title: '简介', dataIndex: 'intro' },
               ]}
+              dataSource={data?.customerInfo}
             />
           </ProCard>
-        </ProCard>
-      )}
-    </PageContainer>
+          <Divider />
+          <ProCard
+            title="财务信息"
+            collapsible
+            extra={
+              <CustomerFinanceForm action="upd" initialValues={data?.finance} refresh={refresh} />
+            }
+          >
+            <ProDescriptions<BAS.CustomerFinance>
+              columns={[
+                {
+                  dataIndex: 'invoice',
+                  title: '开票名称',
+                  copyable: true,
+                },
+                {
+                  dataIndex: 'taxNumber',
+                  title: '开票税号',
+                  copyable: true,
+                },
+                {
+                  dataIndex: 'invoiceAddress',
+                  title: '开户地址',
+                  copyable: true,
+                },
+                {
+                  dataIndex: 'invoiceTel',
+                  title: '开户电话',
+                  copyable: true,
+                },
+                {
+                  dataIndex: 'bankName',
+                  title: '开户名称',
+                  copyable: true,
+                },
+                {
+                  dataIndex: 'bank',
+                  title: '开户银行',
+                  copyable: true,
+                },
+                {
+                  dataIndex: 'bankAccount',
+                  title: '银行账号',
+                  copyable: true,
+                },
+                {
+                  dataIndex: 'alipay',
+                  title: '支付宝账号',
+                  copyable: true,
+                },
+                {
+                  dataIndex: 'wxpay',
+                  title: '微信账号',
+                  copyable: true,
+                },
+                {
+                  dataIndex: 'settlementId',
+                  title: '结算方式',
+                  valueEnum: valueEnum('Settlement'),
+                },
+                {
+                  dataIndex: 'debtTypeId',
+                  title: '账期类型',
+                  valueEnum: valueEnum('DebtType'),
+                },
+                {
+                  dataIndex: 'initDate',
+                  title: '余额日期',
+                  valueType: 'date',
+                },
+                {
+                  dataIndex: 'isInit',
+                  title: '对账初始化',
+                  valueEnum: new Map([
+                    [0, '否'],
+                    [1, '是'],
+                  ]),
+                },
+                {
+                  dataIndex: 'initRecv',
+                  title: '期初应收款',
+                  valueType: 'money',
+                },
+                {
+                  dataIndex: 'initPerRecv',
+                  title: '期初预收款',
+                  valueType: 'money',
+                },
+                {
+                  dataIndex: 'InitRecvOther',
+                  title: '期初其他应收款',
+                  valueType: 'money',
+                },
+                {
+                  dataIndex: 'creditLimit',
+                  title: '授信额度',
+                  valueType: 'money',
+                },
+              ]}
+              dataSource={data?.finance}
+            />
+          </ProCard>
+          <Divider />
+          <ProCard title="联系人" collapsible>
+            <EditableProTable<BAS.Rel>
+              rowKey="relId"
+              loading={loading}
+              value={data?.customerRel}
+              actionRef={custRelActionRef}
+              bordered
+              columns={relColumns}
+              recordCreatorProps={{
+                record: {
+                  relId: (Math.random() * 1000000).toFixed(0),
+                  action: 'add',
+                } as BAS.Rel,
+              }}
+              editable={{
+                onSave: async (key, values) => {
+                  if (values.action === 'add') {
+                    await addCustomerRel({
+                      ...values,
+                      custId: id,
+                    });
+                  } else {
+                    await updCustomerRel(values);
+                  }
+                  refresh();
+                },
+                onDelete: async (key) => {
+                  await delCustomerRel([key as number]);
+                  refresh();
+                },
+              }}
+            />
+          </ProCard>
+          <Divider />
+          <ProCard collapsible split={'vertical'} title="跟踪动态">
+            <ProCard>
+              {detail ? <CustRecord customer={detail} custRel={data?.customerRel} /> : ''}
+            </ProCard>
+            <ProCard>{detail ? <CustDoc customer={detail} /> : ''}</ProCard>
+          </ProCard>
+        </>
+      }
+    />
   );
 };

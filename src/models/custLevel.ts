@@ -5,12 +5,15 @@ import { queryCustLevel as query } from '@/services/Bas';
 export default () => {
   const [level, setLevel] = useState<BAS.CustLevel[]>([]);
   const [levelOptions, setLevelOptions] = useState<SelectOptions>([]);
-  const queryCustLevel = useCallback(async (options) => {
-    const response = await query(options);
-    setLevel(response.data.rows);
-    setLevelOptions(response.data.rows.map((i) => ({ label: i.levelName, value: i.levelId })));
-    return response;
-  }, []);
+  const queryCustLevel = useCallback(
+    async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
+      const response = await query(data, headers);
+      setLevel(response.data.rows);
+      setLevelOptions(response.data.rows.map((i) => ({ label: i.levelName, value: i.levelId })));
+      return response;
+    },
+    [],
+  );
   return {
     level,
     levelOptions,

@@ -1,21 +1,15 @@
-import ProCard from '@ant-design/pro-card';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { PageContainer } from '@ant-design/pro-layout';
 import React from 'react';
 import type { ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Space, Table, Button } from 'antd';
-import { history } from 'umi';
-import { PlusOutlined } from '@ant-design/icons';
+import { withRouter } from 'umi';
 import { queryLogList } from '@/services/Init';
+import { indexColumns } from '@/utils/columns';
 
-export default (): React.ReactNode => {
+export default withRouter(() => {
   const columns: ProColumnType<API.Log>[] = [
-    {
-      title: '操作内容',
-      dataIndex: 'content',
-      ellipsis: true,
-      search: false,
-    },
+    indexColumns,
+
     {
       title: '操作模块',
       dataIndex: 'modName',
@@ -27,36 +21,17 @@ export default (): React.ReactNode => {
       search: false,
     },
   ];
+  const modId = '12';
   return (
-    <PageHeaderWrapper>
-      <ProCard split="vertical">
+    <PageContainer
+      content={
         <ProTable<API.Log>
           search={false}
-          bordered
-          rowKey="AutoId"
-          rowSelection={{
-            selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+          rowKey="autoId"
+          expandable={{
+            expandedRowRender: (record) => <p style={{ margin: 0 }}>{record.content}</p>,
           }}
-          tableAlertOptionRender={() => {
-            return (
-              <Space size={16}>
-                <a>批量删除</a>
-                <a>导出数据</a>
-              </Space>
-            );
-          }}
-          toolBarRender={() => [
-            <Button
-              type="primary"
-              onClick={() => {
-                history.push('/sys/user/new');
-              }}
-            >
-              <PlusOutlined />
-              新建
-            </Button>,
-          ]}
-          editable={{}}
+          options={false}
           postData={(dataSource) => {
             return dataSource.map((item) => ({
               ...item,
@@ -64,10 +39,15 @@ export default (): React.ReactNode => {
             }));
           }}
           request={async (params) => {
-            const response = await queryLogList({
-              pageSize: params.pageSize,
-              pageNumber: params.current,
-            });
+            const response = await queryLogList(
+              {
+                pageSize: params.pageSize,
+                pageNumber: params.current,
+              },
+              {
+                modId,
+              },
+            );
             return {
               data: response.data.rows,
               success: response.code === 0,
@@ -75,11 +55,11 @@ export default (): React.ReactNode => {
             };
           }}
           pagination={{
-            pageSize: 5,
+            pageSize: 10,
           }}
           columns={columns}
         />
-      </ProCard>
-    </PageHeaderWrapper>
+      }
+    />
   );
-};
+});

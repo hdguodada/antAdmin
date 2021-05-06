@@ -1,0 +1,168 @@
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "rows": [
+      {
+        "date": "2021-03-31", // 如果action === detail, 则是billId的日期, 如果action === serNumStatus  , 则是最后业务日期
+        "storeCd": "@id", // 仓库ID
+        "storeName": "仓库003",
+        "skuId": "@id", // skuId
+        "skuName": "iphone12",
+        "contactName": "@cname", // 如果是入库单,则是suppName, 如果是出库, 则是custName
+        "serNum": "a01",
+        "bussType": 11, // 字典里的枚举值
+        "billId": 79579602913178, // 关联的订单 如果action === detail, 则是有这个字段, 如果action === serNumStatus  , 无这个字段
+        "qty": 1,
+        "status": 1, //是否在库 0 不在库
+        "spuName": "iphone12",
+        "billNo": "QTRK20210331004",
+        "memo": ""
+      },
+      {
+        "date": "2021-03-31",
+        "storeName": "仓库2",
+        "last": 1,
+        "skuName": "iphone12",
+        "contactName": "",
+        "serNum": "a11",
+        "entryId": 1,
+        "status": 1,
+        "bussType": "其他入库",
+        "billId": 79579602913179,
+        "invId": 12960931429338720,
+        "qty": 1,
+        "spuName": "iphone12",
+        "billNo": "QTRK20210331005",
+        "memo": ""
+      },
+      {
+        "date": "2021-03-31",
+        "storeName": "仓库2",
+        "last": 1,
+        "skuName": "iphone12",
+        "contactName": "",
+        "serNum": "a22",
+
+        "entryId": 1,
+        "status": 1,
+        "bussType": "其他入库",
+
+        "billId": 79579602913179,
+        "invId": 12960931429338720,
+        "qty": 1,
+        "spuName": "iphone12",
+        "billNo": "QTRK20210331005",
+        "memo": ""
+      },
+      {
+        "date": "2021-03-31",
+        "storeName": "仓库003",
+        "last": 1,
+        "skuName": "iphone12",
+        "contactName": "",
+        "serNum": "aaa001",
+
+        "entryId": 1,
+        "status": 1,
+        "bussType": "其他入库",
+
+        "billId": 79579602913178,
+        "invId": 12960931429338720,
+        "qty": 1,
+        "spuName": "iphone12",
+        "billNo": "QTRK20210331004",
+        "memo": ""
+      },
+      {
+        "date": "2021-03-31",
+        "storeName": "仓库003",
+        "last": 1,
+        "skuName": "iphone12",
+        "contactName": "",
+        "serNum": "aaa002",
+
+        "entryId": 1,
+        "status": 1,
+        "bussType": "其他入库",
+
+        "billId": 79579602913178,
+        "invId": 12960931429338720,
+        "qty": 1,
+        "spuName": "iphone12",
+        "billNo": "QTRK20210331004",
+        "memo": ""
+      },
+      {
+        "date": "2021-03-31",
+        "storeName": "仓库003",
+        "last": 1,
+        "skuName": "iphone12",
+        "contactName": "",
+        "serNum": "aaa003",
+
+        "entryId": 1,
+        "status": 1,
+        "bussType": "其他入库",
+
+        "billId": 79579602913178,
+        "invId": 12960931429338720,
+        "qty": 1,
+        "spuName": "iphone12",
+        "billNo": "QTRK20210331004",
+        "memo": ""
+      },
+      {
+        "date": "2021-03-31",
+        "storeName": "仓库003",
+        "last": 1,
+        "skuName": "iphone12",
+        "contactName": "",
+        "serNum": "aaa004",
+
+        "entryId": 1,
+        "status": 1,
+        "bussType": "其他入库",
+
+        "billId": 79579602913178,
+        "invId": 12960931429338720,
+        "qty": 1,
+        "spuName": "iphone12",
+        "billNo": "QTRK20210331004",
+        "memo": ""
+      },
+      {
+        "date": "2021-03-31",
+        "storeName": "仓库003",
+        "last": 1,
+        "skuName": "iphone12",
+        "contactName": "",
+        "serNum": "aaa005",
+
+        "entryId": 1,
+        "status": 1,
+        "bussType": "其他入库",
+
+        "billId": 79579602913178,
+        "invId": 12960931429338720,
+        "qty": 1,
+        "spuName": "iphone12",
+        "billNo": "QTRK20210331004",
+        "memo": ""
+      }
+    ]
+  },
+  "data2": {
+    "data": {
+      "row|10": [
+        {
+          "storeCd": "@id",
+          "storeName": "@cname",
+          "serNum": "@id",
+          "skuId": "@id",
+          "skuName": "@cname"
+        }
+      ]
+    }
+  }
+}

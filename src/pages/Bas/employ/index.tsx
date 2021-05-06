@@ -4,9 +4,7 @@ import type { ActionType, ProColumns, ProColumnType } from '@ant-design/pro-tabl
 import { EditableProTable } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import ProCard from '@ant-design/pro-card';
-import { Button, message } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import DelPopconfirm from '@/components/DelPopconfirm';
+import { message } from 'antd';
 import EmployForm from './form';
 import {
   addPost,
@@ -14,9 +12,16 @@ import {
   queryEmploy,
   queryEmployInfo,
   queryPost,
-  updEmploy,
   updPost,
 } from '@/services/Bas';
+import {
+  baseSearch,
+  indexColumns,
+  optionColumns,
+  stateColumns,
+  tableAlertOptionRenderDom,
+} from '@/utils/columns';
+import BatchDel from '@/components/DelPopconfirm';
 
 export type UserTableProps = {
   postId: React.Key;
@@ -35,10 +40,10 @@ export const PostTable: React.FC<PostTableProps> = (props) => {
   const actionRef = useRef<ActionType>();
   return (
     <EditableProTable<BAS.Post>
-      bordered
       expandable={{
         defaultExpandedRowKeys: [1],
       }}
+      bordered
       actionRef={actionRef}
       params={queryFilter}
       rowKey="postId"
@@ -105,6 +110,7 @@ export const EmployTable: React.FC<UserTableProps> = (props) => {
   const [modalFormInit, setModalFormInit] = useState<BAS.Employ>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const EmployColumns: ProColumnType<BAS.Employ>[] = [
+    indexColumns,
     {
       title: '员工姓名',
       dataIndex: 'empName',
@@ -129,83 +135,39 @@ export const EmployTable: React.FC<UserTableProps> = (props) => {
       search: false,
       editable: false,
     },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      valueType: 'select',
-      initialValue: 1,
-      valueEnum: () =>
-        new Map([
-          [1, { text: '正常', status: 'Success' }],
-          [0, { text: '禁用', status: 'Error' }],
-        ]),
-    },
-    {
-      title: '操作',
-      key: 'action',
-      valueType: 'option',
-      width: 200,
-      render: (_, entity) => {
-        return [
-          <a
-            key="edit"
-            onClick={async () => {
-              setFormAction('upd');
-              const empoly = (await queryEmployInfo(entity.postId)).data;
-              setModalFormInit(empoly);
-              setModalVisit(true);
-            }}
-          >
-            修改
-          </a>,
-          <DelPopconfirm
-            key="del"
-            onConfirm={async () => {
-              await delEmploy([entity.postId]);
-              actionRef?.current?.reload();
-            }}
-          />,
-        ];
+    stateColumns,
+    optionColumns({
+      modify: async ({ record }) => {
+        setFormAction('upd');
+        const empoly = (await queryEmployInfo(record.empId)).data;
+        setModalFormInit(empoly);
+        setModalVisit(true);
       },
-    },
+      del: async ({ record }) => {
+        await delEmploy([record.empId]);
+        actionRef?.current?.reload();
+      },
+    }),
   ];
   return (
     <>
       <ProTable<BAS.Employ, { postId: React.Key }>
-        bordered
         actionRef={actionRef}
         params={{ postId }}
         rowKey="empId"
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            onClick={() => {
-              setFormAction('add');
-              setModalFormInit({});
-              setModalVisit(true);
-            }}
-          >
-            <PlusOutlined />
-            新建
-          </Button>,
-        ]}
-        editable={{
-          onDelete: async (key) => {
-            await delEmploy([key as React.Key]);
-            message.success('删除数据成功。');
+        search={baseSearch({
+          fn: () => {
+            setFormAction('add');
+            setModalFormInit(undefined);
+            setModalVisit(true);
           },
-          onSave: async (_, row) => {
-            await updEmploy(row);
-            message.success('修改数据成功。');
-          },
-        }}
+        })}
+        options={false}
         request={async (params) => {
           const response = await queryEmploy({
             ...params,
-            queryFilter: {
-              postId: params.postId,
-            },
             pageNumber: params.current,
+            queryFilter: params,
           });
           return {
             data: response.data.rows,
@@ -213,25 +175,32 @@ export const EmployTable: React.FC<UserTableProps> = (props) => {
             total: response.data.total,
           };
         }}
-        pagination={{
-          pageSize: 5,
+        rowSelection={{}}
+        tableAlertOptionRender={({ selectedRowKeys }) => {
+          return tableAlertOptionRenderDom([
+            <BatchDel
+              key="del"
+              onConfirm={async () => {
+                await delEmploy(selectedRowKeys);
+                actionRef.current?.reload();
+              }}
+            />,
+          ]);
         }}
         columns={EmployColumns}
       />
-      {modalFormInit && (
-        <EmployForm
-          initialValues={modalFormInit}
-          action={formAction}
-          visible={modalVisit}
-          setVisible={setModalVisit}
-          actionRef={actionRef}
-        />
-      )}
+      <EmployForm
+        initialValues={modalFormInit}
+        action={formAction}
+        visible={modalVisit}
+        setVisible={setModalVisit}
+        actionRef={actionRef}
+      />
     </>
   );
 };
 
-export default (): React.ReactNode => {
+export default () => {
   const [postId, setPostId] = useState<React.Key>(0);
   const postColumns: ProColumns<BAS.Post>[] = [
     {
@@ -265,8 +234,7 @@ export default (): React.ReactNode => {
   return (
     <PageHeaderWrapper>
       <ProCard split="vertical">
-        <ProCard colSpan="384px" ghost>
-          <div style={{ height: 88 }}></div>
+        <ProCard colSpan="384px">
           <PostTable
             columns={postColumns}
             onChange={(id) => {
@@ -275,7 +243,7 @@ export default (): React.ReactNode => {
             postId={postId}
           />
         </ProCard>
-        <ProCard ghost>
+        <ProCard>
           <EmployTable postId={postId} />
         </ProCard>
       </ProCard>

@@ -1,15 +1,10 @@
-import {
-  ProFormText,
-  ProFormGroup,
-  ProFormRadio,
-  ModalForm,
-  ProFormSelect,
-} from '@ant-design/pro-form';
+import ProForm, { ProFormText, ProFormRadio, ModalForm, ProFormSelect } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
-import { message, Modal } from 'antd';
+import { message } from 'antd';
 import React, { useRef } from 'react';
 import type { ActionType } from '@ant-design/pro-table';
 import { addDict, queryDictTypes, updDict } from '@/services/Sys';
+import { patternMsg } from '@/utils/validator';
 
 type FormProps = {
   action: 'add' | 'upd';
@@ -30,29 +25,12 @@ export default (props: FormProps) => {
       formRef={formRef}
       title={action === 'add' ? '新建字典' : `修改字典(${initialValues.dictName})`}
       visible={visible}
-      submitter={{
-        searchConfig: {
-          submitText: '确认',
-          resetText: '关闭',
-        },
-      }}
       onFinish={async (values) => {
         if (action === 'upd') {
           await updDict({ ...initialValues, ...values });
           message.success('提交成功');
         } else {
           await addDict(values);
-          Modal.confirm({
-            content: '新增字典成功,是否继续添加?',
-            onCancel() {
-              setVisible(false);
-            },
-            onOk() {
-              formRef?.current?.resetFields();
-            },
-          });
-          actionRef?.current?.reload();
-          return false;
         }
         actionRef?.current?.reload();
         return true;
@@ -66,7 +44,7 @@ export default (props: FormProps) => {
         setVisible(v);
       }}
     >
-      <ProFormGroup>
+      <ProForm.Group>
         <ProFormSelect
           name="dictTypeId"
           label="字典分类"
@@ -82,11 +60,11 @@ export default (props: FormProps) => {
             }));
           }}
         />
-      </ProFormGroup>
-      <ProFormGroup>
-        <ProFormText width="md" name="dictName" label="字典名称" />
+      </ProForm.Group>
+      <ProForm.Group>
+        <ProFormText width="md" name="dictName" label="字典名称" rules={patternMsg.text('')} />
         <ProFormText width="md" name="dictDesc" label="字典描述" />
-      </ProFormGroup>
+      </ProForm.Group>
       <ProFormRadio.Group
         width="md"
         name="state"

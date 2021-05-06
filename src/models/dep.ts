@@ -1,28 +1,21 @@
 /** 部门的相关store */
 import { useState, useCallback } from 'react';
-import { queryDepList as query } from '@/services/Sys/dep';
+import { queryDepTreelist as queryTree } from '@/services/Sys/dep';
+import { transformTreeData } from '@/utils/utils';
+import type { DataNode } from 'antd/lib/tree';
 
 export default () => {
-  const [depList, setDepList] = useState<API.Dep[]>([]);
-  const [treeDataSimpleMode, setTreeDataSimpleMode] = useState<TreeData>([]);
-  const queryDepList = useCallback(async (options) => {
-    const response = await query(options);
-    setDepList(response.data.rows);
-    setTreeDataSimpleMode(
-      response.data.rows.map((i) => ({
-        id: i.depId,
-        value: i.depId,
-        title: i.depName,
-        pId: i.pDepId,
-        disabled: options.disabled?.indexOf(String(i.depId)) > -1,
-      })),
-    );
+  const [depTree, setDepTree] = useState<API.Dep[]>([]);
+  const [treeDataSimpleMode, setTreeDataSimpleMode] = useState<DataNode[]>([]);
+  const queryDepTree = useCallback(async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
+    const response = await queryTree(data, headers);
+    setDepTree(response.data.rows);
+    setTreeDataSimpleMode(transformTreeData(response.data.rows, undefined, 'depId', 'depName'));
     return response;
   }, []);
-
   return {
-    depList,
-    queryDepList,
     treeDataSimpleMode,
+    queryDepTree,
+    depTree,
   };
 };

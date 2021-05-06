@@ -7,7 +7,6 @@ export default () => {
   return (
     <ProCard>
       <PageContainer
-        title={false}
         tabList={[
           {
             tab: '分类',

@@ -1,13 +1,16 @@
-import React, { useEffect } from 'react';
-import { useModel, history } from 'umi';
+import React from 'react';
+import { useModel, history, useRequest } from 'umi';
 
 export default () => {
-  const { queryCustArea } = useModel('custArea');
+  const { queryCustArea, queryCustAreaTree } = useModel('custArea', (models) => ({
+    queryCustArea: models.queryCustArea,
+    queryCustAreaTree: models.queryCustAreaTree,
+  }));
   const { queryProductType } = useModel('productType', (model) => ({
     queryProductType: model.query,
   }));
-  const { queryDepList } = useModel('dep', (model) => ({
-    queryDepList: model.queryDepList,
+  const { queryDepTree } = useModel('dep', (model) => ({
+    queryDepTree: model.queryDepTree,
   }));
   const { queryBrand } = useModel('brand', (model) => ({
     queryBrand: model.query,
@@ -28,41 +31,83 @@ export default () => {
     setInitialState: model.setInitialState,
     initialState: model.initialState,
   }));
-
+  const { querySupp, queryTreeSupp } = useModel('suppType', (model) => ({
+    querySupp: model.query,
+    queryTreeSupp: model.queryTree,
+  }));
+  const { queryCustTypeTree, queryCustType } = useModel('custType', (model) => ({
+    queryCustTypeTree: model.queryCustTypeTree,
+    queryCustType: model.queryCustType,
+  }));
+  const { queryUserRoles } = useModel('userRole', (model) => ({
+    queryUserRoles: model.queryUserRoles,
+  }));
   const { queryStore } = useModel('store', (model) => ({
     queryStore: model.query,
   }));
-  useEffect(() => {
-    if (history.location.pathname !== '/user/login') {
-      Promise.all([
-        queryCustArea({ pageNumber: -1 }),
-        queryBrand({ pageNumber: -1 }),
-        queryUnit({ pageNumber: -1 }),
-        queryAttr({ pageNumber: -1 }),
-        queryProductType({ pageNumber: -1 }),
-        queryOptions(),
-        queryDepList({ pageNumber: -1 }),
-        queryCustLevel({ pageNumber: -1 }),
-        queryStore({ pageNumber: -1 }),
-      ]).then(() => {
+  useRequest(
+    async () => {
+      if (history.location.pathname !== '/user/login') {
+        await Promise.all([
+          queryUserRoles(),
+          queryOptions(),
+          queryDepTree(),
+          queryBrand(),
+          queryUnit(),
+          queryAttr(),
+        ]);
+        await Promise.all([
+          queryTreeSupp(),
+          queryCustAreaTree(),
+          queryCustArea(),
+          queryCustTypeTree(),
+          queryCustType(),
+          queryProductType(),
+          queryCustLevel(),
+          querySupp(),
+          queryStore(),
+        ]);
+      }
+      return {
+        data: undefined,
+        success: true,
+      };
+    },
+    {
+      onSuccess() {
         setInitialState({
           ...initialState,
           globalDataLoaded: true,
         });
-      });
-    }
-  }, [
-    queryOptions,
-    queryCustArea,
-    queryProductType,
-    queryBrand,
-    queryUnit,
-    queryAttr,
-    queryCustLevel,
-    setInitialState,
-    queryDepList,
-    initialState,
-    queryStore,
-  ]);
+      },
+    },
+  );
+  // useEffect(() => {
+  //   if (history.location.pathname !== '/user/login') {
+  //     Promise.all([
+  //       queryBrand(),
+  //       queryUnit(),
+  //       queryAttr(),
+  //       queryProductType(),
+  //       queryOptions(),
+  //       queryDepTree(),
+  //       queryCustLevel(),
+  //       querySupp(),
+  //     ]).then(() => {
+  //       Promise.all([
+  //         queryTreeSupp(),
+  //         queryCustAreaTree(),
+  //         queryCustArea(),
+  //         queryCustTypeTree(),
+  //         queryCustType(),
+  //       ]).then(() => {
+  //         setInitialState({
+  //           ...initialState,
+  //           globalDataLoaded: true,
+  //         });
+  //       });
+  //     });
+  //   }
+  // }, []);
   return <div />;
 };

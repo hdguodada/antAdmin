@@ -1,0 +1,43 @@
+{
+  "custId": 1,
+  "date": "2021-04-02",
+  "billNo": "QTRK2021040200113",
+  "entries": [
+    {
+      "spuId": 687,
+      "skuId": 4,
+      "skuName": null,
+      "spuName": "测试产品",
+      "cateName": "服装1",
+      "code": "产品条码0315_1",
+      "barCode": "产品编码2",
+      "isSerNum": true,
+      "isWarranty": true,
+      "storeCd": "C01",
+      "storeName": "成品仓",
+      "currentQty": 0,
+      "realQty": 0,
+      "baseUnitName": "个",
+      "baseUnitId": 3,
+      "outDefaultLocationUnitId": 0,
+      "inDefaultLocationUnitId": 0,
+      "inLocationUnitId": 3,
+      "inLocationUnitRate": 1,
+      "unitList": [
+        { "rate": 1, "unitId": 3, "unitName": "个" },
+        { "rate": 10, "unitId": 6, "unitName": "盒" }
+      ],
+      "priceList": [],
+      "autoId": 260424,
+      "unitId": 3,
+      "rate": 1,
+      "deduction": 0,
+      "basQty": 5,
+      "beforeDisAmount": 25,
+      "amount": 25,
+      "snapshotQty": "5",
+      "price": 5
+    }
+  ],
+  "dev": true
+}

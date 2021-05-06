@@ -7,8 +7,8 @@ export default () => {
   const [custTypeTree, setCustTypeTree] = useState<BAS.CustType[]>([]);
   const [custTypeOptions, setCustTypeOptions] = useState<SelectOptions>([]);
   const [treeDataSimpleMode, setTreeDataSimpleMode] = useState<TreeData>([]);
-  const queryCustType = useCallback(async (options) => {
-    const response = await queryCusttypes(options);
+  const queryCustType = useCallback(async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
+    const response = await queryCusttypes(data, headers);
     setCustType(response.data.rows);
     setCustTypeOptions(
       response.data.rows.map((i) => ({ label: i.custTypeName, value: i.custTypeId })),
@@ -23,11 +23,14 @@ export default () => {
     );
     return response;
   }, []);
-  const queryCustTypeTree = useCallback(async () => {
-    const response = await queryTree();
-    setCustTypeTree(response.data.rows);
-    return response;
-  }, []);
+  const queryCustTypeTree = useCallback(
+    async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
+      const response = await queryTree(data, headers);
+      setCustTypeTree(response.data.rows);
+      return response;
+    },
+    [],
+  );
   return {
     custType,
     custTypeOptions,

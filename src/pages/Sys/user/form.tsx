@@ -1,16 +1,11 @@
 import { addUser, updUser } from '@/services/Sys/user';
-import {
-  ProFormText,
-  ProFormGroup,
-  ProFormSelect,
-  ProFormRadio,
-  ModalForm,
-} from '@ant-design/pro-form';
+import ProForm, { ProFormText, ProFormSelect, ProFormRadio, ModalForm } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
-import { message, Form, TreeSelect, Modal } from 'antd';
 import React, { useRef } from 'react';
 import { useModel } from 'umi';
 import type { ActionType } from '@ant-design/pro-table';
+import { patternMsg } from '@/utils/validator';
+import { DepSelect } from '@/utils/form';
 
 type UserFormProps = {
   action: 'add' | 'upd';
@@ -22,7 +17,6 @@ type UserFormProps = {
 const UserForm: React.FC<UserFormProps> = (props) => {
   const { action, actionRef, visible, setVisible, initialValues } = props;
   const formRef = useRef<FormInstance>();
-  const { treeDataSimpleMode } = useModel('dep');
   const { userRoleOptions } = useModel('userRole');
   const { userType } = useModel('options', (model) => ({
     userType: model.typeOption('UserType'),
@@ -38,29 +32,11 @@ const UserForm: React.FC<UserFormProps> = (props) => {
       visible={visible}
       formRef={formRef}
       title=""
-      submitter={{
-        searchConfig: {
-          submitText: '确认',
-          resetText: '关闭',
-        },
-      }}
       onFinish={async (values) => {
         if (action === 'upd') {
           await updUser({ ...initialValues, ...values });
-          message.success('提交成功');
         } else {
           await addUser(values);
-          Modal.confirm({
-            content: '新增用户成功,是否继续添加?',
-            onCancel() {
-              setVisible(false);
-            },
-            onOk() {
-              formRef?.current?.resetFields();
-            },
-          });
-          actionRef?.current?.reload();
-          return false;
         }
         actionRef?.current?.reload();
         return true;
@@ -74,29 +50,29 @@ const UserForm: React.FC<UserFormProps> = (props) => {
         setVisible(v);
       }}
     >
-      <ProFormGroup>
-        <ProFormText width="md" name="userName" label="账号名称" disabled={action === 'upd'} />
-        <ProFormText width="md" name="realName" label="真实姓名" />
-      </ProFormGroup>
+      <ProForm.Group>
+        <ProFormText
+          width="md"
+          name="userName"
+          label="账号名称"
+          disabled={action === 'upd'}
+          rules={patternMsg.text('账号名称')}
+        />
+        <ProFormText
+          width="md"
+          name="realName"
+          label="真实姓名"
+          rules={patternMsg.text('真实姓名')}
+        />
+      </ProForm.Group>
       {action === 'add' && (
-        <ProFormGroup>
+        <ProForm.Group>
           <ProFormText.Password width="md" name="passWord" label="密码" />
           <ProFormText.Password width="md" name="checkPassWord" label="确认密码" />
-        </ProFormGroup>
+        </ProForm.Group>
       )}
-
-      <ProFormGroup>
-        <Form.Item label="所属部门" name="depId" style={{ width: '328px' }}>
-          <TreeSelect
-            showSearch
-            placeholder="请选择"
-            allowClear
-            treeDefaultExpandAll
-            treeData={treeDataSimpleMode}
-            treeDataSimpleMode={true}
-            treeNodeFilterProp="title"
-          />
-        </Form.Item>
+      <ProForm.Group>
+        <DepSelect name="depId" label="所属部门" showNew={true} />
         <ProFormSelect
           showSearch
           params={{}}
@@ -111,11 +87,11 @@ const UserForm: React.FC<UserFormProps> = (props) => {
           }}
           options={userType}
         />
-      </ProFormGroup>
-      <ProFormGroup>
+      </ProForm.Group>
+      <ProForm.Group>
         <ProFormText width="md" name="email" label="邮箱" />
         <ProFormText width="md" name="mobile" label="手机号码" />
-      </ProFormGroup>
+      </ProForm.Group>
       <ProFormSelect
         width="lg"
         mode="multiple"

@@ -1,61 +1,71 @@
-import {
+import ProForm, {
   ProFormText,
-  ProFormGroup,
   ModalForm,
   ProFormSelect,
   ProFormUploadDragger,
 } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
-import { Button, message } from 'antd';
+import { message } from 'antd';
 import React, { useRef } from 'react';
-import type { ActionType } from '@ant-design/pro-table';
-import { addCustDoc } from '@/services/Bas';
+import { addCustDoc, updCustDoc } from '@/services/Bas';
 import { useModel } from 'umi';
 
 type FormProps = {
-  actionRef?: React.MutableRefObject<ActionType | undefined>;
-  initialValues: BAS.Customer | Record<string, unknown>;
+  action: 'add' | 'upd';
+  visible: boolean;
+  setVisible: (visible: boolean) => void;
+  initialValues?: BAS.CustDoc;
+  custRel?: BAS.Rel[];
+  customer: BAS.Customer;
+  refresh?: () => void;
 };
 export default (props: FormProps) => {
-  const { actionRef, initialValues } = props;
+  const { initialValues, visible, setVisible, action, customer, refresh } = props;
   const formRef = useRef<FormInstance>();
   const { typeOption } = useModel('options', (model) => ({ typeOption: model.typeOption }));
   return (
     <ModalForm<BAS.CustDoc>
       initialValues={{
-        custId: initialValues.custId,
+        custId: customer.custId,
       }}
-      trigger={
-        <Button key="newRecord" type="primary">
-          上传附件
-        </Button>
-      }
-      title={<div>新建客户附件({initialValues.custName})</div>}
-      submitter={{
-        searchConfig: {
-          submitText: '确认',
-          resetText: '关闭',
-        },
+      visible={visible}
+      onVisibleChange={(v) => {
+        if (v) {
+          formRef.current?.setFieldsValue(initialValues);
+        } else {
+          formRef.current?.resetFields();
+        }
+        setVisible(v);
       }}
+      title={<div>新建客户附件({customer.custName})</div>}
       formRef={formRef}
       onFinish={async (values) => {
-        await addCustDoc(values);
-        message.success('保存成功');
-        actionRef?.current?.reload();
+        if (action === 'add') {
+          await addCustDoc({
+            ...values,
+            custId: customer.custId,
+          });
+        } else {
+          await updCustDoc({
+            ...initialValues,
+            ...values,
+          });
+        }
+        refresh?.();
         return true;
       }}
     >
       <ProFormText width="md" name="custId" label="客户" disabled hidden />
       <ProFormText width="md" name="docName" label="文件名称" disabled hidden />
       <ProFormText width="md" name="docPath" label="文件路径" disabled hidden />
-      <ProFormGroup>
+      <ProForm.Group>
         <ProFormSelect
           width="md"
           name="docTypeId"
           label="文件类别"
           options={typeOption('CustDocType')}
         />
-      </ProFormGroup>
+      </ProForm.Group>
       <ProFormUploadDragger
         fieldProps={{
           multiple: false,

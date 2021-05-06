@@ -1,15 +1,15 @@
-import { Button, message } from 'antd';
+import { Button } from 'antd';
 import { Checkbox } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
-import { EditableProTable } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import { queryModules, updRole } from '@/services/Sys';
 
 import ProCard from '@ant-design/pro-card';
 
 type FormProps = {
   initialValues: API.UserRole;
-  setRoleId: (id: number) => void;
+  setRoleId: () => void;
 };
 const RoleForm: React.FC<FormProps> = (props) => {
   const actionRef = useRef<ActionType>();
@@ -25,7 +25,6 @@ const RoleForm: React.FC<FormProps> = (props) => {
         entries[item.modId] = [item.funId];
       }
     });
-    console.log(entries);
     return entries;
   };
   const [modSelectedMap, setModSelectedMap] = useState<Record<string, number[]>>({});
@@ -43,6 +42,7 @@ const RoleForm: React.FC<FormProps> = (props) => {
     {
       dataIndex: 'memo',
       title: '模块名称',
+      search: false,
       render: (_, record) => (
         <a>
           {_}({record.modId})
@@ -52,6 +52,7 @@ const RoleForm: React.FC<FormProps> = (props) => {
     {
       title: '可操作模块',
       dataIndex: 'funs',
+      search: false,
       render: (_, entity) => {
         const options = entity.funs.map((i) => ({
           label: i.funName,
@@ -99,15 +100,15 @@ const RoleForm: React.FC<FormProps> = (props) => {
     },
   ];
   return (
-    <EditableProTable<API.Module>
-      bordered
+    <ProTable<API.Module>
       actionRef={actionRef}
-      value={module}
+      dataSource={module}
       columns={columns}
-      recordCreatorProps={false}
+      options={false}
+      pagination={false}
       rowKey="modId"
-      toolBarRender={() => {
-        return [
+      search={{
+        optionRender: () => [
           <Button
             type="primary"
             key="save"
@@ -130,13 +131,12 @@ const RoleForm: React.FC<FormProps> = (props) => {
                 funAuth,
               };
               await updRole(submitForm);
-              message.success('保存成功');
-              setRoleId(+submitForm.roleId);
+              setRoleId();
             }}
           >
             保存数据
           </Button>,
-        ];
+        ],
       }}
     />
   );

@@ -36,7 +36,7 @@ declare namespace API {
   export type Dict = {
     dictTypeId: number | string; // 字典分类Id
     dictId: number | string; // 数据字典Id
-    dictName?: string; // 字典名称
+    dictName: string; // 字典名称
     dictDesc?: string; // 字典描述
     exten1?: string; // 备用扩展1
     exten2?: string; // 备用扩展3
@@ -71,13 +71,13 @@ declare namespace API {
   export type CodeRule = {
     codeId: string | number;
     codeName: string;
-    prefix: string;
-    YYYY: 0 | 1;
-    MM: 0 | 1;
-    DD: 0 | 1;
     len: number;
-    isRandom: 0 | 1;
+    yyyy: number;
+    mm: number;
+    dd: number;
+    isRandom: number;
     startNo: number;
+    prefix: string;
   } & DefaultField;
   export type Log = {
     userId: string;
@@ -133,6 +133,7 @@ declare namespace API {
     roleDesc: string;
     sortNum: number;
     state: number;
+    new?: boolean;
     stateName: string;
     funAuth:
       | {
@@ -156,7 +157,7 @@ declare namespace API {
     depName?: string;
     lastLogin?: string;
     loginCnt?: number;
-    userId?: number | string;
+    userId: React.Key;
     name?: string;
     passWord?: string;
     email?: string;

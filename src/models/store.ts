@@ -4,10 +4,12 @@ import { queryStore } from '@/services/Bas';
 export default () => {
   const [list, setList] = useState<BAS.Store[]>([]);
   const [options, setOptions] = useState<SelectOptions>([]);
-  const query = useCallback(async (data) => {
-    const response = await queryStore(data);
+  const [valueEnum, setValueEnum] = useState<Map<string, string>>();
+  const query = useCallback(async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
+    const response = await queryStore(data, headers);
     setList(response.data.rows);
     setOptions(response.data.rows.map((i) => ({ label: i.storeName, value: i.storeCd })));
+    setValueEnum(new Map(response.data.rows.map((i) => [i.storeCd, i.storeName])));
     return response;
   }, []);
 
@@ -15,5 +17,6 @@ export default () => {
     list,
     options,
     query,
+    valueEnum,
   };
 };

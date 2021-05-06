@@ -1,5 +1,4 @@
-import ProCard from '@ant-design/pro-card';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { PageContainer } from '@ant-design/pro-layout';
 import React from 'react';
 import type { ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
@@ -25,12 +24,11 @@ export default (): React.ReactNode => {
     },
   ];
   return (
-    <PageHeaderWrapper>
-      <ProCard split="vertical">
+    <PageContainer
+      content={
         <ProTable<API.Exception>
           search={false}
           rowKey="autoId"
-          bordered
           request={async (params) => {
             const response = await queryException({
               pageSize: params.pageSize,
@@ -42,12 +40,13 @@ export default (): React.ReactNode => {
               total: response.data.total,
             };
           }}
+          options={false}
           pagination={{
-            pageSize: 5,
+            pageSize: 10,
           }}
           columns={columns}
         />
-      </ProCard>
-    </PageHeaderWrapper>
+      }
+    ></PageContainer>
   );
 };

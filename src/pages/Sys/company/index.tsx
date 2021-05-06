@@ -1,5 +1,5 @@
 import ProCard from '@ant-design/pro-card';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { PageContainer } from '@ant-design/pro-layout';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import React from 'react';
 import { queryCompanyInfo, updCompanyInfo } from '@/services/Sys';
@@ -76,20 +76,22 @@ const columns: ProColumnType<API.Company>[] = [
 ];
 export default (): React.ReactNode => {
   return (
-    <PageHeaderWrapper>
-      <ProCard split="vertical">
-        <ProDescriptions
-          bordered={true}
-          request={async () => {
-            return queryCompanyInfo();
-          }}
-          editable={{
-            onSave: (k, r) => updCompanyInfo(r),
-          }}
-          columns={columns}
-          column={{ xl: 2, sm: 1, xs: 1 }}
-        />
-      </ProCard>
-    </PageHeaderWrapper>
+    <PageContainer
+      content={
+        <ProCard split="vertical">
+          <ProDescriptions
+            bordered
+            request={async () => {
+              return queryCompanyInfo();
+            }}
+            editable={{
+              onSave: (k, r) => updCompanyInfo(r),
+            }}
+            columns={columns}
+            column={{ xl: 2, sm: 1, xs: 1 }}
+          />
+        </ProCard>
+      }
+    ></PageContainer>
   );
 };

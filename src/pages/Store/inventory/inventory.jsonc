@@ -1,0 +1,38 @@
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "rows|10": [
+      {
+        "storeName": "@cname",
+        "unitName": "个",
+        "skuName": "@cname",
+        "code": "SL001768",
+        "storeCd": "@id",
+        "skuId": "@id",
+        "qty": "@number",
+        "cateName": "@cname",
+        "unitId": "@id",
+        "spuName": "@cname",
+        "cateId": "@id",
+        "isSerNum": 0 // 盘点的都是非序列管理的商品
+      }
+    ]
+  },
+  "data1": {
+    "rows|10": [
+      {
+        "pdDate": "@date",
+        "locationName": "所有仓库",
+        "pdResult": [
+          {
+            "billId": "@id",
+            "billNo": "盘盈单 QTRK2131313"
+          }
+        ],
+        "billId": "@id",
+        "billNo": "@id"
+      }
+    ]
+  }
+}

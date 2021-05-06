@@ -1,26 +1,22 @@
 import type { DepFilters } from '@/services/Sys/dep';
-import { queryDepTreelist, updDep, delDep } from '@/services/Sys/dep';
-import ProCard from '@ant-design/pro-card';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { delDep } from '@/services/Sys/dep';
+import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button } from 'antd';
-import { message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { DepDataType } from '../user';
-import DelPopconfirm from '@/components/DelPopconfirm';
 import { useModel } from 'umi';
-import { PlusOutlined } from '@ant-design/icons';
 import DepForm from './form';
+import { baseSearch, optionColumns, stateColumns } from '@/utils/columns';
 
 export default (): React.ReactNode => {
   const actionRef = useRef<ActionType>();
-  const { queryDepList } = useModel('dep', (model) => ({
+  const { queryDepTree } = useModel('dep', (model) => ({
     treeDataSimpleMode: model.treeDataSimpleMode,
-    queryDepList: model.queryDepList,
+    queryDepTree: model.queryDepTree,
   }));
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<API.Dep>>({});
+  const [modalFormInit, setModalFormInit] = useState<API.Dep>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const depColumns: ProColumnType<DepDataType>[] = [
     {
@@ -32,6 +28,7 @@ export default (): React.ReactNode => {
     {
       title: '部门名称',
       dataIndex: 'depName',
+      fixed: 'left',
     },
     {
       title: '负责人',
@@ -43,96 +40,56 @@ export default (): React.ReactNode => {
       dataIndex: 'phone',
       search: false,
     },
-    {
-      title: '状态',
-      dataIndex: 'state',
-      valueType: 'select',
-      search: false,
-      valueEnum: () => {
-        return new Map([
-          [1, { text: '正常', status: 'Success' }],
-          [0, { text: '禁用', status: 'Error' }],
-        ]);
+    stateColumns,
+    optionColumns({
+      modify: async ({ record }) => {
+        setFormAction('upd');
+        setModalFormInit(record);
+        setModalVisit(true);
       },
-    },
-    {
-      title: '操作',
-      key: 'action',
-      valueType: 'option',
-      width: 150,
-      render: (_, entity, _index, action) => {
-        return [
-          <a
-            key="editable"
-            onClick={() => {
-              setFormAction('upd');
-              setModalFormInit(entity);
-              setModalVisit(true);
-            }}
-          >
-            修改
-          </a>,
-          <DelPopconfirm
-            key="del"
-            onConfirm={async () => {
-              await delDep([entity.depId]);
-              action.reload();
-            }}
-          />,
-        ];
+      del: async ({ record }) => {
+        await delDep([record.depId]);
       },
-    },
+    }),
   ];
   return (
-    <PageHeaderWrapper title={false}>
-      <ProCard split="vertical">
-        <ProTable<DepDataType, DepFilters>
-          bordered
-          actionRef={actionRef}
-          toolBarRender={() => [
-            <Button
-              type="primary"
-              onClick={() => {
+    <PageContainer
+      content={
+        <>
+          <ProTable<DepDataType, DepFilters>
+            actionRef={actionRef}
+            expandable={{
+              defaultExpandedRowKeys: [1],
+            }}
+            search={baseSearch({
+              fn: () => {
                 setFormAction('add');
-                setModalFormInit({});
+                setModalFormInit(undefined);
                 setModalVisit(true);
-              }}
-            >
-              <PlusOutlined />
-              新建
-            </Button>,
-          ]}
-          editable={{
-            onSave: async (_, row) => {
-              await updDep(row);
-              message.success('修改部门成功。');
-            },
-          }}
-          expandable={{
-            defaultExpandedRowKeys: [1],
-          }}
-          search={{ collapseRender: false, collapsed: false, span: 4 }}
-          rowKey="depId"
-          columns={depColumns}
-          request={async (params) => {
-            queryDepList({ pageSize: -1 });
-            const response = await queryDepTreelist(params);
-            return {
-              data: response.data.rows,
-              success: response.code === 0,
-              total: response.data.total,
-            };
-          }}
-          pagination={false}
-        />
-      </ProCard>
-      <DepForm
-        action={formAction}
-        visible={modalVisit}
-        actionRef={actionRef}
-        setVisible={setModalVisit}
-        initialValues={modalFormInit}
-      />
-    </PageHeaderWrapper>
+              },
+            })}
+            rowKey="depId"
+            columns={depColumns}
+            request={async (params) => {
+              const response = await queryDepTree({ ...params, queryFilter: params });
+              return {
+                data: response.data.rows,
+                success: response.code === 0,
+                total: response.data.total,
+              };
+            }}
+            pagination={false}
+            options={false}
+          />
+          <DepForm
+            action={formAction}
+            visible={modalVisit}
+            actionRef={actionRef}
+            setVisible={setModalVisit}
+            initialValues={modalFormInit}
+          />
+        </>
+      }
+    />
   );
 };

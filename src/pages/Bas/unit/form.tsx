@@ -1,31 +1,12 @@
-import {
-  ProFormText,
-  ProFormGroup,
-  ProFormRadio,
-  ModalForm,
-  ProFormUploadDragger,
-} from '@ant-design/pro-form';
+import ProForm, { ProFormText, ModalForm } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
-import { message } from 'antd';
 import React, { useRef } from 'react';
-import type { ActionType } from '@ant-design/pro-table';
 import { addUnit, updUnit } from '@/services/Bas';
-import { useModel } from 'umi';
+import { StateForm } from '@/utils/form';
 
-type FormProps = {
-  action: 'add' | 'upd';
-  actionRef?: React.MutableRefObject<ActionType | undefined>;
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-  initialValues: BAS.Brand | Record<string, unknown>;
-  addCb?: () => void;
-};
-export default (props: FormProps) => {
-  const { action, visible, setVisible, initialValues } = props;
+export default (props: FormProps<BAS.Unit>) => {
+  const { action, visible, setVisible, initialValues, refresh } = props;
   const formRef = useRef<FormInstance>();
-  const { query } = useModel('unit', (model) => ({
-    query: model.query,
-  }));
 
   return (
     <ModalForm<BAS.Unit>
@@ -33,27 +14,20 @@ export default (props: FormProps) => {
         state: 1,
       }}
       formRef={formRef}
-      title={action === 'add' ? '新建计量单位' : `修改计量单位(${initialValues.brandName})`}
+      title={action === 'add' ? '新建计量单位' : `修改计量单位(${initialValues?.unitName})`}
       visible={visible}
-      submitter={{
-        searchConfig: {
-          submitText: '确认',
-          resetText: '关闭',
-        },
-      }}
       onFinish={async (values) => {
         if (action === 'upd') {
           await updUnit({
             ...initialValues,
             ...values,
           });
-          message.success('提交成功');
         } else {
           await addUnit({
             ...values,
           });
         }
-        query({ pageNumber: -1 });
+        refresh?.();
         return true;
       }}
       onVisibleChange={(v) => {
@@ -64,27 +38,13 @@ export default (props: FormProps) => {
         } else {
           formRef.current?.resetFields();
         }
-        setVisible(v);
+        setVisible?.(v);
       }}
     >
-      <ProFormGroup>
+      <ProForm.Group>
         <ProFormText width="md" name="unitName" label="计量单位" />
-      </ProFormGroup>
-      <ProFormRadio.Group
-        width="md"
-        name="state"
-        label="状态"
-        options={[
-          {
-            label: '禁用',
-            value: 0,
-          },
-          {
-            label: '正常',
-            value: 1,
-          },
-        ]}
-      />
+      </ProForm.Group>
+      {StateForm}
     </ModalForm>
   );
 };

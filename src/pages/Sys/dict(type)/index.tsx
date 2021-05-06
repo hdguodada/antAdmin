@@ -8,6 +8,7 @@ import { Button } from 'antd';
 import { history } from 'umi';
 import { PlusOutlined } from '@ant-design/icons';
 import { queryDictTypes } from '@/services/Sys';
+import { stateColumns } from '@/utils/columns';
 
 export default (): React.ReactNode => {
   const ref = useRef<FormInstance>();
@@ -23,42 +24,13 @@ export default (): React.ReactNode => {
       title: '枚举类型',
       dataIndex: 'enumType',
     },
-    {
-      title: '顺序号',
-      dataIndex: 'sortNum',
-      search: false,
-      hideInTable: true,
-    },
-    {
-      title: '状态',
-      dataIndex: 'state',
-      valueType: 'select',
-      valueEnum: () => {
-        return new Map([
-          [
-            1,
-            {
-              text: '正常',
-              status: 'Success',
-            },
-          ],
-          [
-            0,
-            {
-              text: '禁用',
-              status: 'Error',
-            },
-          ],
-        ]);
-      },
-    },
+    stateColumns,
   ];
   return (
     <PageHeaderWrapper>
       <ProCard split="vertical">
         <ProCard colSpan={'440px'} ghost>
           <ProTable<API.DictType>
-            bordered
             search={false}
             params={queryFilter}
             rowKey="dictTypeId"
@@ -84,10 +56,7 @@ export default (): React.ReactNode => {
             ]}
             editable={{}}
             request={async (params) => {
-              const response = await queryDictTypes({
-                ...params,
-                pageNumber: params.current,
-              });
+              const response = await queryDictTypes(params);
               return {
                 data: response.data.rows,
                 success: response.code === 0,

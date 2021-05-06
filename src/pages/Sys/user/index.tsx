@@ -1,16 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import React, { useRef, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import ProCard from '@ant-design/pro-card';
 import styles from './index.less';
-import { useModel } from 'umi';
-import { Button, message, Space, Table } from 'antd';
-import { delUser, queryUserInfo, queryUsers, resetPassword, updUser } from '@/services/Sys/user';
-import { PlusOutlined } from '@ant-design/icons';
+import { message } from 'antd';
+import { delUser, queryUsers, resetPassword, updUser } from '@/services/Sys/user';
 import { queryDepTreelist } from '@/services/Sys/dep';
-import DelPopconfirm from '@/components/DelPopconfirm';
 import UserForm from './form';
+import { baseSearch, indexColumns, optionColumns, stateColumns } from '@/utils/columns';
 
 export type DepDataType = API.Dep;
 
@@ -33,7 +31,6 @@ export const DepTable: React.FC<DepTableProps> = (props) => {
 
   return (
     <ProTable<DepDataType>
-      bordered
       expandable={{
         defaultExpandedRowKeys: [1],
       }}
@@ -80,31 +77,22 @@ export const DepTable: React.FC<DepTableProps> = (props) => {
 
 export const UserTable: React.FC<UserTableProps> = (props) => {
   const { depId } = props;
-  const { queryDepList } = useModel('dep');
-  const { queryOptions } = useModel('options', (model) => ({
-    userTypeOptions: model.typeOption('UserType'),
-    queryOptions: model.queryOptions,
-  }));
-  const { queryRoles } = useModel('userRole', (model) => ({
-    roles: model.userRoleOptions,
-    queryRoles: model.queryUserRoles,
-  }));
   const actionRef = useRef<ActionType>();
-  useEffect(() => {
-    queryDepList({ pageNumber: -1 });
-    queryOptions();
-    queryRoles({ pageNumber: -1 });
-  }, [queryDepList, queryOptions, queryRoles]);
   const [modalVisit, setModalVisit] = useState(false);
   const [modalFormInit, setModalFormInit] = useState<Partial<API.CurrentUser>>({});
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const userColumns: ProColumnType<UserDataType>[] = [
+    indexColumns,
+    {
+      title: '账号',
+      dataIndex: 'userName',
+      search: false,
+    },
     {
       title: '姓名',
       dataIndex: 'realName',
       ellipsis: true,
       copyable: true,
-      fixed: 'left',
       render: (_) => <a>{_}</a>,
     },
     {
@@ -137,88 +125,46 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
       search: false,
       editable: false,
     },
-    {
-      title: '状态',
-      dataIndex: 'state',
-      valueType: 'select',
-      initialValue: 1,
-      valueEnum: () =>
-        new Map([
-          [1, { text: '正常', status: 'Success' }],
-          [0, { text: '禁用', status: 'Error' }],
-        ]),
-    },
-    {
-      title: '操作',
-      key: 'action',
-      valueType: 'option',
-      width: 200,
-      render: (_, entity) => {
-        return [
-          <a
-            key="edit"
-            onClick={async () => {
-              setFormAction('upd');
-              const user = (await queryUserInfo(entity.userId)).data;
-              setModalFormInit(user);
-              setModalVisit(true);
-            }}
-          >
-            修改
-          </a>,
-          <DelPopconfirm
-            key="del"
-            onConfirm={async () => {
-              await delUser([entity.userId]);
-              actionRef?.current?.reload();
-            }}
-          />,
-          <a
-            type="text"
-            key="resetPassword"
-            className="error-color"
-            onClick={async () => {
-              const res = await resetPassword();
-              message.success(res.msg);
-            }}
-          >
-            重置密码
-          </a>,
-        ];
+    stateColumns,
+    optionColumns({
+      modify: async ({ record }) => {
+        setFormAction('upd');
+        setModalFormInit(record);
+        setModalVisit(true);
       },
-    },
+      del: async ({ record }) => {
+        await delUser([record.userId]);
+      },
+      width: 150,
+      jsxList: [
+        <a
+          type="text"
+          key="resetPassword"
+          className="error-color"
+          onClick={async () => {
+            const res = await resetPassword();
+            message.success(res.msg);
+          }}
+        >
+          重置密码
+        </a>,
+      ],
+    }),
   ];
   return (
     <>
       <ProTable<API.CurrentUser, { depId: number | string }>
-        bordered
         actionRef={actionRef}
         params={{ depId }}
         rowKey="userId"
-        rowSelection={{
-          selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-        }}
-        tableAlertOptionRender={() => {
-          return (
-            <Space size={16}>
-              <a>批量删除</a>
-              <a>导出数据</a>
-            </Space>
-          );
-        }}
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            onClick={() => {
-              setFormAction('add');
-              setModalFormInit({});
-              setModalVisit(true);
-            }}
-          >
-            <PlusOutlined />
-            新建
-          </Button>,
-        ]}
+        options={false}
+        search={baseSearch({
+          fn: () => {
+            setFormAction('add');
+            setModalFormInit({});
+            setModalVisit(true);
+          },
+        })}
         editable={{
           onDelete: async (key) => {
             await delUser([key]);
@@ -233,6 +179,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
           const response = await queryUsers({
             ...params,
             pageNumber: params.current,
+            queryFilter: params,
           });
           return {
             data: response.data.rows,
@@ -241,7 +188,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
           };
         }}
         pagination={{
-          pageSize: 5,
+          pageSize: 10,
         }}
         columns={userColumns}
       />
@@ -274,22 +221,24 @@ export default (): React.ReactNode => {
     },
   ];
   return (
-    <PageHeaderWrapper>
-      <ProCard split="vertical">
-        <ProCard colSpan="384px" ghost>
-          <div style={{ height: 88 }}></div>
-          <DepTable
-            columns={depColumns}
-            onChange={(id) => {
-              setdepId(id);
-            }}
-            depId={depId}
-          />
+    <PageContainer
+      content={
+        <ProCard split="vertical">
+          <ProCard colSpan="384px">
+            <div style={{ height: 25 }} />
+            <DepTable
+              columns={depColumns}
+              onChange={(id) => {
+                setdepId(id);
+              }}
+              depId={depId}
+            />
+          </ProCard>
+          <ProCard>
+            <UserTable depId={depId} />
+          </ProCard>
         </ProCard>
-        <ProCard ghost>
-          <UserTable depId={depId} />
-        </ProCard>
-      </ProCard>
-    </PageHeaderWrapper>
+      }
+    />
   );
 };

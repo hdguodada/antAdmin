@@ -1,60 +1,76 @@
-import {
+import type { FormInstance } from '@ant-design/pro-form';
+import ProForm, {
   ProFormText,
-  ProFormGroup,
-  ProFormRadio,
   ModalForm,
   ProFormSelect,
   ProFormTextArea,
   ProFormDatePicker,
 } from '@ant-design/pro-form';
-import { Button } from 'antd';
-import React from 'react';
+import React, { useRef } from 'react';
 import type { ActionType } from '@ant-design/pro-table';
-import { addCustRecord } from '@/services/Bas';
+import { addCustRecord, updCustRecord } from '@/services/Bas';
 import { useModel } from 'umi';
 import { queryUsers } from '@/services/Sys';
+import moment from 'moment';
+import { patternMsg } from '@/utils/validator';
 
 type FormProps = {
+  action: 'add' | 'upd';
+  visible: boolean;
+  setVisible: (visible: boolean) => void;
   actionRef?: React.MutableRefObject<ActionType | undefined>;
-  initialValues: BAS.CustRecord | Record<string, unknown>;
-  custRel?: BAS.CustRel[];
+  initialValues?: BAS.CustRecord;
+  custRel?: BAS.Rel[];
+  customer: BAS.Customer;
+  refresh?: () => void;
 };
 export default (props: FormProps) => {
-  const { actionRef, initialValues, custRel } = props;
+  const { currentUser } = useModel('@@initialState', (model) => ({
+    currentUser: model.initialState?.currentUser,
+  }));
+  const { initialValues, custRel, visible, setVisible, action, customer, refresh } = props;
   const { typeOption } = useModel('options', (model) => ({ typeOption: model.typeOption }));
+  const formRef = useRef<FormInstance>();
   return (
     <ModalForm<BAS.CustRecord>
-      trigger={
-        <Button key="newRecord" type="primary">
-          新建
-        </Button>
-      }
-      title={<div>新建行动记录({initialValues.custName})</div>}
-      submitter={{
-        searchConfig: {
-          submitText: '确认',
-          resetText: '关闭',
-        },
+      title={<div>新建行动记录({customer?.custName})</div>}
+      visible={visible}
+      initialValues={{
+        state: 1,
+        exeDate: moment().format('YYYY-MM-DD'),
       }}
       onFinish={async (values) => {
-        await addCustRecord(values);
-        actionRef?.current?.reload();
+        if (action === 'add') {
+          await addCustRecord({
+            ...values,
+            custId: customer.custId,
+          });
+        } else {
+          await updCustRecord({
+            ...initialValues,
+            ...values,
+          });
+        }
+        refresh?.();
         return true;
       }}
+      formRef={formRef}
+      onVisibleChange={(v) => {
+        if (v) {
+          formRef.current?.setFieldsValue(initialValues);
+        } else {
+          formRef.current?.resetFields();
+        }
+        setVisible(v);
+      }}
     >
-      <ProFormText
-        width="md"
-        name="custId"
-        label="客户"
-        disabled
-        initialValue={initialValues.custId}
-        hidden
-      />
-      <ProFormGroup>
+      <ProFormText width="md" name="custId" label="客户" disabled hidden />
+      <ProForm.Group>
         <ProFormSelect
           width="md"
           name="relId"
           label="联系人"
+          rules={patternMsg.text('')}
           request={async () => {
             return custRel
               ? custRel.map((item) => ({
@@ -68,12 +84,20 @@ export default (props: FormProps) => {
           width="md"
           name="recordTypeId"
           label="行动类别"
+          rules={patternMsg.select('')}
           options={typeOption('CustRecordType')}
         />
-        <ProFormTextArea width="lg" name="content" label="行动内容" />
-        <ProFormDatePicker width="md" name="exeDate" label="执行日期" />
+        <ProFormTextArea width="lg" name="content" label="行动内容" rules={patternMsg.text('')} />
+        <ProFormDatePicker
+          width="md"
+          name="exeDate"
+          label="执行日期"
+          rules={patternMsg.select('')}
+        />
         <ProFormSelect
           width="md"
+          rules={patternMsg.select('')}
+          initialValue={currentUser?.userId}
           name="userId"
           label="执行人"
           request={async () => {
@@ -82,25 +106,8 @@ export default (props: FormProps) => {
               value: user.userId,
             }));
           }}
-          initialValue={initialValues.userId}
         />
-      </ProFormGroup>
-      <ProFormRadio.Group
-        width="md"
-        name="state"
-        label="状态"
-        initialValue={1}
-        options={[
-          {
-            label: '禁用',
-            value: 0,
-          },
-          {
-            label: '正常',
-            value: 1,
-          },
-        ]}
-      />
+      </ProForm.Group>
     </ModalForm>
   );
 };

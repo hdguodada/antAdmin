@@ -1,20 +1,12 @@
-import { ProFormText, ProFormGroup, ProFormRadio, ModalForm } from '@ant-design/pro-form';
+import ProForm, { ProFormText, ModalForm } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
-import { message } from 'antd';
 import React, { useRef } from 'react';
-import type { ActionType } from '@ant-design/pro-table';
 import { addAttr, updAttr } from '@/services/Bas';
 import { useModel } from 'umi';
+import { StateForm } from '@/utils/form';
+import { patternMsg } from '@/utils/validator';
 
-type FormProps = {
-  action: 'add' | 'upd';
-  actionRef?: React.MutableRefObject<ActionType | undefined>;
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-  initialValues: BAS.Attr | Record<string, unknown>;
-  addCb?: () => void;
-};
-export default (props: FormProps) => {
+export default (props: FormProps<BAS.Attr>) => {
   const { action, visible, setVisible, initialValues } = props;
   const formRef = useRef<FormInstance>();
   const { query } = useModel('attr', (model) => ({
@@ -27,14 +19,8 @@ export default (props: FormProps) => {
         state: 1,
       }}
       formRef={formRef}
-      title={action === 'add' ? '新建规格' : `修改规格(${initialValues.attrName})`}
+      title={action === 'add' ? '新建规格' : `修改规格(${initialValues?.attrName})`}
       visible={visible}
-      submitter={{
-        searchConfig: {
-          submitText: '确认',
-          resetText: '关闭',
-        },
-      }}
       onFinish={async (values) => {
         if (action === 'upd') {
           await updAttr({
@@ -46,8 +32,7 @@ export default (props: FormProps) => {
             ...values,
           });
         }
-        message.success('提交成功');
-        query({ pageNumber: -1 });
+        query();
         return true;
       }}
       onVisibleChange={(v) => {
@@ -58,27 +43,18 @@ export default (props: FormProps) => {
         } else {
           formRef.current?.resetFields();
         }
-        setVisible(v);
+        setVisible?.(v);
       }}
     >
-      <ProFormGroup>
-        <ProFormText width="md" name="attrName" label="规格名称" />
-      </ProFormGroup>
-      <ProFormRadio.Group
-        width="md"
-        name="state"
-        label="状态"
-        options={[
-          {
-            label: '禁用',
-            value: 0,
-          },
-          {
-            label: '正常',
-            value: 1,
-          },
-        ]}
-      />
+      <ProForm.Group>
+        <ProFormText
+          width="md"
+          name="attrName"
+          label="规格名称"
+          rules={patternMsg.text('规格名称')}
+        />
+      </ProForm.Group>
+      {StateForm}
     </ModalForm>
   );
 };

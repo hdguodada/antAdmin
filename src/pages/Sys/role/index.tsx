@@ -1,12 +1,14 @@
-import { delRole, queryRoleInfo, queryRoleList, updRole } from '@/services/Sys/role';
-import { FormOutlined } from '@ant-design/icons';
+import { delRole, queryRoleInfo } from '@/services/Sys/role';
 import ProCard from '@ant-design/pro-card';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, message } from 'antd';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import RoleForm from './form';
+import RoleGlobalForm from './roleForm';
 import styles from '@/pages/Sys/user/index.less';
+import { indexColumns, optionColumns, refreshAndNew, stateColumns } from '@/utils/columns';
+import { PageContainer } from '@ant-design/pro-layout';
+import { useRequest, useModel } from 'umi';
 
 export type RoleDataType = API.UserRole;
 
@@ -14,13 +16,18 @@ export default (): React.ReactNode => {
   const actionRef = useRef<ActionType>();
   const [roleId, setRoleId] = useState(1);
   const [modalFormInit, setModalFormInit] = useState<API.UserRole | undefined>();
-
+  const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
+  const [modalVisit, setModalVisit] = useState(false);
+  const { userRoleList, queryUserRoles } = useModel('userRole', (model) => ({
+    userRoleList: model.userRoleList,
+    queryUserRoles: model.queryUserRoles,
+  }));
+  const { data, run } = useRequest(() => queryRoleInfo(roleId), { manual: true });
   useEffect(() => {
-    queryRoleInfo(roleId).then((res) => {
-      setModalFormInit(res.data);
-    });
+    run();
   }, [roleId]);
   const columns: ProColumnType<RoleDataType>[] = [
+    indexColumns,
     {
       title: 'roleId',
       dataIndex: 'roleId',
@@ -31,114 +38,75 @@ export default (): React.ReactNode => {
       title: '角色名称',
       dataIndex: 'roleName',
       render: (_) => <a>{_}</a>,
+      search: false,
     },
     {
       title: '角色描述',
       dataIndex: 'roleDesc',
       search: false,
-      hideInTable: true,
     },
-    {
-      title: '顺序',
-      dataIndex: 'sortNum',
-      search: false,
-      hideInTable: true,
-    },
-    {
-      title: '状态',
-      hideInTable: true,
-      dataIndex: 'state',
-      valueType: 'select',
-      search: false,
-      valueEnum: () =>
-        new Map([
-          [1, { text: '正常', status: 'Success' }],
-          [0, { text: '禁用', status: 'Error' }],
-        ]),
-    },
-    {
-      width: 150,
-      title: '操作',
-      key: 'action',
-      valueType: 'option',
-      render: (_, entity, _index, action) => {
-        return [
-          <Button
-            key="edit"
-            type="link"
-            onClick={() => {
-              action.startEditable?.(entity.roleId);
-            }}
-          >
-            <FormOutlined />
-            修改
-          </Button>,
-        ];
+    stateColumns,
+    optionColumns({
+      modify: async ({ record }) => {
+        setFormAction('upd');
+        const role = (await queryRoleInfo(record.roleId)).data;
+        setModalFormInit(role);
+        setModalVisit(true);
       },
-    },
+      del: async ({ record }) => {
+        await delRole([record.roleId]);
+      },
+    }),
   ];
   return (
-    <>
-      <ProCard split="vertical">
-        <ProCard colSpan="384px">
-          <ProTable<RoleDataType>
-            rowClassName={(record) => {
-              return record.roleId === roleId ? styles['split-row-select-active'] : '';
-            }}
-            onRow={(record) => {
-              return {
-                onClick: async () => {
-                  if (record.roleId) {
-                    setRoleId(record.roleId as number);
-                  }
-                },
-              };
-            }}
-            search={false}
-            options={false}
+    <PageContainer
+      content={
+        <>
+          <RoleGlobalForm
+            action={formAction}
+            visible={modalVisit}
             actionRef={actionRef}
-            editable={{
-              onDelete: async (key) => {
-                await delRole([key as string]);
-                message.success('删除数据成功。');
-              },
-              onSave: async (_, row) => {
-                await updRole(row);
-                message.success('修改数据成功。');
-              },
-            }}
-            bordered
-            rowKey="roleId"
-            columns={columns}
-            request={async (params) => {
-              const response = await queryRoleList({
-                ...params,
-                pageNumber: -1,
-              });
-              return {
-                data: response.data.rows,
-                success: response.code === 0,
-                total: response.data.total,
-              };
-            }}
-            pagination={false}
+            setVisible={setModalVisit}
+            initialValues={modalFormInit as API.UserRole}
           />
-        </ProCard>
-        <ProCard ghost>
-          {modalFormInit ? (
-            <RoleForm
-              initialValues={modalFormInit}
-              setRoleId={(id: number) => {
-                queryRoleInfo(id).then((res) => {
-                  setModalFormInit(res.data);
-                });
-              }}
-            />
-          ) : (
-            <></>
-          )}
-        </ProCard>
-      </ProCard>
-    </>
+          <ProCard split="vertical">
+            <ProCard colSpan="700px">
+              <ProTable<RoleDataType>
+                pagination={false}
+                search={false}
+                toolBarRender={() =>
+                  refreshAndNew({
+                    fn: async () => {
+                      setFormAction('add');
+                      setModalFormInit(undefined);
+                      setModalVisit(true);
+                    },
+                    refresh: queryUserRoles,
+                  })
+                }
+                rowClassName={(record) => {
+                  return record.roleId === roleId ? styles['split-row-select-active'] : '';
+                }}
+                options={false}
+                onRow={(record) => {
+                  return {
+                    onDoubleClick: async () => {
+                      if (record.roleId) {
+                        setRoleId(record.roleId as number);
+                      }
+                    },
+                  };
+                }}
+                actionRef={actionRef}
+                rowKey="roleId"
+                columns={columns}
+                dataSource={userRoleList}
+              />
+            </ProCard>
+            <ProCard>{data ? <RoleForm initialValues={data} setRoleId={run} /> : ''}</ProCard>
+          </ProCard>
+        </>
+      }
+    />
   );
 };

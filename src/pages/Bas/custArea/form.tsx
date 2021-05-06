@@ -1,21 +1,18 @@
-import { ProFormText, ProFormGroup, ProFormRadio, ModalForm } from '@ant-design/pro-form';
+import ProForm, { ProFormText, ModalForm } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
 import { Form, TreeSelect } from 'antd';
-import { message, Modal } from 'antd';
 import React, { useRef } from 'react';
-import type { ActionType } from '@ant-design/pro-table';
 import { addCustArea, updCustArea } from '@/services/Bas';
 import { useModel } from 'umi';
+import { StateForm } from '@/utils/form';
+import { patternMsg } from '@/utils/validator';
 
-type FormProps = {
-  action: 'add' | 'upd';
-  actionRef?: React.MutableRefObject<ActionType | undefined>;
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-  initialValues: BAS.CustArea | Record<string, unknown>;
-};
-const CustAreaForm: React.FC<FormProps> = (props) => {
-  const { action, actionRef, visible, setVisible, initialValues } = props;
+const CustAreaForm: React.FC<FormProps<BAS.CustArea>> = (props) => {
+  const { queryCustAreaTree, queryCustArea } = useModel('custArea', (model) => ({
+    queryCustAreaTree: model.queryCustAreaTree,
+    queryCustArea: model.queryCustArea,
+  }));
+  const { action, visible, setVisible, initialValues } = props;
   const { treeDataSimpleMode } = useModel('custArea', (model) => ({
     treeDataSimpleMode: model.treeDataSimpleMode,
   }));
@@ -26,33 +23,16 @@ const CustAreaForm: React.FC<FormProps> = (props) => {
         state: 1,
       }}
       formRef={formRef}
-      title={action === 'add' ? '新建客户区域' : `修改客户区域(${initialValues.areaName})`}
+      title={action === 'add' ? '新建客户区域' : `修改客户区域(${initialValues?.areaName})`}
       visible={visible}
-      submitter={{
-        searchConfig: {
-          submitText: '确认',
-          resetText: '关闭',
-        },
-      }}
       onFinish={async (values) => {
         if (action === 'upd') {
           await updCustArea({ ...initialValues, ...values });
-          message.success('提交成功');
         } else {
           await addCustArea(values);
-          Modal.confirm({
-            content: '新增客户区域成功,是否继续添加?',
-            onCancel() {
-              setVisible(false);
-            },
-            onOk() {
-              formRef?.current?.resetFields();
-            },
-          });
-          actionRef?.current?.reload();
-          return false;
         }
-        actionRef?.current?.reload();
+        queryCustAreaTree();
+        queryCustArea();
         return true;
       }}
       onVisibleChange={(v) => {
@@ -61,11 +41,16 @@ const CustAreaForm: React.FC<FormProps> = (props) => {
         } else {
           formRef.current?.resetFields();
         }
-        setVisible(v);
+        setVisible?.(v);
       }}
     >
-      <ProFormGroup>
-        <Form.Item label="上级区域" name="pareaId" style={{ width: '328px' }}>
+      <ProForm.Group>
+        <Form.Item
+          label="上级区域"
+          name="pareaId"
+          style={{ width: '328px' }}
+          rules={patternMsg.select('上级区域')}
+        >
           <TreeSelect
             showSearch
             placeholder="请选择"
@@ -76,23 +61,14 @@ const CustAreaForm: React.FC<FormProps> = (props) => {
             treeNodeFilterProp="title"
           />
         </Form.Item>
-        <ProFormText width="md" name="areaName" label="区域名称" />
-      </ProFormGroup>
-      <ProFormRadio.Group
-        width="md"
-        name="state"
-        label="状态"
-        options={[
-          {
-            label: '禁用',
-            value: 0,
-          },
-          {
-            label: '正常',
-            value: 1,
-          },
-        ]}
-      />
+        <ProFormText
+          width="md"
+          name="areaName"
+          label="区域名称"
+          rules={patternMsg.text('区域名称')}
+        />
+      </ProForm.Group>
+      {StateForm}
     </ModalForm>
   );
 };

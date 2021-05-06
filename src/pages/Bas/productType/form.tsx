@@ -1,14 +1,14 @@
-import ProForm, { ProFormText, ProFormGroup, ModalForm, ProFormSlider } from '@ant-design/pro-form';
+import ProForm, { ProFormText, ModalForm, ProFormSlider } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
 import { Input, Select } from 'antd';
 import { Form, TreeSelect } from 'antd';
-import { message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
 import { addProductType, updProductType } from '@/services/Bas';
 import { useModel } from 'umi';
 import { AttrValuesSelect } from '../product/detail';
+import { patternMsg } from '@/utils/validator';
 
 type FormProps = {
   action: 'add' | 'upd';
@@ -21,7 +21,6 @@ type FormProps = {
 export default (props: FormProps) => {
   const { action, visible, setVisible, initialValues } = props;
   const formRef = useRef<FormInstance>();
-
   const [specListEditableKeys, setSpecListEditableKeys] = useState<React.Key[]>([]);
   const { attrListOptions, allAttrList } = useModel('attr', (model) => ({
     attrListOptions: model.options,
@@ -67,20 +66,14 @@ export default (props: FormProps) => {
       formRef={formRef}
       title={action === 'add' ? '新建产品分类' : `修改产品分类(${initialValues?.cateName})`}
       visible={visible}
-      submitter={{
-        searchConfig: {
-          submitText: '确认',
-          resetText: '关闭',
-        },
-      }}
       onFinish={async (values) => {
         if (action === 'upd') {
           await updProductType({ ...initialValues, ...values });
-          message.success('提交成功');
         } else {
+          console.log(values);
           await addProductType(values);
         }
-        queryTreeProductType({ pageNumber: -1 });
+        queryTreeProductType();
         return true;
       }}
       onVisibleChange={(v) => {
@@ -95,7 +88,12 @@ export default (props: FormProps) => {
         setVisible(v);
       }}
     >
-      <Form.Item label="上级类别" name="pcateId" style={{ width: '328px' }}>
+      <Form.Item
+        label="上级类别"
+        name="pcateId"
+        style={{ width: '328px' }}
+        rules={patternMsg.select('上级类别')}
+      >
         <TreeSelect
           showSearch
           placeholder="请选择"
@@ -105,20 +103,24 @@ export default (props: FormProps) => {
           treeNodeFilterProp="title"
         />
       </Form.Item>
-      <ProFormGroup>
-        <ProFormText width="md" name="cateName" label="分类名称" />
+      <ProForm.Group>
+        <ProFormText
+          width="md"
+          name="cateName"
+          label="分类名称"
+          rules={patternMsg.text('分类名称')}
+        />
         <ProFormText width="md" name="iconUrl" label="图标" />
         <ProFormSlider min={1} max={100} width="md" name="sortNum" label="排序" initialValue={1} />
-      </ProFormGroup>
-      <ProFormGroup>
+      </ProForm.Group>
+      <ProForm.Group>
         <ProForm.Item name="attrList" label="属性" trigger="onValuesChange">
           <EditableProTable
-            bordered
             rowKey="autoId"
+            bordered
             recordCreatorProps={{
               newRecordType: 'dataSource',
               record: () => ({
-                attrId: Date.now(),
                 attrName: '',
                 attrValues: [],
                 autoId: Date.now(),
@@ -132,7 +134,7 @@ export default (props: FormProps) => {
             }}
           />
         </ProForm.Item>
-      </ProFormGroup>
+      </ProForm.Group>
     </ModalForm>
   );
 };

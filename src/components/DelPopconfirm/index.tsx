@@ -1,5 +1,5 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Popconfirm } from 'antd';
+import { Button, Popconfirm } from 'antd';
 import React from 'react';
 
 interface Props {
@@ -34,9 +34,9 @@ export default (props: Props) => {
       okButtonProps={{ loading: confirmLoading }}
       icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
     >
-      <a className="error-color" onClick={showPopconfirm}>
-        删除
-      </a>
+      <Button danger onClick={showPopconfirm}>
+        批量删除
+      </Button>
     </Popconfirm>
   );
 };

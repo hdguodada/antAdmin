@@ -1,88 +1,100 @@
-import { queryCustomerRel, queryCustRecord } from '@/services/Bas';
-import ProList from '@ant-design/pro-list';
+import { delCustRecord, queryCustRecord } from '@/services/Bas';
 import type { ActionType } from '@ant-design/pro-table';
-import { Space, Tag } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
-import { useModel } from 'umi';
+import React, { useRef, useState } from 'react';
 import CustRecordForm from './cusRecordForm';
+import ProTable from '@ant-design/pro-table';
+import { dateColumns, indexColumns, optionColumns, refreshAndNew } from '@/utils/columns';
+import { useRequest } from '@/.umi/plugin-request/request';
 
 interface CustRecordProps {
   customer: BAS.Customer;
+  custRel?: BAS.Rel[];
 }
 export default (props: CustRecordProps): React.ReactElement => {
-  const { customer } = props;
+  const { customer, custRel } = props;
   const CustRecordActionRef = useRef<ActionType>();
-  const { currentUser } = useModel('@@initialState', (model) => ({
-    currentUser: model.initialState?.currentUser,
-  }));
-  const [custRel, setCustRel] = useState<BAS.CustRel[]>();
-  useEffect(() => {
-    queryCustomerRel({ pageNumber: -1, queryFilter: { custId: customer.custId } }).then((res) => {
-      setCustRel(res.data.rows);
+  const [modalVisit, setModalVisit] = useState(false);
+  const [modalFormInit, setModalFormInit] = useState<BAS.CustRecord>();
+  const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
+  const { data, loading, refresh } = useRequest(async () => {
+    const response = await queryCustRecord({
+      pageNumber: -1,
+      queryFilter: {
+        custId: customer.custId,
+      },
     });
-  }, [customer.custId]);
+    return {
+      data: response.data.rows,
+      success: response.code === 0,
+      total: response.data.total,
+    };
+  });
   return (
-    <ProList<BAS.CustRecord>
-      size="large"
-      split
-      actionRef={CustRecordActionRef}
-      rowKey="recordId"
-      params={{ custId: customer?.custId }}
-      toolBarRender={() => {
-        return [
-          <CustRecordForm
-            actionRef={CustRecordActionRef}
-            initialValues={{ ...customer, userId: currentUser?.userId }}
-            custRel={custRel}
-            key="add"
-          />,
-        ];
-      }}
-      metas={{
-        title: {
-          render: (_, record) => {
-            return <Tag color="blue">{record.crtDate}</Tag>;
+    <>
+      <CustRecordForm
+        actionRef={CustRecordActionRef}
+        visible={modalVisit}
+        action={formAction}
+        setVisible={setModalVisit}
+        initialValues={modalFormInit}
+        custRel={custRel}
+        customer={customer}
+        refresh={refresh}
+      />
+      <ProTable<BAS.CustRecord>
+        actionRef={CustRecordActionRef}
+        rowKey="recordId"
+        options={false}
+        toolBarRender={() =>
+          refreshAndNew({
+            fn: async () => {
+              setModalFormInit(undefined);
+              setFormAction('add');
+              setModalVisit(true);
+            },
+            refresh,
+          })
+        }
+        search={false}
+        columns={[
+          indexColumns,
+          dateColumns({ title: '执行日期', dataIndex: 'exeDate' }),
+          {
+            dataIndex: 'recordTypeName',
+            title: '行动类型',
+            search: false,
           },
-        },
-        content: {
-          render: (_, record) => {
-            return (
-              <div>
-                <Tag color="#5BD8A6">{record.recordTypeName}</Tag> -{record.content}
-                {record.realName}
-              </div>
-            );
+          {
+            dataIndex: 'relName',
+            title: '联系对象',
+            search: false,
           },
-        },
-        subTitle: {
-          render: (_, record) => {
-            return (
-              <Space size={0}>
-                <Tag color="#5BD8A6">{record.relName}</Tag>
-              </Space>
-            );
+          {
+            dataIndex: 'content',
+            title: '行动内容',
+            search: false,
           },
-        },
-        actions: {
-          render: (_, record) => {
-            return <a key="invite">查看</a>;
+          {
+            dataIndex: 'realName',
+            title: '行动人',
+            search: false,
           },
-        },
-      }}
-      request={async (params) => {
-        const response = await queryCustRecord({
-          ...params,
-          pageNumber: -1,
-          queryFilter: {
-            ...params,
-          },
-        });
-        return {
-          data: response.data.rows,
-          success: response.code === 0,
-          total: response.data.total,
-        };
-      }}
-    ></ProList>
+          optionColumns({
+            modify: async ({ record }) => {
+              setFormAction('upd');
+              setModalFormInit(record);
+              setModalVisit(true);
+            },
+            del: async ({ record }) => {
+              await delCustRecord([record.recordId]);
+              refresh();
+            },
+          }),
+        ]}
+        pagination={false}
+        dataSource={data}
+        loading={loading}
+      />
+    </>
   );
 };

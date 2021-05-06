@@ -1,7 +1,7 @@
 ﻿export default [
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/desktop',
   },
   // 用户登录
   {
@@ -29,12 +29,160 @@
   {
     name: 'purchase',
     icon: 'ShoppingCartOutlined',
-    path: '/purchase',
+    path: '/bis',
     routes: [
       {
+        name: 'purcOrder',
+        path: 'purcOrder',
+        component: './Purchase/Ghdd',
+      },
+      {
+        path: 'purcOrder/:id',
+        component: './Purchase/Ghdd/detail',
+        hideInMenu: true,
+      },
+
+      {
         name: 'purchase',
-        path: '/purchase',
-        component: './Purchase/purchase',
+        path: 'purchase',
+        component: './Purchase/Ghd',
+      },
+      {
+        path: 'purchase/:id',
+        component: './Purchase/Ghd/detail',
+        hideInMenu: true,
+      },
+      {
+        name: 'Thd',
+        path: 'Thd',
+        component: './Purchase/Thd',
+      },
+      {
+        path: 'Thd/:id',
+        component: './Purchase/Thd/detail',
+        hideInMenu: true,
+      },
+      {
+        name: 'Reports',
+        path: 'Reports',
+        component: './Purchase/Reports',
+      },
+    ],
+  },
+  {
+    name: 'sales',
+    path: '/sales',
+    routes: [
+      {
+        name: 'Xhdd',
+        path: 'Xhdd',
+        component: './Sales/xhdd',
+      },
+      {
+        name: 'Xhdd',
+        path: 'Xhdd/:id',
+        component: './Sales/xhdd/detail',
+      },
+      {
+        name: 'Xhd',
+        path: 'Xhd',
+        component: './Sales/xhd',
+      },
+      {
+        name: 'Xhthd',
+        path: 'Xhthd',
+        component: './Sales/Xhthd',
+      },
+      {
+        name: 'Reports',
+        path: 'Reports',
+        component: './Sales/Reports',
+      },
+    ],
+  },
+  {
+    name: 'stock',
+    icon: 'AppstockOutlined',
+    path: '/stock',
+    routes: [
+      {
+        // 调拨单
+        name: 'stockChange',
+        path: 'stockChange',
+        component: './Store/stockChange',
+      },
+      {
+        // 调拨单
+        name: 'stockChange',
+        path: 'stockChange/:id',
+        component: './Store/stockChange/detail',
+        hideInMenu: true,
+      },
+      {
+        // 其他入库单
+        name: 'stockIn',
+        path: 'stockIn',
+        component: './Store/stockIn',
+      },
+      {
+        // 其他入库单
+        name: 'stockIn',
+        path: 'stockIn/:id',
+        component: './Store/stockIn/detail',
+        hideInMenu: true,
+      },
+      {
+        // 其他出库单
+        name: 'stockOut',
+        path: 'stockOut',
+        component: './Store/stockOut',
+      },
+      {
+        // 其他出库单
+        name: 'stockOut',
+        path: 'stockOut/:id',
+        component: './Store/stockOut/detail',
+        hideInMenu: true,
+      },
+
+      {
+        // 盘点
+        name: 'inventory',
+        path: 'inventory',
+        component: './Store/inventory',
+      },
+      {
+        // 报表
+        name: 'Reports',
+        path: 'Reports',
+        component: './Store/Reports',
+      },
+      {
+        // 盘点详情
+        name: 'inventory',
+        path: 'inventory/:id',
+        component: './Store/inventory/detail',
+      },
+      {
+        name: 'storeOrder',
+        path: 'storeOrder',
+        routes: [
+          {
+            name: 'inBalance',
+            path: 'inBalance',
+            component: './Store/inBalance',
+          },
+          {
+            name: 'deliverDetail',
+            path: 'deliverDetail',
+            component: './Store/deliverDetail',
+          },
+          {
+            name: 'serNumDetail',
+            path: 'serNumDetail',
+            component: './Store/serNum/serNumDetail',
+          },
+        ],
       },
     ],
   },
@@ -62,8 +210,8 @@
       {
         name: 'customerDetail',
         path: 'customer/:id',
+
         component: './Bas/customer/detail',
-        hideInMenu: true,
       },
       {
         name: 'supplier',
@@ -71,14 +219,29 @@
         component: './Bas/supplier',
       },
       {
+        name: 'supplier',
+        path: 'supplier/:id',
+        component: './Bas/supplier/form',
+      },
+      {
         name: 'employ',
         path: 'employ',
         component: './Bas/employ',
       },
       {
+        name: 'store',
+        path: 'store',
+        component: './Bas/store',
+      },
+      {
         name: 'basOthers',
         path: 'basOthers',
         component: './Bas/basOthers',
+      },
+      {
+        name: 'account',
+        path: 'account',
+        component: './Bas/account',
       },
     ],
   },
@@ -108,9 +271,14 @@
         component: './Sys/coderule',
       },
       {
-        name: 'CompanyEdit',
-        path: '/sys/CompanyEdit',
+        name: 'company',
+        path: '/sys/company',
         component: './Sys/company',
+      },
+      {
+        name: 'coderule',
+        path: '/sys/coderule',
+        component: './Sys/coderule',
       },
     ],
   },

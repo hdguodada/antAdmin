@@ -1,17 +1,19 @@
-import {
+import ProForm, {
   ProFormText,
-  ProFormGroup,
-  ProFormSelect,
   ProFormSlider,
   ProFormCheckbox,
   ProFormRadio,
   ModalForm,
 } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
-import { message, Modal } from 'antd';
+import { TreeSelect } from 'antd';
+import { Modal } from 'antd';
 import React, { useRef } from 'react';
-import { queryFuns, updModule } from '@/services/Sys';
+import { addModule, queryFuns, updModule } from '@/services/Sys';
 import type { ActionType } from '@ant-design/pro-table';
+import { patternMsg } from '@/utils/validator';
+
+const { confirm } = Modal;
 
 type FormProps = {
   action: 'add' | 'upd';
@@ -28,24 +30,19 @@ const ModuleForm: React.FC<FormProps> = (props) => {
     <ModalForm<API.Module>
       initialValues={{
         state: 1,
+        ver1: 1,
       }}
       formRef={formRef}
       title={action === 'add' ? '新建模块' : `修改模块(${initialValues.modName})`}
       visible={visible}
-      submitter={{
-        searchConfig: {
-          submitText: '确认',
-          resetText: '关闭',
-        },
-      }}
       onFinish={async (values) => {
         if (action === 'upd') {
           await updModule({ ...initialValues, ...values });
-          message.success('提交成功');
+          actionRef?.current?.reload();
         } else {
-          // await (values);
-          Modal.confirm({
-            content: '新增部门成功,是否继续添加?',
+          await addModule(values);
+          confirm({
+            content: '新增模块成功,是否继续添加?',
             onCancel() {
               setVisible(false);
             },
@@ -69,26 +66,38 @@ const ModuleForm: React.FC<FormProps> = (props) => {
       }}
     >
       {initialValues.pModId !== 0 && (
-        <ProFormGroup>
-          <ProFormSelect width="md" name="pModId" label="上级模块" options={moduleOptions} />
-        </ProFormGroup>
+        <ProForm.Group>
+          <ProForm.Item name="pModId" label="上级模块" style={{ width: '500px' }}>
+            <TreeSelect
+              showSearch
+              placeholder="请选择"
+              allowClear
+              treeDefaultExpandAll
+              treeData={moduleOptions}
+            />
+          </ProForm.Item>
+        </ProForm.Group>
       )}
-      <ProFormGroup>
-        <ProFormText width="md" name="modName" label="模块名称" />
-        <ProFormText width="md" name="memo" label="模块说明" />
-      </ProFormGroup>
-      <ProFormGroup>
-        <ProFormText width="md" name="url" label="模块地址" />
+      <ProForm.Group>
+        <ProFormText
+          width="md"
+          name="modName"
+          label="模块名称"
+          rules={patternMsg.text('模块名称')}
+        />
+        <ProFormText width="md" name="memo" label="中文名称" rules={patternMsg.text('中文名称')} />
+      </ProForm.Group>
+      <ProForm.Group>
         <ProFormText width="md" name="path" label="路径" />
-        {initialValues.pModId !== 0 && <ProFormText width="md" name="Component" label="组件" />}
-      </ProFormGroup>
-      <ProFormGroup>
+        <ProFormText width="md" name="url" label="模块地址" />
+      </ProForm.Group>
+      <ProForm.Group>
         <ProFormText width="md" name="icon" label="图标" />
         <ProFormText width="md" name="cNName" label="模块中文名称" />
         <ProFormText width="md" name="cNIcon" label="模块中文Icon" />
         <ProFormSlider width="md" name="sortNum" label="顺序号" />
-      </ProFormGroup>
-      <ProFormGroup>
+      </ProForm.Group>
+      <ProForm.Group>
         <ProFormRadio.Group
           width="md"
           name="ver1"
@@ -125,7 +134,7 @@ const ModuleForm: React.FC<FormProps> = (props) => {
             { label: '关闭', value: 0 },
           ]}
         />
-      </ProFormGroup>
+      </ProForm.Group>
       <ProFormCheckbox.Group
         name="funs"
         label="操作"

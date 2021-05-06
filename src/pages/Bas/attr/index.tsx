@@ -2,17 +2,16 @@ import React, { useRef, useState } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { useModel } from 'umi';
-import DelPopconfirm from '@/components/DelPopconfirm';
-import { Button, Col, Input, message, Row, Tag } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Col, Input, message, Row, Tag } from 'antd';
 import { addAttrValue, delAttr, delAttrValue } from '@/services/Bas';
 import ProductTypeForm from './form';
+import { indexColumns, optionColumns, refreshAndNew } from '@/utils/columns';
 
 export const AddAttrValueInput: React.FC<{
   attrId: number | string;
-  query: any;
+  action: any;
 }> = (props) => {
-  const { attrId, query } = props;
+  const { attrId, action } = props;
   const [inputValue, setInputValue] = useState<string>();
   const handleInputConfirm = async () => {
     if (inputValue) {
@@ -20,9 +19,8 @@ export const AddAttrValueInput: React.FC<{
         attrId,
         attrValueName: inputValue,
       });
-      message.success('新增规格值成功');
+      action();
       setInputValue('');
-      query({ pageNumber: -1 });
     } else {
       message.warn('请输入规格值');
     }
@@ -41,15 +39,16 @@ export const AddAttrValueInput: React.FC<{
   );
 };
 export default () => {
-  const { list, query } = useModel('attr', (model) => ({
-    list: model.list,
+  const { query, list } = useModel('attr', (model) => ({
     query: model.query,
+    list: model.list,
   }));
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<BAS.Attr>>({});
+  const [modalFormInit, setModalFormInit] = useState<BAS.Attr>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const columns: ProColumns<BAS.Attr>[] = [
+    indexColumns,
     {
       title: '属性',
       dataIndex: 'attrName',
@@ -71,7 +70,7 @@ export default () => {
                   onClose={async (e) => {
                     e.preventDefault();
                     await delAttrValue([item.attrValueId]);
-                    query({ pageNumber: -1 });
+                    query();
                   }}
                 >
                   {item.attrValueName}
@@ -79,75 +78,45 @@ export default () => {
               ))}
             </Col>
             <Col flex="auto">
-              {record.attrId && <AddAttrValueInput attrId={record.attrId} query={query} />}
+              {record.attrId && <AddAttrValueInput attrId={record.attrId} action={query} />}
             </Col>
           </Row>
         );
       },
     },
+    optionColumns({
+      modify: async ({ record }) => {
+        setFormAction('upd');
+        setModalFormInit(record);
+        setModalVisit(true);
+      },
+      del: async ({ record }) => {
+        await delAttr([record.attrId]);
+        query();
+      },
+    }),
   ];
-  columns.push({
-    title: '操作',
-    key: 'action',
-    valueType: 'option',
-    render: (_, record) => {
-      return [
-        <a
-          key="editable"
-          onClick={() => {
-            setFormAction('upd');
-            setModalFormInit(record);
-            setModalVisit(true);
-          }}
-        >
-          修改
-        </a>,
-        <DelPopconfirm
-          key="del"
-          onConfirm={async () => {
-            await delAttr([record.attrId]);
-            query({ pageNumber: -1 });
-            message.success('删除成功');
-          }}
-        />,
-      ];
-    },
-  });
   return (
     <>
-      {list.length > 0 ? (
-        <ProTable<BAS.Attr>
-          size="small"
-          expandable={{
-            defaultExpandAllRows: true,
-          }}
-          pagination={false}
-          search={false}
-          rowKey="attrId"
-          actionRef={actionRef}
-          bordered
-          options={false}
-          toolBarRender={() => [
-            <Button
-              type="primary"
-              onClick={() => {
-                setFormAction('add');
-                setModalFormInit({});
-                setModalVisit(true);
-              }}
-            >
-              <PlusOutlined />
-              新建
-            </Button>,
-          ]}
-          columns={columns}
-          dataSource={list}
-          postData={(values) => values[0].children}
-        />
-      ) : (
-        ''
-      )}
-
+      <ProTable<BAS.Attr>
+        pagination={false}
+        search={false}
+        toolBarRender={() =>
+          refreshAndNew({
+            fn: async () => {
+              setFormAction('add');
+              setModalFormInit(undefined);
+              setModalVisit(true);
+            },
+            refresh: query,
+          })
+        }
+        rowKey="attrId"
+        actionRef={actionRef}
+        dataSource={list}
+        options={false}
+        columns={columns}
+      />
       <ProductTypeForm
         action={formAction}
         visible={modalVisit}

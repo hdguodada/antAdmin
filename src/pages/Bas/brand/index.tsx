@@ -2,26 +2,22 @@ import React, { useRef, useState } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { useModel } from 'umi';
-import DelPopconfirm from '@/components/DelPopconfirm';
-import { Avatar, Button } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Avatar } from 'antd';
 import { delBrand } from '@/services/Bas';
 import ProductTypeForm from './form';
+import { indexColumns, optionColumns, refreshAndNew, stateColumns } from '@/utils/columns';
 
 export default () => {
-  const { brandList, query } = useModel('brand', (model) => ({
-    brandList: model.list,
+  const { list, query } = useModel('brand', (model) => ({
+    list: model.list,
     query: model.query,
   }));
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<BAS.CustType>>({});
+  const [modalFormInit, setModalFormInit] = useState<Partial<BAS.Brand>>({});
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const columns: ProColumns<BAS.Brand>[] = [
-    {
-      dataIndex: 'index',
-      valueType: 'index',
-    },
+    indexColumns,
     {
       title: '品牌名称',
       dataIndex: 'brandName',
@@ -38,84 +34,52 @@ export default () => {
       search: false,
       render: (_, record) => (record.logo ? <Avatar src={BASE_URL + _} /> : '-'),
     },
-    {
-      title: '状态',
-      dataIndex: 'state',
-      valueType: 'select',
-      valueEnum: () => {
-        return new Map([
-          [1, { text: '正常', status: 'Success' }],
-          [0, { text: '禁用', status: 'Error' }],
-        ]);
+    stateColumns,
+    optionColumns({
+      modify: async ({ record }) => {
+        setFormAction('upd');
+        setModalFormInit({
+          ...record,
+          logoMid: record.logo ? [{ url: BASE_URL + record.logo }] : [],
+        });
+        setModalVisit(true);
       },
-    },
+      del: async ({ record }) => {
+        await delBrand([record.brandId]);
+        query();
+      },
+    }),
   ];
-  columns.push({
-    title: '操作',
-    key: 'action',
-    valueType: 'option',
-    render: (_, entity) => {
-      return [
-        <a
-          key="editable"
-          onClick={() => {
-            setFormAction('upd');
-            setModalFormInit(entity);
-            setModalVisit(true);
-          }}
-        >
-          修改
-        </a>,
-        <DelPopconfirm
-          key="del"
-          onConfirm={async () => {
-            await delBrand([entity.brandId]);
-            query({ pageNumber: -1 });
-          }}
-        />,
-      ];
-    },
-  });
   return (
     <>
-      {brandList.length > 0 ? (
-        <ProTable<BAS.Brand>
-          size="small"
-          expandable={{
-            defaultExpandAllRows: true,
-          }}
-          pagination={false}
-          search={false}
-          rowKey="brandId"
-          actionRef={actionRef}
-          bordered
-          toolBarRender={() => [
-            <Button
-              type="primary"
-              onClick={() => {
-                setFormAction('add');
-                setModalFormInit({});
-                setModalVisit(true);
-              }}
-            >
-              <PlusOutlined />
-              新建
-            </Button>,
-          ]}
-          columns={columns}
-          dataSource={brandList}
-          postData={(values) => values[0].children}
-        />
-      ) : (
-        ''
-      )}
-
+      <ProTable<BAS.Brand>
+        expandable={{
+          defaultExpandAllRows: true,
+        }}
+        pagination={false}
+        search={false}
+        toolBarRender={() =>
+          refreshAndNew({
+            fn: async () => {
+              setFormAction('add');
+              setModalFormInit({});
+              setModalVisit(true);
+            },
+            refresh: query,
+          })
+        }
+        rowKey="brandId"
+        actionRef={actionRef}
+        columns={columns}
+        options={false}
+        dataSource={list}
+      />
       <ProductTypeForm
         action={formAction}
         visible={modalVisit}
         actionRef={actionRef}
         setVisible={setModalVisit}
-        initialValues={modalFormInit}
+        initialValues={modalFormInit as BAS.Brand}
       />
     </>
   );

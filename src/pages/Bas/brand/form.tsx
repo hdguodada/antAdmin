@@ -1,16 +1,10 @@
-import {
-  ProFormText,
-  ProFormGroup,
-  ProFormRadio,
-  ModalForm,
-  ProFormUploadDragger,
-} from '@ant-design/pro-form';
+import ProForm, { ProFormText, ModalForm, ProFormUploadDragger } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
-import { Upload } from 'antd';
-import { message, Form } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import type { ActionType } from '@ant-design/pro-table';
 import { addBrand, updBrand } from '@/services/Bas';
+import { StateForm } from '@/utils/form';
+import { patternMsg } from '@/utils/validator';
 import { useModel } from 'umi';
 
 type FormProps = {
@@ -18,7 +12,7 @@ type FormProps = {
   actionRef?: React.MutableRefObject<ActionType | undefined>;
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  initialValues: BAS.Brand | Record<string, unknown>;
+  initialValues: BAS.Brand;
   addCb?: () => void;
 };
 export default (props: FormProps) => {
@@ -27,62 +21,45 @@ export default (props: FormProps) => {
   const { query } = useModel('brand', (model) => ({
     query: model.query,
   }));
-
   return (
     <ModalForm<BAS.Brand>
       initialValues={{
         state: 1,
       }}
       formRef={formRef}
-      title={action === 'add' ? '新建产品分类' : `修改产品分类(${initialValues.brandName})`}
+      title={action === 'add' ? '新建商品品牌' : `修改商品品牌(${initialValues.brandName})`}
       visible={visible}
-      submitter={{
-        searchConfig: {
-          submitText: '确认',
-          resetText: '关闭',
-        },
-      }}
       onFinish={async (values) => {
         if (action === 'upd') {
           await updBrand({
             ...initialValues,
             ...values,
-            logo: values.logoMid[0].response.data.path,
           });
-          message.success('提交成功');
         } else {
-          await addBrand({
-            ...values,
-            logo: values.logoMid[0].response.data.path,
-          });
+          await addBrand(values);
         }
-        query({ pageNumber: -1 });
+        await query();
         return true;
       }}
       onVisibleChange={(v) => {
         if (v) {
-          const logoMid = initialValues.logo
-            ? [
-                {
-                  url: BASE_URL + initialValues.logo,
-                },
-              ]
-            : [];
-          formRef.current?.setFieldsValue({
-            ...initialValues,
-            logoMid,
-          });
+          formRef.current?.setFieldsValue(initialValues);
         } else {
           formRef.current?.resetFields();
         }
         setVisible(v);
       }}
     >
-      <ProFormGroup>
-        <ProFormText width="md" name="brandName" label="品牌名称" />
+      <ProForm.Group>
+        <ProFormText
+          width="md"
+          name="brandName"
+          label="品牌名称"
+          rules={patternMsg.text('品牌名称')}
+        />
         <ProFormText width="md" name="letter" label="letter" />
-      </ProFormGroup>
-      <ProFormGroup>
+      </ProForm.Group>
+      <ProForm.Group>
         <ProFormUploadDragger
           width="lg"
           label="Logo"
@@ -92,24 +69,25 @@ export default (props: FormProps) => {
           max={1}
           fieldProps={{
             listType: 'picture',
+            onChange: (info) => {
+              if (info.file.status === 'done') {
+                formRef.current?.setFieldsValue({
+                  logo: info.file.response.data.path,
+                  logoMid: info.fileList,
+                });
+              } else if (info.file.status === 'removed') {
+                formRef.current?.setFieldsValue({
+                  logo: '',
+                  logoMid: [],
+                });
+              }
+            },
           }}
         />
-      </ProFormGroup>
-      <ProFormRadio.Group
-        width="md"
-        name="state"
-        label="状态"
-        options={[
-          {
-            label: '禁用',
-            value: 0,
-          },
-          {
-            label: '正常',
-            value: 1,
-          },
-        ]}
-      />
+        <ProFormText label={'logo'} name={'logo'} hidden />
+      </ProForm.Group>
+
+      {StateForm}
     </ModalForm>
   );
 };

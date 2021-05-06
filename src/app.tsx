@@ -8,8 +8,29 @@ import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import type { RequestOptionsInit, ResponseError } from 'umi-request';
 import { queryCurrent, queryRouters } from './services/Sys/user';
-import { queryRegionTree } from './services/Sys';
-// import * as Icons from '@ant-design/icons';
+import {
+  SmileOutlined,
+  HeartOutlined,
+  ShoppingCartOutlined,
+  AppstoreOutlined,
+  SafetyOutlined,
+  GlobalOutlined,
+  SettingFilled,
+  MoneyCollectOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
+
+const IconMap: any = {
+  smile: <SmileOutlined style={{ fontSize: '16px' }} />,
+  heart: <HeartOutlined style={{ fontSize: '16px' }} />,
+  ShoppingCartOutlined: <ShoppingCartOutlined style={{ fontSize: '16px' }} />,
+  AppstockOutlined: <AppstoreOutlined style={{ fontSize: '16px' }} />,
+  SafetyOutlined: <SafetyOutlined style={{ fontSize: '16px' }} />,
+  GlobalOutlined: <GlobalOutlined style={{ fontSize: '16px' }} />,
+  SettingFilled: <SettingFilled style={{ fontSize: '16px' }} />,
+  MoneyCollectOutlined: <MoneyCollectOutlined style={{ fontSize: '16px' }} />,
+  SettingOutlined: <SettingOutlined style={{ fontSize: '16px' }} />,
+};
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -35,18 +56,6 @@ export async function getInitialState(): Promise<{
     return undefined;
   };
 
-  const fetchGlobalData = async (): Promise<globalData | undefined> => {
-    try {
-      const globalDataList = await Promise.all([queryRegionTree()]);
-      return {
-        RegionTree: globalDataList[0].data.rows,
-      };
-    } catch (error) {
-      history.push('/user/login');
-    }
-    return undefined;
-  };
-
   // const IconBc = (name: string) =>
   //   React.createElement(Icons && (Icons as any)[name], {
   //     style: { fontSize: '16px' },
@@ -56,6 +65,7 @@ export async function getInitialState(): Promise<{
       const r = (await queryRouters())?.data;
       return r.map((item: any) => ({
         ...item,
+        icon: IconMap[item.meta.icon] || '',
       }));
     } catch (error) {
       history.push('/user/login');
@@ -68,13 +78,11 @@ export async function getInitialState(): Promise<{
     if (currentUser) {
       currentUser.name = currentUser?.realName;
     }
-    const globalData = await fetchGlobalData();
     const menuData = (await fetchRouters()) || [];
     return {
       menuData,
       fetchUserInfo,
       currentUser,
-      globalData,
       settings: {},
       globalDataLoaded: false,
     };
@@ -82,7 +90,6 @@ export async function getInitialState(): Promise<{
   return {
     fetchUserInfo,
     fetchRouters,
-    fetchGlobalData,
     settings: {},
   };
 }
@@ -100,7 +107,9 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         history.push('/user/login');
       }
     },
-    menuDataRender: (menuData) => menuData,
+    menuDataRender: (menuData) => {
+      return initialState?.menuData || menuData;
+    },
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     ...initialState?.settings,
@@ -150,13 +159,13 @@ const errorHandler = (error: ResponseError) => {
 /** 请求拦截器 */
 const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
   const token = localStorage.getItem('token');
-  const authHeader = { Authorization: `Bearer ${token}` };
   let endUrl;
   if (options?.data?.dev) {
     endUrl = `/dev${url}`;
   } else {
     endUrl = BASE_URL + url;
   }
+  const authHeader = { ...options.headers, Authorization: `Bearer ${token}` };
   return {
     url: endUrl,
     options: { ...options, interceptors: true, headers: authHeader },
@@ -167,9 +176,6 @@ const demoResponseInterceptors = async (response: Response) => {
   const data = await response.clone().json();
 
   if (data.code !== 0) {
-    if (data.code === -2) {
-      history.push('/user/login');
-    }
     return Promise.reject(new Error(data.msg || 'Error'));
   }
   return response;

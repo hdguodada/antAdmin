@@ -1,0 +1,28 @@
+{
+  "data": {
+    "autoId": "@id",
+    "skuName": "示例(笔记本)",
+    "code": "SL001768",
+    "cateName": "@cname",
+    "billId": "@id",
+    "billNo": "@id",
+    "buName": "@cname",
+    "cost": "108,500.00",
+    "date": "@date",
+    "memo": "",
+    "inqty": "@natural(1,100)", // 入库数量
+    "baseInQty": "@natural(1,100)", //基本单位数量
+    "inunitCost": "@natural(1,100)", // 单位成本
+    "incost": "@natural(1,100)", // 成本
+
+    "outqty": "@natural(1,100)", // 出库数量
+    "baseOutQty": "@natural(1,100)", // 基本单位数量
+    "outunitCost": "@natural(1,100)", // 单位成本
+    "outcost": "@natural(1,100)", //成本
+
+    "totalcost": "108,500.00", // 成本
+    "totalqty": "1,550", // 基本单位数量
+    "totalunitCost": "70.00", // 单位成本
+    "bussType|1": [10, 11, 12, 13, 14]
+  }
+}

@@ -1,90 +1,91 @@
-import DelPopconfirm from '@/components/DelPopconfirm';
-import { delCustDoc, queryCustDoc } from '@/services/Bas';
-import { ProFormUploadButton } from '@ant-design/pro-form';
-import ProList from '@ant-design/pro-list';
+import { queryCustDoc } from '@/services/Bas';
 import type { ActionType } from '@ant-design/pro-table';
-import { message, Space, Tag } from 'antd';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import CustDocForm from './custDocForm';
+import ProTable from '@ant-design/pro-table';
+import { dateColumns, indexColumns, refreshAndNew } from '@/utils/columns';
+import { useRequest } from 'umi';
 
 interface CustDocProps {
   customer: BAS.Customer;
 }
 export default (props: CustDocProps): React.ReactElement => {
   const { customer } = props;
+  const [modalVisit, setModalVisit] = useState(false);
+  const [modalFormInit, setModalFormInit] = useState<BAS.CustDoc>();
+  const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const CustRecordActionRef = useRef<ActionType>();
+  const { data, loading, refresh } = useRequest(async () => {
+    const response = await queryCustDoc({
+      pageNumber: -1,
+      queryFilter: {
+        custId: customer.custId,
+      },
+    });
+    return {
+      data: response.data.rows,
+      success: response.code === 0,
+    };
+  });
   return (
-    <ProList<BAS.CustDoc>
-      size="large"
-      split
-      actionRef={CustRecordActionRef}
-      rowKey="docId"
-      params={{ custId: customer.custId }}
-      toolBarRender={() => {
-        return [
-          <CustDocForm
-            key="uploadDoc"
-            initialValues={{ ...customer }}
-            actionRef={CustRecordActionRef}
-          />,
-        ];
-      }}
-      metas={{
-        title: {
-          render: (_, record) => {
-            return <Tag color="blue">{record.crtDate}</Tag>;
+    <>
+      <CustDocForm
+        initialValues={modalFormInit}
+        visible={modalVisit}
+        setVisible={setModalVisit}
+        refresh={refresh}
+        action={formAction}
+        customer={customer}
+      />
+      <ProTable<BAS.CustDoc>
+        actionRef={CustRecordActionRef}
+        rowKey="docId"
+        params={{ custId: customer.custId }}
+        columns={[
+          indexColumns,
+          dateColumns({ title: '上传日期', dataIndex: 'crtDate' }),
+          {
+            dataIndex: 'docName',
+            title: '文件名称',
+            search: false,
           },
-        },
-        content: {
-          render: (_, record) => {
-            return <a>{record.docName}</a>;
+          {
+            dataIndex: 'docTypeName',
+            title: '文件类型',
+            search: false,
           },
-        },
-        subTitle: {
-          render: (_, record) => {
-            return (
-              <Space size={0}>
-                <Tag color="#5BD8A6">{record.docTypeName}</Tag>
-              </Space>
-            );
+          {
+            title: '操作',
+            valueType: 'option',
+            render: (_, record) => {
+              return [
+                <a
+                  key="invite"
+                  href={`https://erp.zjqsa.com${record.docPath}`}
+                  download={record.docName}
+                >
+                  下载附件
+                </a>,
+              ];
+            },
           },
-        },
-        actions: {
-          render: (_, record, _index, action) => {
-            return [
-              <a
-                key="invite"
-                href={`https://erp.zjqsa.com${record.docPath}`}
-                download={record.docName}
-              >
-                下载附件
-              </a>,
-              <DelPopconfirm
-                key="del"
-                onConfirm={async () => {
-                  await delCustDoc([record.docId]);
-                  action.reload();
-                  message.success('删除附件成功');
-                }}
-              />,
-            ];
-          },
-        },
-      }}
-      request={async (params) => {
-        const response = await queryCustDoc({
-          ...params,
-          pageNumber: -1,
-          queryFilter: {
-            ...params,
-          },
-        });
-        return {
-          data: response.data.rows,
-          success: response.code === 0,
-          total: response.data.total,
-        };
-      }}
-    ></ProList>
+        ]}
+        pagination={false}
+        loading={loading}
+        options={false}
+        dataSource={data}
+        search={false}
+        toolBarRender={() =>
+          refreshAndNew({
+            fn: async () => {
+              setFormAction('add');
+              setModalFormInit(undefined);
+              setModalVisit(true);
+            },
+            refresh,
+          })
+        }
+      />
+    </>
   );
 };

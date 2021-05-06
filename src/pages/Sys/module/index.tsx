@@ -5,17 +5,26 @@ import ProTable from '@ant-design/pro-table';
 import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { delModule, queryModuleInfo, queryModules } from '@/services/Sys';
-import DelPopconfirm from '@/components/DelPopconfirm';
 import ModuleForm from './form';
+import { transformTreeData } from '@/utils/utils';
+import { memoColumns, optionColumns, stateColumns } from '@/utils/columns';
+import { PageContainer } from '@ant-design/pro-layout';
 
 export default (): React.ReactNode => {
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
-  const [moduleOptions, setModuleOptions] = useState<SelectOptions>([]);
+  const [moduleOptions, setModuleOptions] = useState<any[]>([]);
   const [modalFormInit, setModalFormInit] = useState<Partial<API.Dep>>({});
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const columns: ProColumnType<API.Module>[] = [
+    {
+      title: 'id',
+      dataIndex: 'modId',
+      width: 80,
+      align: 'center',
+      fixed: 'left',
+    },
     {
       title: '模块名称',
       dataIndex: 'modName',
@@ -23,11 +32,7 @@ export default (): React.ReactNode => {
       width: 250,
       search: false,
     },
-    {
-      title: '备注',
-      dataIndex: 'memo',
-      search: false,
-    },
+    memoColumns(),
     {
       title: '路由',
       dataIndex: 'Path',
@@ -43,114 +48,74 @@ export default (): React.ReactNode => {
       dataIndex: 'icon',
       search: false,
     },
-    {
-      title: '状态',
-      search: false,
-      dataIndex: 'state',
-      valueType: 'select',
-      valueEnum: () => {
-        return {
-          0: {
-            text: '正常',
-            status: 'Success',
-          },
-          1: {
-            text: '禁用',
-            status: 'Error',
-          },
-        };
+    stateColumns,
+    optionColumns({
+      modify: async ({ record }) => {
+        setPageLoading(true);
+        setFormAction('upd');
+        const module = (await queryModuleInfo(record.modId)).data;
+        setModalFormInit(module);
+        setModalVisit(true);
+        setPageLoading(false);
       },
-    },
-    {
-      title: '操作',
-      width: 150,
-      key: 'action',
-      valueType: 'option',
-      render: (_, entity) => {
-        return [
-          <Button
-            type="link"
-            key="editable"
-            onClick={async () => {
-              setPageLoading(true);
-              setFormAction('upd');
-              const module = (await queryModuleInfo(entity.modId)).data;
-              setModalFormInit(module);
-              setModalVisit(true);
-              setPageLoading(false);
-            }}
-          >
-            修改
-          </Button>,
-          <DelPopconfirm
-            key="del"
-            onConfirm={async () => {
-              await delModule([entity.modId]);
-            }}
-          />,
-        ];
+      del: async ({ record }) => {
+        await delModule([record.modId]);
       },
-    },
+    }),
   ];
   return (
-    <>
-      <ModuleForm
-        moduleOptions={moduleOptions}
-        action={formAction}
-        visible={modalVisit}
-        setVisible={setModalVisit}
-        initialValues={modalFormInit}
-      />
-      <ProCard split="vertical">
-        <ProTable<API.Module>
-          bordered
-          search={false}
-          actionRef={actionRef}
-          rowKey="modId"
-          loading={pageLoading}
-          toolBarRender={() => [
-            <Button
-              type="primary"
-              onClick={() => {
-                setFormAction('add');
-                setModalFormInit({});
-                setModalVisit(true);
+    <PageContainer
+      content={
+        <>
+          <ModuleForm
+            moduleOptions={moduleOptions}
+            action={formAction}
+            visible={modalVisit}
+            setVisible={setModalVisit}
+            initialValues={modalFormInit}
+            actionRef={actionRef}
+          />
+          <ProCard split="vertical">
+            <ProTable<API.Module>
+              search={false}
+              actionRef={actionRef}
+              rowKey="modId"
+              options={false}
+              loading={pageLoading}
+              toolBarRender={() => [
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setFormAction('add');
+                    setModalFormInit({});
+                    setModalVisit(true);
+                  }}
+                >
+                  <PlusOutlined />
+                  新建
+                </Button>,
+              ]}
+              expandable={{
+                defaultExpandAllRows: true,
               }}
-            >
-              <PlusOutlined />
-              新建
-            </Button>,
-          ]}
-          expandable={{
-            defaultExpandedRowKeys: [13],
-          }}
-          postData={(dataSource) => {
-            return dataSource.map((item) => ({
-              ...item,
-              State: String(item.State),
-            }));
-          }}
-          request={async (params) => {
-            const response = await queryModules({
-              ...params,
-              pageNumber: -1,
-            });
-            setModuleOptions(
-              response.data.rows.map((item) => ({
-                label: item.modName,
-                value: item.modId as string,
-              })),
-            );
-            return {
-              data: response.data.rows,
-              success: response.code === 0,
-              total: response.data.total,
-            };
-          }}
-          pagination={false}
-          columns={columns}
-        />
-      </ProCard>
-    </>
+              request={async (params) => {
+                const response = await queryModules({
+                  ...params,
+                  pageNumber: -1,
+                });
+                setModuleOptions(transformTreeData(response.data.rows, '', 'modId', 'memo'));
+                return {
+                  data: response.data.rows,
+                  success: response.code === 0,
+                  total: response.data.total,
+                };
+              }}
+              pagination={false}
+              columns={columns}
+            />
+          </ProCard>
+        </>
+      }
+    ></PageContainer>
   );
 };

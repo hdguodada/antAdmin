@@ -1,93 +1,79 @@
+import { ModalForm } from '@ant-design/pro-form';
+import type { FormInstance } from 'antd';
+import { Button, Divider } from 'antd';
+import React, { useRef, useState } from 'react';
+import { getCode } from '@/services/Sys';
+import { PageContainer } from '@ant-design/pro-layout';
+import ProCard from '@ant-design/pro-card';
+import { useParams } from 'umi';
 import {
-  ProFormText,
-  ProFormGroup,
-  ProFormRadio,
-  ModalForm,
-  ProFormSelect,
-} from '@ant-design/pro-form';
-import { Divider, FormInstance, TreeSelect, Button } from 'antd';
-import { message, Modal, Form, Cascader } from 'antd';
-import React, { useRef, useEffect, useState } from 'react';
+  delSuppRel,
+  querySuppFinanceInfo,
+  querySuppliersInfo,
+  querySuppRel,
+  saveSupplier,
+  saveSuppRel,
+  saveSuppFinance,
+} from '@/services/Bas';
 import type { ActionType } from '@ant-design/pro-table';
-import { addSupplier, updSupplier } from '@/services/Bas';
-import { useModel } from '@@/plugin-model/useModel';
-import { queryUsers } from '@/services/Sys';
-import { PlusOutlined } from '@ant-design/icons';
-import SuppTypeForm from '../suppType/form';
+import { EditableProTable } from '@ant-design/pro-table';
+import { useRequest } from 'umi';
+import ProDescriptions from '@ant-design/pro-descriptions';
+import { relColumns } from '@/pages/Bas/customer/detail';
+import { BaseSupplierFormGroup, SupplierFinanceGroup } from './addForm';
+import { checkStatus } from '@/utils/columns';
 
-type FormProps = {
-  action: 'add' | 'upd';
-  actionRef?: React.MutableRefObject<ActionType | undefined>;
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-  initialValues: BAS.Supplier | Record<string, unknown>;
-};
-export default (props: FormProps) => {
-  const { action, actionRef, visible, setVisible, initialValues } = props;
+export const SaveSuppForm = (props: FormProps<BAS.Supplier>) => {
+  const { action, actionRef, visible, setVisible, initialValues, refresh } = props;
   const formRef = useRef<FormInstance>();
-  const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<BAS.CustType>>({});
-  const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
-  const { treeDataSimpleMode, query } = useModel('suppType', (model) => ({
-    treeDataSimpleMode: model.treeDataSimpleMode,
-    query: model.query,
-  }));
-  const { RegionTree } = useModel('@@initialState', (model) => ({
-    RegionTree: model?.initialState?.globalData?.RegionTree,
-  }));
-  useEffect(() => {
-    query({ pageNumber: -1 });
-  }, [query]);
   return (
     <>
-      <SuppTypeForm
-        action={formAction}
-        visible={modalVisit}
-        actionRef={actionRef}
-        setVisible={setModalVisit}
-        initialValues={modalFormInit}
-        addCb={() => {
-          formRef?.current?.setFieldsValue({});
-        }}
-      />
       <ModalForm<BAS.Supplier>
-        initialValues={{
-          state: 1,
-        }}
+        initialValues={{ state: 1, checkStatus: 0 }}
         formRef={formRef}
-        title={
-          action === 'add' ? '新建供应商分类' : `修改供应商分类(${initialValues.suppTypeName})`
-        }
+        title={action === 'add' ? '新建供应商' : `修改供应商(${initialValues?.suppName})`}
         visible={visible}
-        submitter={{
-          searchConfig: {
-            submitText: '确认',
-            resetText: '关闭',
-          },
-        }}
         onFinish={async (values) => {
-          if (action === 'upd') {
-            await updSupplier({
-              ...initialValues,
-              ...values,
-              regioncd: values.regioncdMid.join('-'),
-            });
-            message.success('提交成功');
-          } else {
-            await addSupplier(values);
-            Modal.confirm({
-              content: '新增客户分类成功,是否继续添加?',
-              onCancel() {
-                setVisible(false);
-              },
-              onOk() {
-                formRef?.current?.resetFields();
-              },
-            });
-            actionRef?.current?.reload();
-            return false;
-          }
+          await saveSupplier({ ...initialValues, ...values }, undefined, action);
           actionRef?.current?.reload();
+          refresh?.();
+          return true;
+        }}
+        onVisibleChange={(v) => {
+          if (v) {
+            formRef.current?.setFieldsValue(initialValues);
+            if (action === 'add') {
+              getCode('BasSupplier').then((res) => {
+                formRef.current?.setFieldsValue({
+                  suppCd: res.data,
+                });
+              });
+            }
+          } else {
+            formRef.current?.resetFields();
+          }
+          setVisible?.(v);
+        }}
+      >
+        <BaseSupplierFormGroup action={'upd'} />
+      </ModalForm>
+    </>
+  );
+};
+
+export const SaveSuppFinanceForm = (props: FormProps<BAS.Finance>) => {
+  const { action, actionRef, visible, setVisible, initialValues, refresh } = props;
+  const formRef = useRef<FormInstance>();
+  return (
+    <>
+      <ModalForm<BAS.Finance>
+        initialValues={{ state: 1 }}
+        formRef={formRef}
+        visible={visible}
+        onFinish={async (values) => {
+          await saveSuppFinance({ ...initialValues, ...values }, undefined, action);
+          actionRef?.current?.reload();
+          refresh?.();
           return true;
         }}
         onVisibleChange={(v) => {
@@ -96,100 +82,208 @@ export default (props: FormProps) => {
           } else {
             formRef.current?.resetFields();
           }
-          setVisible(v);
+          setVisible?.(v);
         }}
       >
-        <ProFormGroup>
-          <ProFormText width="md" name="suppCd" label="供应商编号" />
-          <ProFormText width="md" name="suppName" label="供应商名称" />
-          <Form.Item label="供应商类别" name="suppTypeId" style={{ width: '328px' }}>
-            <TreeSelect
-              showSearch
-              placeholder="请选择"
-              allowClear
-              treeDefaultExpandAll
-              treeData={treeDataSimpleMode}
-              treeDataSimpleMode={true}
-              treeNodeFilterProp="title"
-              dropdownRender={(menu) => (
-                <div>
-                  {menu}
-                  <Divider style={{ margin: '4px 0' }} />
-                  <Button
-                    style={{ margin: '4px 0' }}
-                    type="ghost"
-                    block
-                    onClick={() => {
-                      setFormAction('add');
-                      setModalFormInit({});
-                      setModalVisit(true);
-                    }}
-                  >
-                    <PlusOutlined />
-                    新建供应商
-                  </Button>
-                </div>
-              )}
-            />
-          </Form.Item>
-          <Form.Item label="所在地" name="regioncdMid" style={{ width: '328px' }}>
-            <Cascader
-              options={RegionTree}
-              onChange={() => {}}
-              fieldNames={{ value: 'id', label: 'label', children: 'children' }}
-            />
-          </Form.Item>
-
-          <ProFormText width="lg" name="address" label="详细地址" />
-          <ProFormSelect
-            width="md"
-            name="buyerId"
-            label="采购员"
-            request={async () => {
-              return (await queryUsers({ pageNumber: -1 })).data.rows.map((item) => ({
-                label: item.realName,
-                value: item.userId,
-              }));
-            }}
-          />
-        </ProFormGroup>
-        <ProFormGroup>
-          <ProFormRadio.Group
-            width="md"
-            name="checkStatus"
-            label="审核状态"
-            options={[
-              {
-                label: '未审核',
-                value: 0,
-              },
-              {
-                label: '审核通过',
-                value: 1,
-              },
-              {
-                label: '审核未通过',
-                value: 2,
-              },
-            ]}
-          />
-          <ProFormRadio.Group
-            width="md"
-            name="state"
-            label="状态"
-            options={[
-              {
-                label: '禁用',
-                value: 0,
-              },
-              {
-                label: '正常',
-                value: 1,
-              },
-            ]}
-          />
-        </ProFormGroup>
+        <SupplierFinanceGroup action={'upd'} />
       </ModalForm>
     </>
+  );
+};
+
+export default () => {
+  const { id } = useParams<{ id: string }>();
+  const actionRef = useRef<ActionType>();
+  const { data, loading, refresh } = useRequest(async () => {
+    const supplier = await querySuppliersInfo(id);
+    const supplierFinance = await querySuppFinanceInfo(id);
+    return Promise.resolve({
+      data: {
+        supplier: supplier.data,
+        finance: supplierFinance.data,
+      },
+      success: supplier.code === 0,
+    });
+  });
+  const [visible, setVisible] = useState<boolean>(false);
+  const [visible1, setVisible1] = useState<boolean>(false);
+  return (
+    <PageContainer
+      title={data?.supplier.suppName}
+      extra={
+        <Button
+          loading={loading}
+          type="primary"
+          onClick={() => {
+            refresh();
+          }}
+        >
+          刷新
+        </Button>
+      }
+      content={
+        <>
+          <SaveSuppForm
+            action="upd"
+            visible={visible}
+            setVisible={setVisible}
+            initialValues={data?.supplier as BAS.Supplier}
+            refresh={refresh}
+          />
+          <SaveSuppFinanceForm
+            action="upd"
+            visible={visible1}
+            setVisible={setVisible1}
+            initialValues={data?.finance}
+            refresh={refresh}
+          />
+          <ProCard
+            collapsible
+            title="基本信息"
+            extra={
+              <Button
+                onClick={() => {
+                  setVisible(true);
+                }}
+              >
+                修改
+              </Button>
+            }
+          >
+            <ProDescriptions<BAS.Supplier>
+              columns={[
+                {
+                  dataIndex: 'suppTypeName',
+                  title: '供应商类别',
+                },
+                {
+                  dataIndex: 'suppCd',
+                  title: '供应商编号',
+                  copyable: true,
+                },
+                {
+                  dataIndex: 'suppName',
+                  title: '供应商名称',
+                },
+                {
+                  dataIndex: 'address',
+                  title: '联系地址',
+                },
+                {
+                  dataIndex: 'memo',
+                  title: '备注',
+                },
+                checkStatus(undefined),
+              ]}
+              dataSource={data?.supplier}
+            />
+          </ProCard>
+          <Divider />
+          <ProCard
+            collapsible
+            title="财务信息"
+            extra={
+              <Button
+                onClick={() => {
+                  setVisible1(true);
+                }}
+              >
+                修改
+              </Button>
+            }
+          >
+            <ProDescriptions<BAS.Finance>
+              columns={[
+                {
+                  dataIndex: 'taxInvoice',
+                  title: '开票名称',
+                },
+                {
+                  dataIndex: 'taxPayerNo',
+                  title: '开票税号',
+                },
+                {
+                  dataIndex: 'taxBank',
+                  title: '开户银行',
+                },
+                {
+                  dataIndex: 'taxBankAccount',
+                  title: '银行账号',
+                },
+                {
+                  dataIndex: 'taxAddress',
+                  title: '开户地址',
+                },
+                {
+                  dataIndex: 'taxTel',
+                  title: '开户电话',
+                },
+                {
+                  dataIndex: 'taxEmail',
+                  title: '发票邮箱',
+                },
+                {
+                  dataIndex: 'debtTypeId',
+                  title: '账期类型',
+                },
+                {
+                  dataIndex: 'initPayable',
+                  title: '期初应付款',
+                },
+                {
+                  dataIndex: 'initPerPayable',
+                  title: '期初预付款',
+                },
+              ]}
+              dataSource={data?.finance}
+            />
+          </ProCard>
+          <Divider />
+          <ProCard collapsible title="联系人">
+            <EditableProTable<BAS.Rel>
+              rowKey="relId"
+              bordered
+              columns={relColumns}
+              actionRef={actionRef}
+              params={{ suppId: id }}
+              recordCreatorProps={{
+                record: {
+                  relId: (Math.random() * 1000000).toFixed(0),
+                  action: 'add',
+                } as BAS.Rel,
+              }}
+              editable={{
+                onSave: async (key, values) => {
+                  await saveSuppRel({
+                    ...values,
+                    suppId: id,
+                    action: values.action || 'upd',
+                  });
+                  actionRef?.current?.reload();
+                },
+                onDelete: async (key) => {
+                  await delSuppRel([+key]);
+                  actionRef?.current?.reload();
+                },
+              }}
+              request={async (params) => {
+                const response = await querySuppRel({
+                  ...params,
+                  pageNumber: -1,
+                  queryFilter: {
+                    ...params,
+                  },
+                });
+                return {
+                  data: response.data.rows,
+                  success: response.code === 0,
+                  total: response.data.total,
+                };
+              }}
+            />
+          </ProCard>
+        </>
+      }
+    />
   );
 };
