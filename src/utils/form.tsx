@@ -9,6 +9,7 @@ import { patternMsg } from './validator';
 import { queryUsers } from '@/services/Sys';
 import type { NamePath } from 'antd/lib/form/interface';
 import { useRequest } from '@@/plugin-request/request';
+import UserForm from '@/pages/Sys/user/form';
 
 export const StateForm = (
   <ProFormRadio.Group
@@ -94,26 +95,51 @@ type UserSelectProps = {
   label: string;
   disabled?: boolean;
   formRef?: any;
+  showNew?: boolean;
 };
-export const UserSelect = ({ name, label, disabled }: UserSelectProps) => {
+export const UserSelect = ({ name, label, disabled, showNew }: UserSelectProps) => {
+  const { options, queryUsers } = useModel('user', (model) => ({
+    options: model.options,
+    queryUsers: model.queryUsers,
+  }));
+  const [modalVisit, setModalVisit] = useState(false);
+
   return (
-    <ProFormSelect
-      width="md"
-      showSearch
-      fieldProps={{
-        optionFilterProp: 'label',
-      }}
-      disabled={disabled}
-      name={name}
-      label={label}
-      request={async () => {
-        const res = await queryUsers({ pageNumber: -1 });
-        return res.data.rows.map((i) => ({
-          label: i.realName,
-          value: i.userId,
-        }));
-      }}
-    />
+    <>
+      <ProFormSelect
+        width="md"
+        showSearch
+        fieldProps={{
+          optionFilterProp: 'label',
+          dropdownRender: (menu) => {
+            return (
+              <div>
+                {menu}
+                {showNew && (
+                  <>
+                    <Divider style={{ margin: '4px 0' }} />
+                    <Button
+                      block
+                      type="primary"
+                      onClick={() => {
+                        setModalVisit(true);
+                      }}
+                    >
+                      <PlusOutlined />
+                    </Button>
+                  </>
+                )}
+              </div>
+            );
+          },
+        }}
+        disabled={disabled}
+        name={name}
+        label={label}
+        options={options}
+      />
+      <UserForm action="add" setVisible={setModalVisit} visible={modalVisit} refresh={queryUsers} />
+    </>
   );
 };
 

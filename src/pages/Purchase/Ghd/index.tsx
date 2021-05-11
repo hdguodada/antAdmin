@@ -14,7 +14,7 @@ export default () => {
       openCloseFn={() => {}}
       del={delPurchase}
       queryList={queryPurchase}
-      bussType={BussType.购货单}
+      bussType={BussType.采购单}
     />
   );
 };

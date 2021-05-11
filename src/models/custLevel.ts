@@ -16,6 +16,7 @@ export default () => {
   );
   return {
     level,
+    levelFilter: ({ state = 1 }= {}) => level.filter((item) => item.state === state),
     levelOptions,
     queryCustLevel,
   };

@@ -72,6 +72,7 @@
   {
     name: 'sales',
     path: '/sales',
+    icon: 'MoneyCollectOutlined',
     routes: [
       {
         name: 'Xhdd',
@@ -82,6 +83,7 @@
         name: 'Xhdd',
         path: 'Xhdd/:id',
         component: './Sales/xhdd/detail',
+        hideInMenu: true,
       },
       {
         name: 'Xhd',
@@ -101,9 +103,9 @@
     ],
   },
   {
-    name: 'stock',
-    icon: 'AppstockOutlined',
-    path: '/stock',
+    name: 'store',
+    icon: 'AppstoreOutlined',
+    path: '/store',
     routes: [
       {
         // 调拨单
@@ -162,28 +164,29 @@
         name: 'inventory',
         path: 'inventory/:id',
         component: './Store/inventory/detail',
+        hideInMenu: true,
       },
+    ],
+  },
+  {
+    name: 'funds',
+    path: '/funds',
+    icon: 'PayCircleFilled',
+    routes: [
+      { name: 'receipt', path: 'receipt', component: './Funds/receipt' },
       {
-        name: 'storeOrder',
-        path: 'storeOrder',
-        routes: [
-          {
-            name: 'inBalance',
-            path: 'inBalance',
-            component: './Store/inBalance',
-          },
-          {
-            name: 'deliverDetail',
-            path: 'deliverDetail',
-            component: './Store/deliverDetail',
-          },
-          {
-            name: 'serNumDetail',
-            path: 'serNumDetail',
-            component: './Store/serNum/serNumDetail',
-          },
-        ],
+        name: 'receipt',
+        path: 'receipt/:id',
+        component: './Funds/receipt/detail',
+        hideInMenu: true,
       },
+      { name: 'payment', path: 'payment', component: './Funds/payment' },
+      { name: 'verifica', path: 'verifica', component: './Funds/verifica' },
+      { name: 'ori', path: 'ori', component: './Funds/ori' },
+      { name: 'ori', path: 'ori/:id', component: './Funds/ori/detail', hideInMenu: true },
+      { name: 'opm', path: 'opm', component: './Funds/opm' },
+      { name: 'fundTf', path: 'fundTf', component: './Funds/fundTf' },
+      { name: 'Reports', path: 'Reports', component: './Funds/Reports' },
     ],
   },
   {
@@ -210,7 +213,7 @@
       {
         name: 'customerDetail',
         path: 'customer/:id',
-
+        hideInMenu: true,
         component: './Bas/customer/detail',
       },
       {
@@ -222,6 +225,7 @@
         name: 'supplier',
         path: 'supplier/:id',
         component: './Bas/supplier/form',
+        hideInMenu: true,
       },
       {
         name: 'employ',
@@ -250,6 +254,16 @@
     icon: 'GlobalOutlined',
     name: 'sys',
     routes: [
+      {
+        name: 'print',
+        path: 'print/:id/:bussType',
+        component: './Sys/print',
+        menuRender: false,
+        menuHeaderRender: false,
+        headerRender: false,
+        footerRender: false,
+        hideInMenu: true,
+      },
       {
         name: 'user',
         path: '/sys/user',

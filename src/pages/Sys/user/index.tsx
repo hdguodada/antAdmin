@@ -9,6 +9,7 @@ import { delUser, queryUsers, resetPassword, updUser } from '@/services/Sys/user
 import { queryDepTreelist } from '@/services/Sys/dep';
 import UserForm from './form';
 import { baseSearch, indexColumns, optionColumns, stateColumns } from '@/utils/columns';
+import { useModel, useRequest } from 'umi';
 
 export type DepDataType = API.Dep;
 
@@ -81,6 +82,17 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
   const [modalVisit, setModalVisit] = useState(false);
   const [modalFormInit, setModalFormInit] = useState<Partial<API.CurrentUser>>({});
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
+  const { queryUsers } = useModel('user', (model) => ({
+    queryUsers: model.query,
+  }));
+  const { run, error } = useRequest(
+    async (params) => {
+      return queryUsers(params);
+    },
+    {
+      manual: true,
+    },
+  );
   const userColumns: ProColumnType<UserDataType>[] = [
     indexColumns,
     {
@@ -176,15 +188,15 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
           },
         }}
         request={async (params) => {
-          const response = await queryUsers({
+          const response = await run({
             ...params,
             pageNumber: params.current,
             queryFilter: params,
           });
           return {
-            data: response.data.rows,
-            success: response.code === 0,
-            total: response.data.total,
+            data: response.rows,
+            success: !error,
+            total: response.total,
           };
         }}
         pagination={{

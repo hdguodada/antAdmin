@@ -7,12 +7,15 @@ import type { DataNode } from 'antd/lib/tree';
 export default () => {
   const [depTree, setDepTree] = useState<API.Dep[]>([]);
   const [treeDataSimpleMode, setTreeDataSimpleMode] = useState<DataNode[]>([]);
-  const queryDepTree = useCallback(async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
-    const response = await queryTree(data, headers);
-    setDepTree(response.data.rows);
-    setTreeDataSimpleMode(transformTreeData(response.data.rows, undefined, 'depId', 'depName'));
-    return response;
-  }, []);
+  const queryDepTree = useCallback(
+    async (data = { pageNumer: -1, state: 1 }, headers = { modId: '92' }) => {
+      const response = await queryTree(data, headers);
+      setDepTree(response.data.rows);
+      setTreeDataSimpleMode(transformTreeData(response.data.rows, undefined, 'depId', 'depName'));
+      return response;
+    },
+    [],
+  );
   return {
     treeDataSimpleMode,
     queryDepTree,

@@ -8,11 +8,11 @@ import type { DepDataType } from '../user';
 import { useModel } from 'umi';
 import DepForm from './form';
 import { baseSearch, optionColumns, stateColumns } from '@/utils/columns';
+import GlobalWrapper from '@/components/GlobalWrapper';
 
 export default (): React.ReactNode => {
   const actionRef = useRef<ActionType>();
   const { queryDepTree } = useModel('dep', (model) => ({
-    treeDataSimpleMode: model.treeDataSimpleMode,
     queryDepTree: model.queryDepTree,
   }));
   const [modalVisit, setModalVisit] = useState(false);
@@ -53,43 +53,45 @@ export default (): React.ReactNode => {
     }),
   ];
   return (
-    <PageContainer
-      content={
-        <>
-          <ProTable<DepDataType, DepFilters>
-            actionRef={actionRef}
-            expandable={{
-              defaultExpandedRowKeys: [1],
-            }}
-            search={baseSearch({
-              fn: () => {
-                setFormAction('add');
-                setModalFormInit(undefined);
-                setModalVisit(true);
-              },
-            })}
-            rowKey="depId"
-            columns={depColumns}
-            request={async (params) => {
-              const response = await queryDepTree({ ...params, queryFilter: params });
-              return {
-                data: response.data.rows,
-                success: response.code === 0,
-                total: response.data.total,
-              };
-            }}
-            pagination={false}
-            options={false}
-          />
-          <DepForm
-            action={formAction}
-            visible={modalVisit}
-            actionRef={actionRef}
-            setVisible={setModalVisit}
-            initialValues={modalFormInit}
-          />
-        </>
-      }
-    />
+    <GlobalWrapper type="list">
+      <PageContainer
+        content={
+          <>
+            <ProTable<DepDataType, DepFilters>
+              actionRef={actionRef}
+              expandable={{
+                defaultExpandedRowKeys: [1],
+              }}
+              search={baseSearch({
+                fn: () => {
+                  setFormAction('add');
+                  setModalFormInit(undefined);
+                  setModalVisit(true);
+                },
+              })}
+              rowKey="depId"
+              columns={depColumns}
+              request={async (params) => {
+                const response = await queryDepTree({ ...params, queryFilter: params });
+                return {
+                  data: response.data.rows,
+                  success: response.code === 0,
+                  total: response.data.total,
+                };
+              }}
+              pagination={false}
+              options={false}
+            />
+            <DepForm
+              action={formAction}
+              visible={modalVisit}
+              actionRef={actionRef}
+              setVisible={setModalVisit}
+              initialValues={modalFormInit}
+            />
+          </>
+        }
+      />
+    </GlobalWrapper>
   );
 };

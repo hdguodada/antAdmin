@@ -197,4 +197,13 @@ export const mapModId = {
   purchaseGhdd: '52',
   sales: '94',
   account: '93',
+  funds: '110',
+};
+
+export const filterRoutes = (sysRoutes: any[], apiRoutes: any[]) => {
+  console.log(sysRoutes, apiRoutes);
+  const res = sysRoutes.filter((sysRoute) => {
+    return apiRoutes.findIndex((apiRoute) => apiRoute.path === sysRoute.path) !== -1;
+  });
+  return res;
 };

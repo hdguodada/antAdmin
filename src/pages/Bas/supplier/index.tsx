@@ -7,6 +7,7 @@ import {
   baseSearch,
   checkStatus,
   indexColumns,
+  keywordColumns,
   stateColumns,
   tableAlertOptionRenderDom,
 } from '@/utils/columns';
@@ -14,9 +15,12 @@ import { history } from 'umi';
 import BatchDel from '@/components/DelPopconfirm';
 import { useState } from 'react';
 import AddSuppForm from './addForm';
-import { Button, message } from 'antd';
+import { Badge, Button, message, Radio } from 'antd';
 import { check } from '@/services';
 import { mapModId } from '@/utils/utils';
+import GlobalWrapper from '@/components/GlobalWrapper';
+import { LightFilter, ProFormDatePicker } from '@ant-design/pro-form';
+import Checkbox from 'antd/lib/checkbox/Checkbox';
 
 export const Supplier: React.FC<{
   select: boolean;
@@ -27,7 +31,12 @@ export const Supplier: React.FC<{
   const [modalVisit, setModalVisit] = useState(false);
   const [modalFormInit, setModalFormInit] = useState<BAS.Supplier>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
+  const [initParams, setInitParams] = useState(selectParams || { state: 1 });
   const columns: ProColumns<BAS.Supplier>[] = [
+    keywordColumns({
+      placeholder: '按供应商编号,供应商名称,等查询',
+    }),
+
     indexColumns,
     {
       dataIndex: 'suppId',
@@ -36,11 +45,6 @@ export const Supplier: React.FC<{
       hideInTable: true,
       render: (_, record) => <div>{record.suppTypeName}</div>,
       search: false,
-    },
-    {
-      dataIndex: 'keyword',
-      title: '快速查询',
-      hideInTable: true,
     },
     {
       dataIndex: 'suppCd',
@@ -127,7 +131,7 @@ export const Supplier: React.FC<{
         action={formAction}
         setVisible={setModalVisit}
       />
-      <ProTable<BAS.Supplier, { state: number; checkStatus: number }>
+      <ProTable<BAS.Supplier, { state: number; checkStatus?: number }>
         rowKey="suppId"
         actionRef={actionRef}
         options={false}
@@ -138,6 +142,7 @@ export const Supplier: React.FC<{
             setModalVisit(true);
           },
         })}
+        pagination={{ pageSize: 10 }}
         columns={columns}
         params={selectParams}
         request={async (params) => {
@@ -211,5 +216,9 @@ export const Supplier: React.FC<{
 };
 
 export default () => {
-  return <PageContainer content={<Supplier select={false} />} />;
+  return (
+    <GlobalWrapper type="list">
+      <PageContainer content={<Supplier select={false} />} />;
+    </GlobalWrapper>
+  );
 };

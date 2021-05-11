@@ -14,15 +14,72 @@
     "baseInQty": "@natural(1,100)", //基本单位数量
     "inunitCost": "@natural(1,100)", // 单位成本
     "incost": "@natural(1,100)", // 成本
-
     "outqty": "@natural(1,100)", // 出库数量
     "baseOutQty": "@natural(1,100)", // 基本单位数量
     "outunitCost": "@natural(1,100)", // 单位成本
     "outcost": "@natural(1,100)", //成本
-
     "totalcost": "108,500.00", // 成本
     "totalqty": "1,550", // 基本单位数量
     "totalunitCost": "70.00", // 单位成本
     "bussType|1": [10, 11, 12, 13, 14]
+  },
+  "deliverSummary": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "columns": [
+        "期初",
+        "普通采购",
+        "盘盈",
+        "其他入库",
+        "入库合计",
+        "采购退回",
+        "普通销售",
+        "其他出库",
+        "出库合计",
+        "结存"
+      ],
+      "rows|10": [
+        {
+          "code": "SL001768",
+          "skuName": "示例(笔记本)",
+          "spuCode": "MacBook Air",
+          "cateName": "默认分类",
+          "unitName": "个",
+          "storeName": "默认仓库",
+          "storeCd": "CK001",
+          "summary|10": [
+            {
+              "qty": "@natural(1,100)",
+              "cost": "@natural(1,100)"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "serNumDetail": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "rows|20": [
+        {
+          "date": "@date", // 如果action === detail, 则是billId的日期, 如果action === serNumStatus  , 则是最后业务日期
+          "storeCd": "@id", // 仓库ID
+          "storeName": "@cname",
+          "skuId": "@id", // skuId
+          "skuName": "@cname",
+          "contactName": "@cname", // 如果是入库单,则是suppName, 如果是出库, 则是custName
+          "serNum": "@id",
+          "bussType|1": [10, 11, 12, 13], // 字典里的枚举值
+          "billId": "@id", // 关联的订单 如果action === detail, 则是有这个字段, 如果action === serNumStatus  , 无这个字段
+          "qty": "@natural(1,100)",
+          "status": 1, //是否在库 0 不在库
+          "spuName": "@cname",
+          "billNo": "@id",
+          "memo": ""
+        }
+      ]
+    }
   }
 }

@@ -1,14 +1,15 @@
 import { CustomerTable } from './index';
 import { DashOutlined } from '@ant-design/icons';
 import { Input, Modal } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const CustomerSelect: React.FC<{
   value?: React.Key;
   custName?: string;
   disabled?: boolean;
-  onChange?: (value: React.Key) => void;
-}> = ({ value, onChange, disabled, custName }) => {
+  onChange?: (value: React.Key | BAS.Customer) => void;
+  labelInValue?: boolean;
+}> = ({ value, onChange, disabled, custName, labelInValue }) => {
   const [visible, setVisible] = useState<boolean>(false);
   const handleOk = () => {
     setVisible(false);
@@ -22,12 +23,18 @@ const CustomerSelect: React.FC<{
     }
     return '';
   });
-  const handleChange = (ttt: { label: string; value: React.Key }) => {
-    onChange?.(ttt.value);
-    setInputValue(ttt.label);
+  const handleChange = (ttt: BAS.Customer) => {
+    if (labelInValue) {
+      onChange?.(ttt);
+    } else {
+      onChange?.(ttt.custId);
+    }
+    setInputValue(ttt.custName);
     handleCancel();
   };
-
+  useEffect(() => {
+    setInputValue(custName || '');
+  }, [custName]);
   return (
     <>
       <Input
@@ -36,6 +43,7 @@ const CustomerSelect: React.FC<{
         onClick={() => {
           setVisible(true);
         }}
+        placeholder={'(空)'}
         disabled={disabled}
         suffix={
           <DashOutlined
@@ -46,7 +54,12 @@ const CustomerSelect: React.FC<{
         }
       />
       <Modal visible={visible} width={1000} onOk={handleOk} onCancel={handleCancel}>
-        <CustomerTable select={true} onChange={handleChange} />
+        <CustomerTable
+          select={{
+            state: 1,
+          }}
+          onChange={handleChange}
+        />
       </Modal>
     </>
   );

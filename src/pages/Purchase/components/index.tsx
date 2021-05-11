@@ -16,6 +16,7 @@ import {
   memoColumns,
   qtyColumns,
   skuIdColumns,
+  spuCodeColumns,
   storeCdColumns,
 } from '@/utils/columns';
 import { getCode } from '@/services/Sys';
@@ -42,6 +43,7 @@ import { queryPurchaseUnStockIn } from '@/services/Purchase';
 import { InputNumber } from 'antd';
 import { getCurrentStock, getSkuStock } from '@/services/Store';
 import CustomerSelect from '@/pages/Bas/customer/customerSelect';
+import ProCard from '@ant-design/pro-card';
 
 export const CheckAudit = ({ checkStatus }: { checkStatus: boolean }) => {
   return checkStatus ? <img src={AuditImage} alt="" style={{ marginRight: '100px' }} /> : <div />;
@@ -83,7 +85,7 @@ export const SupplierSelect: React.FC<{
         onClick={() => {
           setVisible(true);
         }}
-        style={{ width: '328px' }}
+        style={{ width: '100%' }}
         disabled={disabled}
         suffix={
           <DashOutlined
@@ -106,7 +108,7 @@ export const SupplierSelect: React.FC<{
 
 export const SkuSelect: React.FC<{
   value?: PUR.Entries[];
-  onChange?: (value: PUR.Entries[]) => void;
+  onChange?: (value: PUR.Entries[] | React.Key) => void;
   setEditableKeys?: (value: React.Key[]) => void;
   disabled?: boolean;
   type?: 'single' | 'multiple';
@@ -125,9 +127,11 @@ export const SkuSelect: React.FC<{
         taxRate: 0,
         outStoreCd: item.storeCd,
       })) || [];
-    const onChangeValue = type === 'multiple' ? value?.concat(v) ?? v : v;
+    const onChangeValue = type === 'multiple' ? value?.concat(v) ?? v : v[0].skuId;
     onChange?.(onChangeValue);
-    setEditableKeys?.(onChangeValue.map((i) => i.autoId));
+    if (Array.isArray(onChangeValue)) {
+      setEditableKeys?.(onChangeValue.map((i) => i.autoId));
+    }
     setVisible(false);
   };
   const columns: ProColumns<PUR.Entries>[] = [
@@ -135,11 +139,7 @@ export const SkuSelect: React.FC<{
       placeholder: '请输入商品名称或编码',
     }),
     indexColumns,
-    {
-      title: '编码',
-      dataIndex: 'code',
-      search: false,
-    },
+    spuCodeColumns,
     {
       dataIndex: 'cateName',
       title: '商品类别',
@@ -196,8 +196,8 @@ export const SkuSelect: React.FC<{
         </Button>
       ) : (
         <Input
-          value={value?.[0]?.skuName || value?.[0].spuName}
-          style={{ width: '328px' }}
+          value={selectedEntries?.[0]?.skuName}
+          style={{ width: '100%' }}
           disabled={disabled}
           onClick={() => {
             setVisible(true);
@@ -265,6 +265,9 @@ export const SkuSelect: React.FC<{
           rowKey={'skuId'}
           options={false}
           columns={columns}
+          params={{
+            state: 1,
+          }}
           request={async (params) => {
             const response = await querySkuList({
               ...params,
@@ -284,19 +287,25 @@ export const SkuSelect: React.FC<{
 };
 
 export enum BussType {
-  购货订单 = 10,
-  购货退货订单 = 11,
-  购货单 = 12,
-  购货退货单 = 13,
+  采购订单 = 10,
+  采购退货订单 = 11,
+  采购单 = 12,
+  采购退货单 = 13,
   销货订单 = 20,
-  销货退货订单 = 21,
-  销货单 = 22,
-  销货退货单 = 23,
+  销售退货订单 = 21,
+  销售单 = 22,
+  销售退货单 = 23,
   其他入库单 = 40,
   盘盈 = 41,
   其他出库单 = 42,
   盘亏 = 43,
   调拨单 = 44,
+  付款单 = 50,
+  收款单 = 51,
+  核销单 = 53,
+  其他收入单 = 54,
+  其他支出单 = 55,
+  资金转账单 = 56,
 }
 export enum StockType {
   入库 = 'In',
@@ -318,22 +327,34 @@ export enum OrderType {
 }
 
 export enum BussTypeApiUrl {
-  购货订单 = '/bis/purcOrder',
-  购货单 = '/bis/purchase',
-  购货退货单 = '/bis/purcReturn',
+  采购订单 = '/bis/purcOrder',
+  采购单 = '/bis/purchase',
+  采购退货单 = '/bis/purcReturn',
   其他入库单 = '/bis/stockIn',
   其他出库单 = '/bis/stockOut',
   调拨单 = '/bas/stock/stockChange',
+  其他收入单 = '/funds/ori',
+  其他支出单 = '/funds/ori',
+  收款单 = '/funds/receipt',
+  付款单 = '',
+  核销单 = '',
+  资金转账单 = '',
 }
 
 export enum BussTypeComponentUrl {
-  购货订单 = '/bis/purcOrder',
-  购货单 = '/bis/purchase',
-  购货退货单 = '/bis/Thd',
-  其他入库单 = '/stock/stockIn',
-  其他出库单 = '/stock/stockOut',
-  调拨单 = '/stock/stockChange',
-  盘点 = '/stock/inventory',
+  采购订单 = '/bis/purcOrder',
+  采购单 = '/bis/purchase',
+  采购退货单 = '/bis/Thd',
+  其他入库单 = '/store/stockIn',
+  其他出库单 = '/store/stockOut',
+  调拨单 = '/store/stockChange',
+  盘点 = '/store/inventory',
+  其他收入单 = '/funds/ori',
+  其他支出单 = '/funds/ori',
+  收款单 = '/funds/receipt',
+  付款单 = '',
+  核销单 = '',
+  资金转账单 = '',
 }
 
 export function getOrderType(orderType: OrderType) {
@@ -347,28 +368,28 @@ export function getOrderType(orderType: OrderType) {
     return [BussType.其他入库单, BussType.盘盈, BussType.其他出库单, BussType.盘亏];
   }
   if (orderType === OrderType.购货) {
-    return [BussType.购货订单, BussType.购货退货订单, BussType.购货单, BussType.购货退货单];
+    return [BussType.采购订单, BussType.采购退货订单, BussType.采购单, BussType.采购退货单];
   }
   if (orderType === OrderType.销货) {
-    return [BussType.销货订单, BussType.销货退货订单, BussType.销货单, BussType.销货退货单];
+    return [BussType.销货订单, BussType.销售退货订单, BussType.销售单, BussType.销售退货单];
   }
   if (orderType === OrderType.购销货) {
     return [
-      BussType.购货订单,
-      BussType.购货退货订单,
-      BussType.购货单,
-      BussType.购货退货单,
+      BussType.采购订单,
+      BussType.采购退货订单,
+      BussType.采购单,
+      BussType.采购退货单,
       BussType.销货订单,
-      BussType.销货退货订单,
-      BussType.销货单,
-      BussType.销货退货单,
+      BussType.销售退货订单,
+      BussType.销售单,
+      BussType.销售退货单,
     ];
   }
   if (orderType === OrderType.购销货退货单) {
-    return [BussType.购货退货订单, BussType.购货退货单, BussType.销货退货订单, BussType.销货退货单];
+    return [BussType.采购退货订单, BussType.采购退货单, BussType.销售退货订单, BussType.销售退货单];
   }
   if (orderType === OrderType.订单) {
-    return [BussType.购货订单, BussType.购货退货订单, BussType.销货订单, BussType.销货退货订单];
+    return [BussType.采购订单, BussType.采购退货订单, BussType.销货订单, BussType.销售退货订单];
   }
   return [];
 }
@@ -381,6 +402,9 @@ export function calPriceTitle(bussType: BussType) {
     return '出库单价';
   }
   if (getOrderType(OrderType.购货).indexOf(bussType) > -1) {
+    if (bussType === BussType.采购退货单) {
+      return '退货单价';
+    }
     return '购货单价';
   }
   if (getOrderType(OrderType.销货).indexOf(bussType) > -1) {
@@ -397,6 +421,9 @@ export function calAmountTitle(bussType: BussType) {
     return '出库金额';
   }
   if (getOrderType(OrderType.购货).indexOf(bussType) > -1) {
+    if (bussType === BussType.采购退货单) {
+      return '退货金额';
+    }
     return '购货金额';
   }
   if (getOrderType(OrderType.销货).indexOf(bussType) > -1) {
@@ -405,7 +432,13 @@ export function calAmountTitle(bussType: BussType) {
   return '';
 }
 
-export const BussTypeFormField = ({ bussType }: { bussType: BussType }) => {
+export const BussTypeFormField = ({
+  bussType,
+  disabled,
+}: {
+  bussType: BussType;
+  disabled: boolean;
+}) => {
   const { valueEnum } = useModel('options', (model) => ({ valueEnum: model.valueEnum }));
   if (getOrderType(OrderType.其他入库).indexOf(bussType) > -1) {
     return (
@@ -413,6 +446,7 @@ export const BussTypeFormField = ({ bussType }: { bussType: BussType }) => {
         width="md"
         name="bussType"
         label="业务类型"
+        disabled={disabled}
         initialValue={BussType.其他入库单}
         options={[
           {
@@ -433,6 +467,7 @@ export const BussTypeFormField = ({ bussType }: { bussType: BussType }) => {
         width="md"
         name="bussType"
         label="业务类型"
+        disabled={disabled}
         initialValue={BussType.其他出库单}
         options={[
           {
@@ -451,16 +486,17 @@ export const BussTypeFormField = ({ bussType }: { bussType: BussType }) => {
     return (
       <ProFormRadio.Group
         name="bussType"
+        disabled={disabled}
         label="业务类型"
-        initialValue={BussType.购货订单}
+        initialValue={BussType.采购订单}
         options={[
           {
             label: '购货',
-            value: BussType.购货订单,
+            value: BussType.采购订单,
           },
           {
             label: '退货',
-            value: BussType.购货退货订单,
+            value: BussType.采购退货订单,
           },
         ]}
       />
@@ -584,7 +620,7 @@ const generateInitValuesFromBussType = (bussType: BussType, url: string, compone
   } = {
     codeId: 'GHDD',
   };
-  if (bussType === BussType.购货单) {
+  if (bussType === BussType.采购单) {
     other = {
       codeId: 'GHD',
     };
@@ -599,7 +635,7 @@ const generateInitValuesFromBussType = (bussType: BussType, url: string, compone
       codeId: 'QTCK',
     };
   }
-  if (bussType === BussType.购货退货单) {
+  if (bussType === BussType.采购退货单) {
     other = {
       codeId: 'THD',
     };
@@ -630,16 +666,16 @@ export const GenerateButton: React.FC<{
 }> = ({ bussType, billStatus, billId }) => {
   let url = '';
   let children = '';
-  if (bussType === BussType.购货订单) {
-    url = `${BussTypeComponentUrl.购货单}/new?srcGhddBillId=`;
+  if (bussType === BussType.采购订单) {
+    url = `${BussTypeComponentUrl.采购单}/new?srcGhddBillId=`;
     children = '生成购货单';
   }
-  if (bussType === BussType.购货退货订单) {
-    url = `${BussTypeComponentUrl.购货退货单}/new?srcGhddBillId=`;
+  if (bussType === BussType.采购退货订单) {
+    url = `${BussTypeComponentUrl.采购退货单}/new?srcGhddBillId=`;
     children = '生成退货单';
   }
-  if (bussType === BussType.购货单) {
-    url = `${BussTypeComponentUrl.购货退货单}/new?srcGhdBillId=`;
+  if (bussType === BussType.采购单) {
+    url = `${BussTypeComponentUrl.采购退货单}/new?srcGhdBillId=`;
     children = '生成退货单';
   }
   return (
@@ -669,7 +705,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
   } = props;
   const actionRef = useRef<ActionType>();
   const formRef = useRef<FormInstance>();
-  const initValues = generateInitValuesFromBussType(bussType, url, componentUrl);
+  const initialValues = generateInitValuesFromBussType(bussType, url, componentUrl);
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const [editableKeys, setEditableKeys] = useState<React.Key[]>();
@@ -888,7 +924,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
       editable: false,
       hideInTable:
         [
-          BussType.购货订单,
+          BussType.采购订单,
           BussType.其他入库单,
           BussType.盘盈,
           BussType.其他出库单,
@@ -903,8 +939,8 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
       editable: false,
       hideInTable:
         [
-          BussType.购货单,
-          BussType.购货订单,
+          BussType.采购单,
+          BussType.采购订单,
           BussType.其他入库单,
           BussType.盘盈,
           BussType.其他出库单,
@@ -923,7 +959,8 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
     async () => {
       setIsInfo(id !== 'new');
       if (id === 'new') {
-        const billNo = (await getCode(initValues.codeId)).data;
+        const billNo = (await getCode(initialValues.codeId)).data;
+        const { suppId, contactName, custId } = (location as any).query;
         let res: PUR.Purchase = {
           billId: '',
           billNo,
@@ -932,14 +969,17 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
           disRate: 0,
           disAmount: 0,
           rpAmount: 0,
+          suppId,
+          custId,
+          contactName,
         };
-        if ([BussType.购货单, BussType.购货退货单].indexOf(bussType) > -1) {
+        if ([BussType.采购单, BussType.采购退货单].indexOf(bussType) > -1) {
           const { srcGhddBillId, srcGhdBillId } = (location as any).query;
           // srcGhddBillId, srcGhdBillId 只存在一个,
           if (srcGhddBillId) {
             // 如果当前页面是购货单,则是生成购货单, 如果是退货单,则是从购货订单生成退货单
             const ttt =
-              bussType === BussType.购货单
+              bussType === BussType.采购单
                 ? '/bis/purcOrder/infoUnStockIn'
                 : '/bis/purcOrder/infoReturnable';
             const srcGhdd = (
@@ -968,16 +1008,16 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
           if (srcGhdBillId) {
             // 从购货单生成退货单
             const ttt = '/bis/purchase/infoReturn';
-            const srcGhdd = (
+            const srcGHD = (
               await queryPurchaseUnStockIn(srcGhddBillId || srcGhdBillId, undefined, ttt)
             ).data;
-            const entries = srcGhdd.entries?.map((i) => ({
+            const entries = srcGHD.entries?.map((i) => ({
               ...i,
               autoId: +(Math.random() * 1000000).toFixed(0),
               srcGhdBillNo: [
                 {
                   billId: srcGhdBillId,
-                  billNo: srcGhdd.billNo,
+                  billNo: srcGHD.billNo,
                 },
               ],
               srcDtlId: i.dtlId,
@@ -985,7 +1025,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
             setEditableKeys(entries?.map((i) => i.autoId));
             res = {
               ...res,
-              ...srcGhdd,
+              ...srcGHD,
               entries,
               billNo,
               bussType,
@@ -997,7 +1037,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
           success: true,
         };
       }
-      const info = (await queryInfo(id, `${initValues.url}/info`, undefined, { dev })).data;
+      const info = (await queryInfo(id, `${initialValues.url}/info`, undefined, { dev })).data;
       setChecked(info.checkStatus === 2);
       const entries = info.entries?.map((en) => ({
         ...en,
@@ -1019,7 +1059,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
           await getSuppAccountPayableSum(values.suppId);
         }
         formRef.current?.setFieldsValue(values);
-        if (bussType === BussType.购货单) {
+        if (bussType === BussType.采购单) {
           calPrice(values as any, formRef, true);
         }
       },
@@ -1028,10 +1068,10 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
   );
   useEffect(() => {
     run();
-  }, [id]);
+  }, [id, run]);
   return (
     <PageContainer
-      title={initValues.title}
+      title={initialValues.title}
       loading={loading}
       footer={[
         <CheckAudit checkStatus={checked} key={'checkImg'} />,
@@ -1047,7 +1087,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
               )}
               <CheckTwoButton
                 key="check"
-                url={initValues.checkButton.url}
+                url={initialValues.checkButton.url}
                 selectedRowKeys={[id]}
                 refresh={refresh}
                 checkStatus={checked ? 1 : 2}
@@ -1066,12 +1106,20 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
           children={'保存'}
         />,
         <Button key="refresh" type={'dashed'} onClick={refresh} children={'刷新'} />,
+        <Button
+          key="print"
+          type="link"
+          target="_blank"
+          href={`#/sys/print/${id}/${bussType}`}
+          children={'打印'}
+        />,
       ]}
-      content={
+    >
+      <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }}>
         <ProForm<PUR.Purchase>
           onFinish={async (values) => {
             // 新增或修改时,对序列号商品进行基本单位判断.购货订单无需序列号
-            if (bussType !== BussType.购货订单) {
+            if (bussType !== BussType.采购订单) {
               const ttt = values?.entries?.filter((item) => {
                 if (item.isSerNum) {
                   if (item.unitId !== item.baseUnitId) {
@@ -1089,7 +1137,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
               // 新增
               const res = await add({ ...values, dev }, `${url}/add`);
               message.success(res.msg);
-              history.push(`${initValues.componentUrl}/${res.data.id}`);
+              history.push(`${initialValues.componentUrl}/${res.data.id}`);
             } else {
               await upd({ ...values, dev }, `${url}/upd`);
               refresh();
@@ -1097,7 +1145,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
             return false;
           }}
           onValuesChange={async (values) => {
-            if ([BussType.购货单, BussType.购货退货单].indexOf(bussType) > -1) {
+            if ([BussType.采购单, BussType.采购退货单].indexOf(bussType) > -1) {
               if (values.suppId) {
                 await getSuppAccountPayableSum(values.suppId);
               }
@@ -1112,8 +1160,8 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
           <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
           <ProForm.Group>
             {[BussType.其他入库单, ...getOrderType(OrderType.购货)].indexOf(bussType) > -1 && (
-              <ProFormDependency name={['suppName']}>
-                {({ suppName }) => (
+              <ProFormDependency name={['contactName']}>
+                {({ contactName }) => (
                   <ProForm.Item
                     name="suppId"
                     label="供应商"
@@ -1123,22 +1171,24 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
                         : patternMsg.text('供应商')
                     }
                   >
-                    <SupplierSelect disabled={checked} suppName={suppName} />
+                    <SupplierSelect disabled={checked} suppName={contactName} />
                   </ProForm.Item>
                 )}
               </ProFormDependency>
             )}
             {[BussType.其他出库单, ...getOrderType(OrderType.销货)].indexOf(bussType) > -1 && (
-              <ProFormDependency name={['suppName']}>
-                {({ custName }) => (
-                  <ProForm.Item name="custId" label="客户" rules={patternMsg.text('客户')}>
-                    <CustomerSelect custName={custName} />
-                  </ProForm.Item>
-                )}
+              <ProFormDependency name={['contactName']}>
+                {({ contactName }) => {
+                  return (
+                    <ProForm.Item name="custId" label="客户" rules={patternMsg.text('客户')}>
+                      <CustomerSelect custName={contactName} disabled={checked} />
+                    </ProForm.Item>
+                  );
+                }}
               </ProFormDependency>
             )}
             <ProFormDatePicker width="md" name="date" label="单据日期" disabled={checked} />
-            {bussType === BussType.购货订单 && (
+            {bussType === BussType.采购订单 && (
               <ProFormDatePicker
                 width="md"
                 name="deliveryDate"
@@ -1156,13 +1206,13 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
             {getOrderType(OrderType.购货).indexOf(bussType) > -1 && (
               <>
                 <DepSelect name="depId" label="采购部门" showNew disabled={checked} />
-                <UserSelect name="operId" label="采购员" disabled={checked} />
+                <UserSelect showNew name="operId" label="采购员" disabled={checked} />
               </>
             )}
             {getOrderType(OrderType.销货).indexOf(bussType) > -1 && (
               <>
                 <DepSelect name="depId" label="销售部门" showNew disabled={checked} />
-                <UserSelect name="operId" label="销售员" disabled={checked} />
+                <UserSelect showNew name="operId" label="销售员" disabled={checked} />
               </>
             )}
           </ProForm.Group>
@@ -1170,7 +1220,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
             <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
               <SkuSelect setEditableKeys={setEditableKeys} disabled={checked} />
             </ProForm.Item>
-            <BussTypeFormField bussType={bussType} />
+            <BussTypeFormField bussType={bussType} disabled={checked} />
           </ProForm.Group>
           <ProForm.Item name="entries" trigger="onValuesChange">
             <EditableProTable<PUR.Entries>
@@ -1221,12 +1271,12 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
                 <ProFormDigit
                   width="sm"
                   name="disAmount"
-                  label={bussType === BussType.购货退货单 ? '退款优惠' : '优惠金额'}
+                  label={bussType === BussType.采购退货单 ? '退款优惠' : '优惠金额'}
                   disabled={checked}
                 />
                 <ProFormDigit disabled width="sm" name="amount" label="优惠后金额" />
               </ProForm.Group>
-              {[BussType.购货单, BussType.购货退货单].indexOf(bussType) > -1 && (
+              {[BussType.采购单, BussType.采购退货单].indexOf(bussType) > -1 && (
                 <ProForm.Group>
                   <ProFormDigit width="sm" name="arrears" label="本次欠款" disabled />
                   <ProFormDigit width="sm" name="accountPayableSum" label="供应商欠款" disabled />
@@ -1240,7 +1290,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
                   <ProFormDigit
                     width="sm"
                     name="rpAmount"
-                    label={bussType === BussType.购货单 ? '本次付款' : '本次退款'}
+                    label={bussType === BussType.采购单 ? '本次付款' : '本次退款'}
                     min={0}
                     disabled={checked}
                     fieldProps={{ precision: 2 }}
@@ -1250,7 +1300,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
             </>
           )}
         </ProForm>
-      }
-    />
+      </ProCard>
+    </PageContainer>
   );
 };

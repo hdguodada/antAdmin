@@ -1,0 +1,120 @@
+{
+  "upd": {
+    "id": 796196089548663,
+    "buId": 888888,
+    "payeeId": "",
+    "contactName": "零售客户",
+    "date": "2021-05-10",
+    "billNo": "SKD20210510001",
+    "accounts": [
+      {
+        "accId": "129719133591171123",
+        "payment": "200.00",
+        "wayId": "129719133591171138",
+        "settlement": "231321",
+        "remark": ""
+      }
+    ],
+    "entries": [
+      {
+        "billId": 796196089548657,
+        "billNo": "QTSR20210508001",
+        "billType": "QTSR",
+        "transType": "其他收入",
+        "billDate": "2021-05-08",
+        "billPrice": 200,
+        "hasCheck": 0,
+        "notCheck": 200,
+        "nowCheck": "200.00"
+      }
+    ],
+    "discount": "0",
+    "payment": "0.00",
+    "description": ""
+  },
+  "add": {
+    "custId": "@id",
+    "contactName": "零售客户",
+    "date": "@date",
+    "billNo": "SKD20210511001",
+    "accounts": [
+      {
+        "accountId": "@id",
+        "payment": "200.00",
+        "settlement": "@id",
+        "settlementNo": "string",
+        "remark": ""
+      }
+    ],
+    "entries": [
+      {
+        "billId": "@id",
+        "billNo": "@id",
+        "bussType": "@number", // 业务类型
+        "billDate": "@date", // 单据日期
+        "billPrice": "200.00", // 单据金额
+        "hasCheck": "0.00", // 已核销
+        "notCheck": "200.00", // 未核销
+        "nowCheck": "200.00" //本次核销
+      }
+    ],
+    "discount": "0.00", // 整单折扣
+    "payment": "0.00", // 本次预收款
+    "memo": "" // 备注
+  },
+  "list": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "summary": {
+        "amount": 400,
+        "adjustRate": 0,
+        "bDeAmount": 400,
+        "deAmount": 0,
+        "payment": 400
+      },
+      "rows|5": [
+        {
+          "amount": "@natural(200, 300)", // 收款合计
+          "wayName": ["信用卡"],
+          "adjustRate": 0, // 整单备注
+          "contactName": "@cname", // 联系
+          "memo": null, // 备注
+          "billDate": "@date", // 单据日期
+          "remark": [""], // 分录备注
+          "bDeAmount": 200, // 本次核销金额
+          "checkName": "@cname", // 审核人
+          "crtName": "@cname", // 制单人
+          "hxAmount": 200,
+          "accountName": ["支付宝", "微信"], // 结算账号
+          "settlement": [1, 2], // 结算方式
+          "settlementNo": ["@id", "@id"], // 结算号
+          "operName": "@cname", // 收款人
+          "deAmount": 0, // 本次预收款
+          "checked": 0,
+          "payment": ["200"],
+          "id": "@id",
+          "billNo": "@id",
+          "order": ["1"]
+        }
+      ]
+    }
+  },
+  "源单": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "rows": [
+        {
+          "bussType": "@natural(10, 15)",
+          "billId": "@id",
+          "billNo": "@id",
+          "billDate": "@date",
+          "billPrice": "@natural(100, 300)",
+          "notCheck": "@natural(100, 300)",
+          "hasCheck": "@natural(100, 300)"
+        }
+      ]
+    }
+  }
+}

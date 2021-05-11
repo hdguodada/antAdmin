@@ -15,6 +15,8 @@ import {
   memoColumns,
   cateIdColumns,
   unitIdColumns,
+  spuCodeColumns,
+  billNoColumns,
 } from '@/utils/columns';
 import moment from 'moment';
 import { BussType } from '@/pages/Purchase/components';
@@ -60,7 +62,6 @@ export const InBalance: React.FC = () => {
       columns={columns}
       search={{
         defaultCollapsed: false,
-        span: 5,
       }}
       request={async (params) => {
         const response = await storeReports(params, undefined, '/bas/store/inBalance');
@@ -246,7 +247,6 @@ export const DeliverDetail: React.FC = () => {
       columns={columns}
       search={{
         defaultCollapsed: false,
-        span: 5,
       }}
       request={async (params) => {
         const response = await storeReports(params, undefined, '/bas/store/deliverDetail');
@@ -259,12 +259,220 @@ export const DeliverDetail: React.FC = () => {
     />
   );
 };
+
+export const DeliverSummary: React.FC = () => {
+  const { valueEnum } = useModel('store', (model) => ({ valueEnum: model.valueEnum }));
+  const columns: ProColumns<PUR.PurchaseOrder>[] = [
+    indexColumns,
+    cateIdColumns,
+    codeColumns,
+    skuIdColumns,
+    {
+      title: '仓库',
+      dataIndex: 'storeCd',
+      valueType: 'select',
+      valueEnum,
+      render: (_, record) => <div>{record.storeName}</div>,
+    },
+    unitIdColumns,
+  ];
+  const [fColumns, setFColumns] = useState<ProColumns<PUR.PurchaseOrder>[]>([]);
+  return (
+    <ProTable
+      rowKey="autoId"
+      pagination={false}
+      bordered
+      options={false}
+      columns={fColumns}
+      search={{
+        defaultCollapsed: false,
+      }}
+      scroll={{ x: 2500 }}
+      request={async (params) => {
+        const response = await storeReports(params, undefined, '/bas/store/deliverSummary');
+        setFColumns(() => {
+          return columns.concat(
+            response.data.columns?.map((item, index) => ({
+              title: item,
+              children: [
+                {
+                  title: '数量',
+                  dataIndex: ['summary', index, 'qty'],
+                },
+                {
+                  title: '成本',
+                  dataIndex: ['summary', index, 'cost'],
+                },
+              ],
+            })) || [],
+          );
+        });
+        return {
+          data: response.data.rows,
+          success: response.code === 0,
+          total: response.data.total,
+        };
+      }}
+    />
+  );
+};
+
+// 序列号跟踪表
+export const SerNumDetail: React.FC = () => {
+  const { valueEnum } = useModel('store', (model) => ({ valueEnum: model.valueEnum }));
+  const { typeOption } = useModel('options', (model) => ({ typeOption: model.valueEnum }));
+  const columns: ProColumns<PUR.PurchaseOrder>[] = [
+    {
+      title: '单据日期',
+      dataIndex: 'date',
+      valueType: 'dateRange',
+      initialValue: [moment().startOf('month'), moment()],
+      render: (_, record) => <div>{record.date}</div>,
+      search: {
+        transform: (value) => ({
+          beginDate: value[0],
+          endDate: value[1],
+        }),
+      },
+    },
+    indexColumns,
+    codeColumns,
+    skuIdColumns,
+    spuCodeColumns,
+    {
+      title: '序列号',
+      dataIndex: 'serNum',
+    },
+    {
+      title: '仓库',
+      dataIndex: 'storeCd',
+      valueType: 'select',
+      valueEnum,
+      render: (_, record) => <div>{record.storeName}</div>,
+    },
+
+    {
+      dataIndex: 'bussType',
+      title: '业务类别',
+      valueType: 'select',
+      fieldProps: {
+        mode: 'multiple',
+      },
+      valueEnum: typeOption('BussType'),
+    },
+    {
+      title: '客户/供应商',
+      dataIndex: 'contactName',
+      search: false,
+    },
+    billNoColumns(() => {}),
+    {
+      dataIndex: 'status',
+      title: '状态',
+      valueEnum: new Map([
+        [1, { text: '在库', status: 'Success' }],
+        [0, { text: '已出库', status: 'Processing' }],
+      ]),
+    },
+  ];
+  return (
+    <ProTable
+      rowKey="autoId"
+      pagination={false}
+      bordered
+      options={false}
+      columns={columns}
+      search={{
+        defaultCollapsed: false,
+      }}
+      request={async (params) => {
+        const response = await storeReports(params, undefined, '/bas/store/serNumDetail');
+        return {
+          data: response.data.rows,
+          success: response.code === 0,
+          total: response.data.total,
+        };
+      }}
+    />
+  );
+};
+// 序列号状态表
+export const SerNumStatus: React.FC = () => {
+  const { valueEnum } = useModel('store', (model) => ({ valueEnum: model.valueEnum }));
+  const { typeOption } = useModel('options', (model) => ({ typeOption: model.valueEnum }));
+  const columns: ProColumns<PUR.PurchaseOrder>[] = [
+    indexColumns,
+    {
+      title: '最后业务日期',
+      dataIndex: 'date',
+      search: false,
+    },
+    codeColumns,
+    skuIdColumns,
+    spuCodeColumns,
+    {
+      title: '序列号',
+      dataIndex: 'serNum',
+    },
+    {
+      dataIndex: 'status',
+      title: '状态',
+      valueEnum: new Map([
+        [1, { text: '在库', status: 'Success' }],
+        [0, { text: '已出库', status: 'Processing' }],
+      ]),
+    },
+    {
+      title: '仓库',
+      dataIndex: 'storeCd',
+      valueType: 'select',
+      valueEnum,
+      render: (_, record) => <div>{record.storeName}</div>,
+    },
+
+    {
+      dataIndex: 'bussType',
+      title: '业务类别',
+      valueType: 'select',
+      fieldProps: {
+        mode: 'multiple',
+      },
+      valueEnum: typeOption('BussType'),
+    },
+    {
+      title: '客户/供应商',
+      dataIndex: 'contactName',
+      search: false,
+    },
+  ];
+  return (
+    <ProTable
+      rowKey="autoId"
+      pagination={false}
+      bordered
+      options={false}
+      columns={columns}
+      search={{
+        defaultCollapsed: false,
+      }}
+      request={async (params) => {
+        const response = await storeReports(params, undefined, '/bas/store/serNumStatus');
+        return {
+          data: response.data.rows,
+          success: response.code === 0,
+          total: response.data.total,
+        };
+      }}
+    />
+  );
+};
+
 export default () => {
   return (
     <GlobalWrapper type={'list'}>
       <PageContainer
         content={
-          <ProCard tabs={{ activeKey: 'tab2' }}>
+          <ProCard tabs={{}}>
             <ProCard.TabPane key="tab1" tab="商品库存余额表">
               <InBalance />
             </ProCard.TabPane>
@@ -272,13 +480,13 @@ export default () => {
               <DeliverDetail />
             </ProCard.TabPane>
             <ProCard.TabPane key="tab3" tab="商品收发汇总表">
-              <InBalance />
+              <DeliverSummary />
             </ProCard.TabPane>
             <ProCard.TabPane key="tab4" tab="序列号跟踪表">
-              <InBalance />
+              <SerNumDetail />
             </ProCard.TabPane>
             <ProCard.TabPane key="tab5" tab="序列号状态表">
-              <InBalance />
+              <SerNumStatus />
             </ProCard.TabPane>
           </ProCard>
         }

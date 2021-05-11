@@ -107,9 +107,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         history.push('/user/login');
       }
     },
-    menuDataRender: (menuData) => {
-      return initialState?.menuData || menuData;
-    },
+    menuDataRender: (menuData) => menuData,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     ...initialState?.settings,
@@ -161,7 +159,7 @@ const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
   const token = localStorage.getItem('token');
   let endUrl;
   if (options?.data?.dev) {
-    endUrl = `/dev${url}`;
+    endUrl = `/${options?.data?.dev}${url}`;
   } else {
     endUrl = BASE_URL + url;
   }

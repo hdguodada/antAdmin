@@ -9,6 +9,7 @@ import {
   baseSearch,
   indexColumns,
   optionColumns,
+  spuCodeColumns,
   stateColumns,
   tableAlertOptionRenderDom,
 } from '@/utils/columns';
@@ -36,10 +37,7 @@ const ProductsTable: React.FC<{
       title: '商品名称',
       dataIndex: 'spuName',
     },
-    {
-      title: '商品编码',
-      dataIndex: 'barCode',
-    },
+    spuCodeColumns,
     {
       title: '分类',
       dataIndex: 'cateName',

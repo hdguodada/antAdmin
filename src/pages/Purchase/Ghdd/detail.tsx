@@ -8,7 +8,7 @@ export default () => {
   return (
     <NewOrderForm
       queryInfo={queryPurchaseInfo}
-      bussType={BussType.购货订单}
+      bussType={BussType.采购订单}
       add={addPurchase}
       upd={updPurchase}
       url={url}

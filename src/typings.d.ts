@@ -35,6 +35,7 @@ type RowResponse<T> = {
     pageSize: number;
     pageNumber: number;
     columns?: string[];
+    summary?: Record<string, number>;
   };
   msg: string;
 };
@@ -55,7 +56,7 @@ type QueryRequest<T> = {
     current?: number | undefined;
     keyword?: string | undefined;
   };
-  dev?: boolean;
+  dev?: string;
   action?: 'add' | 'upd';
 };
 type MyHeaders = {

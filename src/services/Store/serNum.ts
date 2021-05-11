@@ -12,7 +12,7 @@ export async function serNumDetail(data: QueryRequest<STORE.SN>): Promise<RowRes
     method: 'POST',
     data: {
       ...data,
-      dev: true,
+      dev: 'bas',
     },
   });
 }
@@ -44,7 +44,7 @@ export async function storeReports(
     params,
     headers,
     data: {
-      dev: true,
+      dev: 'bas',
     },
   });
 }

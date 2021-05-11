@@ -93,7 +93,7 @@ declare namespace BAS {
     skuId?: React.Key;
     skuName?: string;
     autoId: React.Key;
-    code: string; // 商品编码
+    skuCode: string; // 商品条码
     skuImageUrl: string;
     attrList?: { attrId: React.Key; attrValueId: React.Key }[];
     priceList: Spu['priceList'][];
@@ -107,7 +107,7 @@ declare namespace BAS {
     cateName: ProductType['cateName'];
     brandId: Brand['brandId']; // 产品品牌
     brandName: Brand['brandName'];
-    barCode: string; // spu的商品编码
+    spuCode: string; // spu的商品编码
     prodTag: number[]; // 产品标签 字典- ProdTag
     keywords: string; // 搜索关键字
     spec: string; // isMulSpec = 0的情况下规格型号
@@ -214,6 +214,7 @@ declare namespace BAS {
   } & DefaultField;
   export type Supplier = {
     address: string; // 地址
+    contactName?: string;
     buyerId: number; // 采购员
     buyerName: string;
     checkDate: string; // 审核日期
@@ -282,6 +283,7 @@ declare namespace BAS {
     children?: CustType[];
   } & DefaultField;
   export type Customer = {
+    contactName?: string;
     custId: string | number; // 客户Id
     pCustId: string | number; // 上级客户
     isPerson: 0 | 1; // 个人客户

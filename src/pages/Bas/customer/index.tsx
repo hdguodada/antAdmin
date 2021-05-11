@@ -16,7 +16,7 @@ import BatchDel from '@/components/DelPopconfirm';
 
 export const CustomerTable: React.FC<{
   select?: { state: number };
-  onChange?: (value: { label: string; value: React.Key }) => void;
+  onChange?: (value: BAS.Customer) => void;
 }> = ({ select, onChange }) => {
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
@@ -79,10 +79,7 @@ export const CustomerTable: React.FC<{
             <a
               key="editable"
               onClick={async () => {
-                onChange?.({
-                  label: entity.custName,
-                  value: entity.custId,
-                });
+                onChange?.(entity);
               }}
             >
               选择

@@ -10,7 +10,7 @@
       "spuName": "测试产品",
       "cateName": "服装1",
       "code": "产品条码0315_1",
-      "barCode": "产品编码2",
+      "spuCode": "产品编码2",
       "isSerNum": true,
       "isWarranty": true,
       "storeCd": "C01",

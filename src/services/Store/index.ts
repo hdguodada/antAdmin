@@ -17,7 +17,7 @@ export async function storeOIList(
     method: 'POST',
     data: {
       ...data,
-      dev: true,
+      dev: 'bas',
     },
   });
 }
@@ -42,7 +42,7 @@ export async function queryToPd(
   return request('/bas/inventory/queryToPd', {
     params,
     method: 'GET',
-    data: { dev: true },
+    data: { dev: 'bas' },
     headers: { modId: mapModId.store },
   });
 }
@@ -53,7 +53,7 @@ export async function queryPdRecordList(
   return request('/bas/inventory/queryPdRecordList', {
     params,
     method: 'GET',
-    data: { dev: true },
+    data: { dev: 'bas' },
     headers: { modId: mapModId.store },
   });
 }

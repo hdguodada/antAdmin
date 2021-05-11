@@ -149,19 +149,16 @@ type PurchaseRequest = {
 /**
  * 采购订单追踪表
  * @returns
- * @param date
+ * @param data
  * @param headers
  */
 export async function purchaseOrderListByGhdd(
-  date: QueryRequest<PurchaseRequest>,
+  data: QueryRequest<PurchaseRequest>,
   headers = { modId: mapModId.purchaseGhdd },
-): Promise<RowResponse<PUR.Purchase>> {
-  return request('/bas/purchaseOrderList/purchaseGhdd', {
+): Promise<RowResponse<PUR.PurchaseOrder>> {
+  return request('/report/purchase/purcOrderTrack', {
     method: 'POST',
-    data: {
-      ...date,
-      dev: true,
-    },
+    data,
     headers,
   });
 }
@@ -180,7 +177,7 @@ export async function purchaseOrderListByDetail(
     method: 'POST',
     data: {
       ...date,
-      dev: true,
+      dev: 'bas',
     },
     headers,
   });
@@ -200,7 +197,7 @@ export async function purchaseDetailBySku(
     method: 'POST',
     data: {
       ...date,
-      dev: true,
+      dev: 'bas',
     },
     headers,
   });
@@ -218,7 +215,7 @@ export async function purchaseDetailBySupp(
     method: 'POST',
     data: {
       ...date,
-      dev: true,
+      dev: 'bas',
     },
   });
 }

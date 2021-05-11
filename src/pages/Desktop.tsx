@@ -11,7 +11,7 @@ export default (): React.ReactNode => {
         <Carousel draggable>
           <div>
             <RcResizeObserver key="resize-observer">
-              <StatisticCard.Group direction={responsive ? 'column' : undefined}>
+              <StatisticCard.Group direction={'column'}>
                 <StatisticCard
                   statistic={{
                     title: '库存预警1',

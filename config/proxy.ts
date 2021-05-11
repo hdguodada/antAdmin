@@ -14,10 +14,15 @@ export default {
       changeOrigin: true,
       pathRewrite: { ['^' + BASE_URL]: '' },
     },
-    '/dev': {
+    '/bas': {
       target: 'https://www.hengdianworld.xyz/mock/18',
       changeOrigin: true,
-      pathRewrite: { ['^' + '/dev']: '' },
+      pathRewrite: { ['^' + '/bas']: '' },
+    },
+    '/funds': {
+      target: 'https://www.hengdianworld.xyz/mock/19',
+      changeOrigin: true,
+      pathRewrite: { ['^' + '/funds']: '' },
     },
   },
   test: {

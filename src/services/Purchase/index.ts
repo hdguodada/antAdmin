@@ -11,7 +11,7 @@ export async function getSnapshotQty(
   return request('/bas/store/entory/searchSnapshotQty', {
     data: {
       ...data,
-      dev: true,
+      dev: 'bas',
     },
     headers,
   });

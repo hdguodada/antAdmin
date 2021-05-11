@@ -11,7 +11,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
 import React, { useRef, useState } from 'react';
 import { useModel, useParams } from 'umi';
-import ProCard from '@ant-design/pro-card';
+import ProCard, { StatisticCard } from '@ant-design/pro-card';
 import { Divider } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import CustRecord from './custRecord';
@@ -21,7 +21,17 @@ import EditFilledForm from './updForm';
 import { indexColumns } from '@/utils/columns';
 import { useRequest } from 'umi';
 import CustomerFinanceForm from './custFinanceForm';
+import GlobalWrapper from '@/components/GlobalWrapper';
+import RcResizeObserver from 'rc-resize-observer';
+import OrderTable from '@/pages/Purchase/components/OrderTable';
+import { BussType, BussTypeApiUrl, BussTypeComponentUrl } from '@/pages/Purchase/components';
+import { delPurchase, openClosePurchase, queryPurchase } from '@/services/Purchase';
 
+const imgStyle = {
+  display: 'block',
+  width: 42,
+  height: 42,
+};
 export const relColumns: ProColumns<BAS.Rel>[] = [
   indexColumns,
 
@@ -108,192 +118,322 @@ export default (): React.ReactNode => {
     valueEnum: model.valueEnum,
   }));
   return (
-    <PageContainer
-      loading={loading}
-      title={detail?.custName}
-      content={
-        <>
-          <ProCard
-            title="基本信息"
-            collapsible
-            extra={[
-              <EditFilledForm key="edit" initialValues={detail} refresh={refresh} action="upd" />,
-            ]}
-          >
-            <ProDescriptions<BAS.Customer>
-              columns={[
-                { title: '客户编号', dataIndex: 'custCd', editable: false },
-                {
-                  title: '客户名称',
-                  dataIndex: 'custName',
-                },
-                {
-                  title: '等级',
-                  dataIndex: 'custLevelName',
-                },
-                {
-                  title: '类型',
-                  dataIndex: 'custTypeName',
-                },
-                { title: '所属部门', dataIndex: 'depName' },
-                { title: '持有人', dataIndex: 'salesman' },
-                { title: '区域', dataIndex: 'custAreaName' },
-                { title: '电话', dataIndex: 'tel' },
-                { title: '传真', dataIndex: 'fax' },
-                { title: '详细地址', dataIndex: 'address' },
-                { title: '邮编', dataIndex: 'zipCode' },
-                { title: '网址', dataIndex: 'wWW' },
-                { title: '邮箱', dataIndex: 'email' },
-                { title: '简介', dataIndex: 'intro' },
-              ]}
-              dataSource={data?.customerInfo}
-            />
-          </ProCard>
-          <Divider />
-          <ProCard
-            title="财务信息"
-            collapsible
-            extra={
-              <CustomerFinanceForm action="upd" initialValues={data?.finance} refresh={refresh} />
-            }
-          >
-            <ProDescriptions<BAS.CustomerFinance>
-              columns={[
-                {
-                  dataIndex: 'invoice',
-                  title: '开票名称',
-                  copyable: true,
-                },
-                {
-                  dataIndex: 'taxNumber',
-                  title: '开票税号',
-                  copyable: true,
-                },
-                {
-                  dataIndex: 'invoiceAddress',
-                  title: '开户地址',
-                  copyable: true,
-                },
-                {
-                  dataIndex: 'invoiceTel',
-                  title: '开户电话',
-                  copyable: true,
-                },
-                {
-                  dataIndex: 'bankName',
-                  title: '开户名称',
-                  copyable: true,
-                },
-                {
-                  dataIndex: 'bank',
-                  title: '开户银行',
-                  copyable: true,
-                },
-                {
-                  dataIndex: 'bankAccount',
-                  title: '银行账号',
-                  copyable: true,
-                },
-                {
-                  dataIndex: 'alipay',
-                  title: '支付宝账号',
-                  copyable: true,
-                },
-                {
-                  dataIndex: 'wxpay',
-                  title: '微信账号',
-                  copyable: true,
-                },
-                {
-                  dataIndex: 'settlementId',
-                  title: '结算方式',
-                  valueEnum: valueEnum('Settlement'),
-                },
-                {
-                  dataIndex: 'debtTypeId',
-                  title: '账期类型',
-                  valueEnum: valueEnum('DebtType'),
-                },
-                {
-                  dataIndex: 'initDate',
-                  title: '余额日期',
-                  valueType: 'date',
-                },
-                {
-                  dataIndex: 'isInit',
-                  title: '对账初始化',
-                  valueEnum: new Map([
-                    [0, '否'],
-                    [1, '是'],
-                  ]),
-                },
-                {
-                  dataIndex: 'initRecv',
-                  title: '期初应收款',
-                  valueType: 'money',
-                },
-                {
-                  dataIndex: 'initPerRecv',
-                  title: '期初预收款',
-                  valueType: 'money',
-                },
-                {
-                  dataIndex: 'InitRecvOther',
-                  title: '期初其他应收款',
-                  valueType: 'money',
-                },
-                {
-                  dataIndex: 'creditLimit',
-                  title: '授信额度',
-                  valueType: 'money',
-                },
-              ]}
-              dataSource={data?.finance}
-            />
-          </ProCard>
-          <Divider />
-          <ProCard title="联系人" collapsible>
-            <EditableProTable<BAS.Rel>
-              rowKey="relId"
-              loading={loading}
-              value={data?.customerRel}
-              actionRef={custRelActionRef}
-              bordered
-              columns={relColumns}
-              recordCreatorProps={{
-                record: {
-                  relId: (Math.random() * 1000000).toFixed(0),
-                  action: 'add',
-                } as BAS.Rel,
-              }}
-              editable={{
-                onSave: async (key, values) => {
-                  if (values.action === 'add') {
-                    await addCustomerRel({
-                      ...values,
-                      custId: id,
-                    });
-                  } else {
-                    await updCustomerRel(values);
-                  }
-                  refresh();
-                },
-                onDelete: async (key) => {
-                  await delCustomerRel([key as number]);
-                  refresh();
-                },
-              }}
-            />
-          </ProCard>
-          <Divider />
-          <ProCard collapsible split={'vertical'} title="跟踪动态">
-            <ProCard>
-              {detail ? <CustRecord customer={detail} custRel={data?.customerRel} /> : ''}
-            </ProCard>
-            <ProCard>{detail ? <CustDoc customer={detail} /> : ''}</ProCard>
-          </ProCard>
-        </>
-      }
-    />
+    <GlobalWrapper type="descriptions">
+      <PageContainer
+        loading={loading}
+        title={detail?.custName}
+        content={
+          !loading && (
+            <>
+              <ProCard direction="column" ghost>
+                {/* 头部 */}
+                <ProCard ghost>
+                  <RcResizeObserver key="resize-observer">
+                    <StatisticCard.Group direction="row">
+                      <StatisticCard
+                        statistic={{
+                          title: '待审核采购订单',
+                          value: 2176,
+                          icon: (
+                            <img
+                              style={imgStyle}
+                              src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                              alt="icon"
+                            />
+                          ),
+                        }}
+                      />
+                      <StatisticCard
+                        statistic={{
+                          title: '待审核采购单',
+                          value: 475,
+                          icon: (
+                            <img
+                              style={imgStyle}
+                              src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*-jVKQJgA1UgAAAAAAAAAAABkARQnAQ"
+                              alt="icon"
+                            />
+                          ),
+                        }}
+                      />
+                      <StatisticCard
+                        statistic={{
+                          title: '待审核采购退货单',
+                          value: 87,
+                          icon: (
+                            <img
+                              style={imgStyle}
+                              src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*FPlYQoTNlBEAAAAAAAAAAABkARQnAQ"
+                              alt="icon"
+                            />
+                          ),
+                        }}
+                      />
+                      <StatisticCard
+                        statistic={{
+                          title: '待审核其他入库单',
+                          value: 1754,
+                          icon: (
+                            <img
+                              style={imgStyle}
+                              src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*pUkAQpefcx8AAAAAAAAAAABkARQnAQ"
+                              alt="icon"
+                            />
+                          ),
+                        }}
+                      />
+                    </StatisticCard.Group>
+                  </RcResizeObserver>
+                </ProCard>
+                <ProCard ghost split="vertical">
+                  <ProCard colSpan={16} direction="column" ghost>
+                    {/* 客户关联的表单 Start */}
+                    <ProCard collapsible title={<span>关联单据</span>} tabs={{ type: 'card' }}>
+                      <ProCard.TabPane key="销售订单" tab="销售订单">
+                        <OrderTable<PUR.Purchase>
+                          url={BussTypeApiUrl.采购订单}
+                          checkUrl={`${BussTypeApiUrl.采购订单}/check`}
+                          componentUrl={BussTypeComponentUrl.采购订单}
+                          openCloseFn={openClosePurchase}
+                          del={delPurchase}
+                          queryList={queryPurchase}
+                          bussType={BussType.采购订单}
+                          initSearch={{
+                            suppId: data?.customerInfo.custId,
+                            contactName: data?.customerInfo.custName,
+                          }}
+                        />
+                      </ProCard.TabPane>
+                      <ProCard.TabPane key="销售单" tab="销售单">
+                        <OrderTable<PUR.Purchase>
+                          url={BussTypeApiUrl.采购单}
+                          checkUrl={`${BussTypeApiUrl.采购单}/check`}
+                          componentUrl={BussTypeComponentUrl.采购单}
+                          openCloseFn={openClosePurchase}
+                          del={delPurchase}
+                          queryList={queryPurchase}
+                          bussType={BussType.采购单}
+                          initSearch={{
+                            suppId: data?.customerInfo.custId,
+                            contactName: data?.customerInfo.custName,
+                          }}
+                        />
+                      </ProCard.TabPane>
+                      <ProCard.TabPane key="销售退货单" tab="销售退货单">
+                        <OrderTable<PUR.Purchase>
+                          url={BussTypeApiUrl.采购退货单}
+                          checkUrl={`${BussTypeApiUrl.采购退货单}/check`}
+                          componentUrl={BussTypeComponentUrl.采购退货单}
+                          openCloseFn={openClosePurchase}
+                          del={delPurchase}
+                          queryList={queryPurchase}
+                          bussType={BussType.采购退货单}
+                          initSearch={{
+                            suppId: data?.customerInfo.custId,
+                            contactName: data?.customerInfo.custName,
+                          }}
+                        />
+                      </ProCard.TabPane>
+                    </ProCard>
+                    {/* 客户关联的表单 End */}
+                    <ProCard title="联系人" collapsible>
+                      <EditableProTable<BAS.Rel>
+                        rowKey="relId"
+                        loading={loading}
+                        value={data?.customerRel}
+                        actionRef={custRelActionRef}
+                        bordered
+                        columns={relColumns}
+                        recordCreatorProps={{
+                          record: {
+                            relId: (Math.random() * 1000000).toFixed(0),
+                            action: 'add',
+                          } as BAS.Rel,
+                        }}
+                        editable={{
+                          onSave: async (key, values) => {
+                            if (values.action === 'add') {
+                              await addCustomerRel({
+                                ...values,
+                                custId: id,
+                              });
+                            } else {
+                              await updCustomerRel(values);
+                            }
+                            refresh();
+                          },
+                          onDelete: async (key) => {
+                            await delCustomerRel([key as number]);
+                            refresh();
+                          },
+                        }}
+                      />
+                    </ProCard>
+                    <ProCard title="销售机会" collapsible>
+                      {detail ? <CustRecord customer={detail} custRel={data?.customerRel} /> : ''}
+                    </ProCard>
+                    <ProCard title="附件" collapsible>
+                      {detail ? <CustDoc customer={detail} /> : ''}
+                    </ProCard>
+                  </ProCard>
+                  <ProCard colSpan={8} direction="column" ghost>
+                    <ProCard
+                      title="基本信息"
+                      collapsible
+                      extra={[
+                        <EditFilledForm
+                          key="edit"
+                          initialValues={detail}
+                          refresh={refresh}
+                          action="upd"
+                        />,
+                      ]}
+                    >
+                      <ProDescriptions<BAS.Customer>
+                        column={2}
+                        columns={[
+                          { title: '客户编号', dataIndex: 'custCd', editable: false },
+                          {
+                            title: '客户名称',
+                            dataIndex: 'custName',
+                          },
+                          {
+                            title: '等级',
+                            dataIndex: 'custLevelName',
+                          },
+                          {
+                            title: '类型',
+                            dataIndex: 'custTypeName',
+                          },
+                          { title: '所属部门', dataIndex: 'depName' },
+                          { title: '持有人', dataIndex: 'salesman' },
+                          { title: '区域', dataIndex: 'custAreaName' },
+                          { title: '电话', dataIndex: 'tel' },
+                          { title: '传真', dataIndex: 'fax' },
+                          { title: '详细地址', dataIndex: 'address' },
+                          { title: '邮编', dataIndex: 'zipCode' },
+                          { title: '网址', dataIndex: 'wWW' },
+                          { title: '邮箱', dataIndex: 'email' },
+                          { title: '简介', dataIndex: 'intro' },
+                        ]}
+                        dataSource={data?.customerInfo}
+                      />
+                    </ProCard>
+                    <Divider />
+                    <ProCard
+                      title="财务信息"
+                      collapsible
+                      extra={
+                        <CustomerFinanceForm
+                          action="upd"
+                          initialValues={data?.finance}
+                          refresh={refresh}
+                        />
+                      }
+                    >
+                      <ProDescriptions<BAS.CustomerFinance>
+                        column={2}
+                        columns={[
+                          {
+                            dataIndex: 'invoice',
+                            title: '开票名称',
+                            copyable: true,
+                          },
+                          {
+                            dataIndex: 'taxNumber',
+                            title: '开票税号',
+                            copyable: true,
+                          },
+                          {
+                            dataIndex: 'invoiceAddress',
+                            title: '开户地址',
+                            copyable: true,
+                          },
+                          {
+                            dataIndex: 'invoiceTel',
+                            title: '开户电话',
+                            copyable: true,
+                          },
+                          {
+                            dataIndex: 'bankName',
+                            title: '开户名称',
+                            copyable: true,
+                          },
+                          {
+                            dataIndex: 'bank',
+                            title: '开户银行',
+                            copyable: true,
+                          },
+                          {
+                            dataIndex: 'bankAccount',
+                            title: '银行账号',
+                            copyable: true,
+                          },
+                          {
+                            dataIndex: 'alipay',
+                            title: '支付宝账号',
+                            copyable: true,
+                          },
+                          {
+                            dataIndex: 'wxpay',
+                            title: '微信账号',
+                            copyable: true,
+                          },
+                          {
+                            dataIndex: 'settlementId',
+                            title: '结算方式',
+                            valueEnum: valueEnum('Settlement'),
+                          },
+                          {
+                            dataIndex: 'debtTypeId',
+                            title: '账期类型',
+                            valueEnum: valueEnum('DebtType'),
+                          },
+                          {
+                            dataIndex: 'initDate',
+                            title: '余额日期',
+                            valueType: 'date',
+                          },
+                          {
+                            dataIndex: 'isInit',
+                            title: '对账初始化',
+                            valueEnum: new Map([
+                              [0, '否'],
+                              [1, '是'],
+                            ]),
+                          },
+                          {
+                            dataIndex: 'initRecv',
+                            title: '期初应收款',
+                            valueType: 'money',
+                          },
+                          {
+                            dataIndex: 'initPerRecv',
+                            title: '期初预收款',
+                            valueType: 'money',
+                          },
+                          {
+                            dataIndex: 'InitRecvOther',
+                            title: '期初其他应收款',
+                            valueType: 'money',
+                          },
+                          {
+                            dataIndex: 'creditLimit',
+                            title: '授信额度',
+                            valueType: 'money',
+                          },
+                        ]}
+                        dataSource={data?.finance}
+                      />
+                    </ProCard>
+                    <Divider />
+                  </ProCard>
+                </ProCard>
+              </ProCard>
+            </>
+          )
+        }
+      />
+    </GlobalWrapper>
   );
 };

@@ -7,7 +7,7 @@
           "spuId": "@id",
           "albumList": "", // 是否传albumList中的第一个?
           "spuName": "商品名称",
-          "barCode": "商品编码",
+          "spuCode": "商品编号",
           "prodTag": [], // 商品标签
           "cateName": "cateIdName",
           "spec": "规格型号",

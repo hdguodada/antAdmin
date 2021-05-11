@@ -1,8 +1,9 @@
 declare namespace PUR {
   export type PurchaseOrder = {
     dev?: boolean;
-    date: string | number;
-    deliveryDate: string | number;
+    dateStr: string;
+    deliveryDateStr: string | number;
+    inDateStr: string;
     srcGhdBillNo?: React.Key[]; // 关联购货单
     srcThdBillNo?: React.Key[]; // 关联购货订单
     srcGhddBillNo?: React.Key[]; // 关联退货单
@@ -27,12 +28,13 @@ declare namespace PUR {
     amount: number; // 采购金额
     tax: number; // 税额
     taxAmount: number; // 价税合计
-    transTypeName: string;
-    transType: React.Key; // 业务类型
+    bussType: React.Key; // 业务类型
     inLocationId?: React.Key; // 调入仓库；
     outLoactionId?: React.Key; // 调出仓库；
     inLocationName?: string;
     outLocationName?: string;
+    summary?: any[];
+    statusName?: string;
   };
 
   export type serItem = {
@@ -49,7 +51,7 @@ declare namespace PUR {
     spuId?: React.Key;
     spuName?: string;
     cateName?: string;
-    barCode?: React.Key;
+    spuCode?: React.Key;
     isWarranty?: boolean;
     currentQty?: number;
     realQty?: number;
@@ -127,10 +129,21 @@ declare namespace PUR {
     cateId?: React.Key;
     suppId?: React.Key;
     suppName?: string;
+    custId?: React.Key;
+    custName?: string;
     stockInQty?: number; // 已入库数量
     bussType?: BussType; // 订单类型 暂定可能值(0, 1 , 2) 0 购货订单 只需保存,无需入库.  1 购货单 需入库 库存有变化 2 购货退货单 购货单的反向操作
     entries?: Entries[];
     operId?: React.Key;
     operName?: string;
+    contactName?: string; // 供应商名称或者客户名称
+    printInfo?: {
+      chineseTaxAmount: string;
+      totalAmount: number;
+      totalQty: number;
+      totalReducedAmount: number;
+      totalTax: number;
+      totalTaxAmount: number;
+    };
   } & DefaultField;
 }

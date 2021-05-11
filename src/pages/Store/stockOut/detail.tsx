@@ -1,6 +1,12 @@
 import React from 'react';
 import { addPurchase, queryPurchaseInfo, updPurchase } from '@/services/Purchase';
-import { BussType, NewOrderForm, StockType } from '@/pages/Purchase/components';
+import {
+  BussType,
+  BussTypeApiUrl,
+  BussTypeComponentUrl,
+  NewOrderForm,
+  StockType,
+} from '@/pages/Purchase/components';
 
 export default () => {
   return (
@@ -10,7 +16,8 @@ export default () => {
       add={addPurchase}
       upd={updPurchase}
       stockType={StockType.出库}
-      dev={true}
+      url={BussTypeApiUrl.其他出库单}
+      componentUrl={BussTypeComponentUrl.其他出库单}
     />
   );
 };

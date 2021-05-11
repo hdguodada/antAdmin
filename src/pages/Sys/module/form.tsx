@@ -88,7 +88,7 @@ const ModuleForm: React.FC<FormProps> = (props) => {
         <ProFormText width="md" name="memo" label="中文名称" rules={patternMsg.text('中文名称')} />
       </ProForm.Group>
       <ProForm.Group>
-        <ProFormText width="md" name="path" label="路径" />
+        <ProFormText width="md" name="path" label="路径" disabled={action === 'upd'} />
         <ProFormText width="md" name="url" label="模块地址" />
       </ProForm.Group>
       <ProForm.Group>

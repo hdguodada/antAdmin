@@ -12,10 +12,11 @@ type UserFormProps = {
   actionRef?: React.MutableRefObject<ActionType | undefined>;
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  initialValues: API.CurrentUser | Record<string, unknown>;
+  initialValues?: API.CurrentUser | Record<string, unknown>;
+  refresh?: () => void;
 };
 const UserForm: React.FC<UserFormProps> = (props) => {
-  const { action, actionRef, visible, setVisible, initialValues } = props;
+  const { action, actionRef, visible, setVisible, initialValues, refresh } = props;
   const formRef = useRef<FormInstance>();
   const { userRoleOptions } = useModel('userRole');
   const { userType } = useModel('options', (model) => ({
@@ -39,6 +40,7 @@ const UserForm: React.FC<UserFormProps> = (props) => {
           await addUser(values);
         }
         actionRef?.current?.reload();
+        refresh?.();
         return true;
       }}
       onVisibleChange={(v) => {

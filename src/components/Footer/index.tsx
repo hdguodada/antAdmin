@@ -45,6 +45,12 @@ export default () => {
   const { queryStore } = useModel('store', (model) => ({
     queryStore: model.query,
   }));
+  const { queryUsers } = useModel('user', (model) => ({
+    queryUsers: model.query,
+  }));
+  const { queryAccount } = useModel('account', (model) => ({
+    queryAccount: model.query,
+  }));
   useRequest(
     async () => {
       if (history.location.pathname !== '/user/login') {
@@ -55,6 +61,7 @@ export default () => {
           queryBrand(),
           queryUnit(),
           queryAttr(),
+          queryUsers(),
         ]);
         await Promise.all([
           queryTreeSupp(),
@@ -66,6 +73,7 @@ export default () => {
           queryCustLevel(),
           querySupp(),
           queryStore(),
+          queryAccount(),
         ]);
       }
       return {

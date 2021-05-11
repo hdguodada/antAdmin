@@ -27,6 +27,7 @@ import { ProductTypeTreeSelect, UserSelect } from './form';
 import moment from 'moment';
 import { delPurchase } from '@/services/Purchase';
 import { showSysInfo } from '@/components/SysInfo';
+import CustomerSelect from '@/pages/Bas/customer/customerSelect';
 
 export const checkStatusValueEnum = new Map([
   [1, { text: '未审核', status: 'Processing' }],
@@ -65,6 +66,14 @@ const billStatusValueEnum = new Map([
       [4, { text: '已关闭', status: 'Default' }],
     ]),
   ],
+  [
+    3,
+    new Map([
+      [1, { text: '未收款', status: 'Processing' }],
+      [2, { text: '部分收款', status: 'Warning' }],
+      [3, { text: '已收款', status: 'Success' }],
+    ]),
+  ],
 ]);
 
 /**
@@ -73,12 +82,12 @@ const billStatusValueEnum = new Map([
  * @param hideInTable
  * @param search
  */
-export const billStatus = <T extends unknown>(
+export const billStatusColumns = <T extends unknown>(
   type: number,
   hideInTable = false,
   search: false | undefined,
 ): ProColumns<T> => ({
-  title: '订单状态',
+  title: type === 3 ? '收款状态' : '订单状态',
   dataIndex: 'billStatus',
   valueType: 'select',
   fieldProps: {
@@ -133,6 +142,7 @@ export const indexColumns: ProColumns = {
   width: 50,
   align: 'center',
   fixed: 'left',
+  key: 'index',
 };
 
 export const cateIdColumns: ProColumns = {
@@ -170,6 +180,12 @@ export const codeColumns: ProColumns = {
   copyable: true,
   ellipsis: true,
   editable: false,
+};
+
+export const spuCodeColumns: ProColumns = {
+  title: '商品编号',
+  dataIndex: 'spuCode',
+  search: false,
 };
 
 export const dateColumns = <T extends unknown>({
@@ -261,24 +277,16 @@ export const storeCdColumns: ProColumns = {
 };
 export const stateColumns: ProColumns = {
   title: '状态',
-  search: false,
   dataIndex: 'state',
   valueType: 'select',
-  valueEnum: () => {
-    return {
-      1: {
-        text: '正常',
-        status: 'Success',
-      },
-      0: {
-        text: '禁用',
-        status: 'Error',
-      },
-    };
-  },
+  initialValue: 1,
+  valueEnum: new Map([
+    [1, { text: '正常', status: 'Success' }],
+    [0, { text: '禁用', status: 'Error' }],
+  ]),
 };
 
-export const billNoColumns = <T extends unknown>(fn: (record?: T) => void): ProColumns<T> => {
+export const billNoColumns = <T extends unknown>(fn?: (record?: T) => void): ProColumns<T> => {
   return {
     title: '订单编号',
     dataIndex: 'billNo',
@@ -286,9 +294,9 @@ export const billNoColumns = <T extends unknown>(fn: (record?: T) => void): ProC
     render: (_, record) => (
       <Button
         onClick={() => {
-          fn(record);
+          fn?.(record);
         }}
-        type={'link'}
+        type="link"
       >
         {_}
       </Button>
@@ -546,7 +554,7 @@ export const baseSearch = ({
 };
 
 export type AdvancedSearchFormField = Partial<{
-  begin1: string;
+  beginDate: string;
   endDate: string;
   crtId: React.Key;
   updId: React.Key;
@@ -566,7 +574,9 @@ export type AdvancedSearchFormField = Partial<{
   date: [string, string];
   deliveryDate: [string, string];
   billStatus: any[];
-  suppIdMid: BAS.Supplier;
+  suppIdMid: Partial<BAS.Supplier>;
+  custIdMid: Partial<BAS.Customer>;
+  contactName: string;
 }>;
 type AdvancedSearchFormProps = {
   value?: AdvancedSearchFormField;
@@ -603,7 +613,13 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
         if (values.suppIdMid) {
           formRef.current?.setFieldsValue({
             suppId: values.suppIdMid.suppId,
-            suppName: values.suppIdMid.suppName,
+            contactName: values.suppIdMid.contactName,
+          });
+        }
+        if (values.custIdMid) {
+          formRef.current?.setFieldsValue({
+            custId: values.custIdMid.custId,
+            contactName: values.custIdMid.contactName,
           });
         }
       }}
@@ -616,8 +632,6 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
       <ProFormText name="endDate" hidden />
       <ProFormText name="suppId" hidden />
       <ProFormText name="suppName" hidden />
-      {/* <ProFormText name="beginArriveDate" hidden />
-      <ProFormText name="endArriveDate" hidden /> */}
       <ProFormText name="skuId" hidden />
       <ProForm.Group>
         <ProFormDateRangePicker
@@ -629,25 +643,37 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
           label="单据日期"
           name="date"
         />
-        {/* <ProFormDateRangePicker width="md" label="交货日期" name="deliveryDate" /> */}
         <ProFormText label="分录备注" width="md" name="entryDesc" />
-        {/* <ProFormText label="关联销货订单" width="md" name="srcXhddNo" />
-        <ProFormText label="关联购货单" width="md" name="srcGhdNo" /> */}
-        <ProFormSelect
-          label="订单状态"
-          width="md"
-          name="status"
-          mode="multiple"
-          hidden={getOrderType(OrderType.其他出入库).indexOf(bussType) > -1}
-          valueEnum={billStatusValueEnum.get(1)}
-        />
-        <ProFormDependency name={['suppName']}>
-          {({ suppName }) => (
-            <ProForm.Item label="供应商" name="suppIdMid">
-              <SupplierSelect labelInValue suppName={suppName} />
-            </ProForm.Item>
-          )}
-        </ProFormDependency>
+        {getOrderType(OrderType.其他出入库).indexOf(bussType) < 0 && (
+          <ProFormSelect
+            label="订单状态"
+            width="md"
+            name="status"
+            mode="multiple"
+            valueEnum={billStatusValueEnum.get(1)}
+          />
+        )}
+        {getOrderType(OrderType.购货).concat(getOrderType(OrderType.其他入库)).indexOf(bussType) >
+          -1 && (
+          <ProFormDependency name={['contactName']}>
+            {({ contactName }) => (
+              <ProForm.Item label="供应商" name="suppIdMid">
+                <SupplierSelect labelInValue suppName={contactName} />
+              </ProForm.Item>
+            )}
+          </ProFormDependency>
+        )}
+
+        {getOrderType(OrderType.销货).concat(getOrderType(OrderType.其他出库)).indexOf(bussType) >
+          -1 && (
+          <ProFormDependency name={['contactName']}>
+            {({ contactName }) => (
+              <ProForm.Item label="客户" name="custIdMid">
+                <CustomerSelect labelInValue custName={contactName} />
+              </ProForm.Item>
+            )}
+          </ProFormDependency>
+        )}
 
         <ProForm.Item label="商品" name="skuIdList">
           <SkuSelect type="single" />
@@ -839,7 +865,7 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
       search: false,
       valueType: 'select',
       valueEnum: BussType,
-      hideInTable: [BussType.购货单, BussType.购货退货单, BussType.调拨单].indexOf(bussType) > -1,
+      hideInTable: [BussType.采购单, BussType.采购退货单, BussType.调拨单].indexOf(bussType) > -1,
     },
     {
       dataIndex: 'inStoreName',
@@ -855,10 +881,10 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
     },
     {
       title: '供应商',
-      dataIndex: 'suppName',
+      dataIndex: 'contactName',
       search: false,
       hideInTable:
-        [BussType.其他入库单, BussType.调拨单, ...getOrderType(OrderType.购货)].indexOf(bussType) >
+        [BussType.其他出库单, BussType.调拨单, ...getOrderType(OrderType.销货)].indexOf(bussType) >
         -1,
     },
     {
@@ -878,55 +904,55 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
     },
     {
       title: '客户',
-      dataIndex: 'custName',
+      dataIndex: 'contactName',
       search: false,
       hideInTable:
-        [BussType.其他出库单, BussType.调拨单, ...getOrderType(OrderType.销货)].indexOf(bussType) >
+        [BussType.其他入库单, BussType.调拨单, ...getOrderType(OrderType.购货)].indexOf(bussType) >
         -1,
     },
     srcOrderColumns({
       title: '关联购货单号',
       dataIndex: 'srcGhdBillNo',
       url: '/bis/purchase',
-      hideInTable: [BussType.购货订单, BussType.购货退货单].indexOf(bussType) < 0,
+      hideInTable: [BussType.采购订单, BussType.采购退货单].indexOf(bussType) < 0,
     }),
     srcOrderColumns({
       title: '关联购货退货单号',
       dataIndex: 'srcThdBillNo',
       url: '/bis/Thd',
-      hideInTable: bussType !== BussType.购货单,
+      hideInTable: bussType !== BussType.采购单,
     }),
     srcOrderColumns({
       title: '关联购货订单号',
       dataIndex: 'srcGhddBillNo',
       url: '/bis/purcOrder',
-      hideInTable: [BussType.购货单, BussType.购货退货单].indexOf(bussType) < 0,
+      hideInTable: [BussType.采购单, BussType.采购退货单].indexOf(bussType) < 0,
     }),
     qtyColumns({
       title: '原购货数量',
       dataIndex: 'srcQty',
-      hideInTable: bussType !== BussType.购货退货单,
+      hideInTable: bussType !== BussType.采购退货单,
     }),
     qtyColumns(),
     totalAmountColumns({
       title: '金额',
     }),
     amountColumns({
-      hideInTable: [BussType.购货单, BussType.购货退货单].indexOf(bussType) < 0,
+      hideInTable: [BussType.采购单, BussType.采购退货单].indexOf(bussType) < 0,
     }),
     rpAmountColumns({
-      title: bussType === BussType.购货单 ? '已付款' : '已退款',
-      hideInTable: [BussType.购货单, BussType.购货退货单].indexOf(bussType) < 0,
+      title: bussType === BussType.采购单 ? '已付款' : '已退款',
+      hideInTable: [BussType.采购单, BussType.采购退货单].indexOf(bussType) < 0,
     }),
     hxStateCodeColumns(
-      bussType === BussType.购货单 ? 1 : 2,
-      [BussType.购货单, BussType.购货退货单].indexOf(bussType) < 0,
+      bussType === BussType.采购单 ? 1 : 2,
+      [BussType.采购单, BussType.采购退货单].indexOf(bussType) < 0,
       getOrderType(OrderType.购销货).indexOf(bussType) > -1 ? undefined : false,
     ),
-    billStatus(
-      BussType.购货订单 === bussType ? 1 : 2,
-      [BussType.购货订单, BussType.销货退货订单].indexOf(bussType) < 0,
-      [BussType.购货订单, BussType.购货退货订单].indexOf(bussType) > -1 ? undefined : false,
+    billStatusColumns(
+      BussType.采购订单 === bussType ? 1 : 2,
+      [BussType.采购订单, BussType.销售退货订单].indexOf(bussType) < 0,
+      [BussType.采购订单, BussType.采购退货订单].indexOf(bussType) > -1 ? undefined : false,
     ),
     checkStatus(getOrderType(OrderType.购销货).indexOf(bussType) > -1 ? undefined : false),
     crtNameColumns(),
