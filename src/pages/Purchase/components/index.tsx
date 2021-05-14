@@ -44,6 +44,7 @@ import { InputNumber } from 'antd';
 import { getCurrentStock, getSkuStock } from '@/services/Store';
 import CustomerSelect from '@/pages/Bas/customer/customerSelect';
 import ProCard from '@ant-design/pro-card';
+import GlobalWrapper from '@/components/GlobalWrapper';
 
 export const CheckAudit = ({ checkStatus }: { checkStatus: boolean }) => {
   return checkStatus ? <img src={AuditImage} alt="" style={{ marginRight: '100px' }} /> : <div />;
@@ -53,9 +54,10 @@ export const SupplierSelect: React.FC<{
   value?: React.Key;
   suppName?: string;
   disabled?: boolean;
-  onChange?: (value: React.Key | BAS.Supplier) => void;
+  onChange?: (value: React.Key | React.Key[] | BAS.Supplier | BAS.Supplier[]) => void;
   labelInValue?: boolean;
-}> = ({ value, onChange, disabled, suppName, labelInValue }) => {
+  multiple?: boolean;
+}> = ({ value, onChange, disabled, suppName, labelInValue, multiple }) => {
   const [visible, setVisible] = useState<boolean>(false);
   const handleCancel = () => {
     setVisible(false);
@@ -66,13 +68,19 @@ export const SupplierSelect: React.FC<{
     }
     return '';
   });
-  const handleChange = (supplier: BAS.Supplier) => {
+  const handleChange = (supplier: BAS.Supplier[]) => {
     if (labelInValue) {
-      onChange?.(supplier);
+      if (multiple) {
+        onChange?.(supplier);
+      } else {
+        onChange?.(supplier[0]);
+      }
+    } else if (multiple) {
+      onChange?.(supplier.map((item) => item.suppId));
     } else {
-      onChange?.(supplier.suppId);
+      onChange?.(supplier[0].suppId);
     }
-    setInputValue(supplier.suppName);
+    setInputValue(supplier.map((item) => item.suppName).join(','));
     handleCancel();
   };
   useEffect(() => {
@@ -100,6 +108,7 @@ export const SupplierSelect: React.FC<{
           select={true}
           onChange={handleChange}
           selectParams={{ checkStatus: 2, state: 1 }}
+          multiple={multiple}
         />
       </Modal>
     </>
@@ -108,14 +117,17 @@ export const SupplierSelect: React.FC<{
 
 export const SkuSelect: React.FC<{
   value?: PUR.Entries[];
-  onChange?: (value: PUR.Entries[] | React.Key) => void;
+  onChange?: (value: PUR.Entries[] | PUR.Entries | React.Key | React.Key[]) => void;
   setEditableKeys?: (value: React.Key[]) => void;
   disabled?: boolean;
-  type?: 'single' | 'multiple';
-}> = ({ value, onChange, setEditableKeys, disabled, type = 'multiple' }) => {
+  type?: 'button' | 'input';
+  multiple?: boolean;
+  labelInValue?: boolean;
+}> = ({ value, onChange, setEditableKeys, disabled, type = 'button', multiple, labelInValue }) => {
   const formRef = useRef<FormInstance>();
   const [visible, setVisible] = useState<boolean>(false);
   const [selectedEntries, setSelectedEntries] = useState<PUR.Entries[]>();
+  const [inputValue, setInputValue] = useState<string>();
   const handleOk = (recordList: PUR.Entries[]) => {
     const v =
       recordList?.map((item) => ({
@@ -127,11 +139,20 @@ export const SkuSelect: React.FC<{
         taxRate: 0,
         outStoreCd: item.storeCd,
       })) || [];
-    const onChangeValue = type === 'multiple' ? value?.concat(v) ?? v : v[0].skuId;
-    onChange?.(onChangeValue);
-    if (Array.isArray(onChangeValue)) {
-      setEditableKeys?.(onChangeValue.map((i) => i.autoId));
+    if (labelInValue) {
+      if (multiple) {
+        onChange?.(v);
+        setEditableKeys?.(v.map((i) => i.autoId));
+      } else {
+        onChange?.(v[0]);
+      }
+    } else if (multiple) {
+      onChange?.(v.map((item) => item.skuId));
+      setEditableKeys?.(v.map((i) => i.autoId));
+    } else {
+      onChange?.(v[0].skuId);
     }
+    setInputValue(v.map((i) => i.skuName).join(', '));
     setVisible(false);
   };
   const columns: ProColumns<PUR.Entries>[] = [
@@ -184,7 +205,7 @@ export const SkuSelect: React.FC<{
   ];
   return (
     <>
-      {type === 'multiple' ? (
+      {type === 'button' ? (
         <Button
           type={'dashed'}
           disabled={disabled}
@@ -196,7 +217,7 @@ export const SkuSelect: React.FC<{
         </Button>
       ) : (
         <Input
-          value={selectedEntries?.[0]?.skuName}
+          value={inputValue}
           style={{ width: '100%' }}
           disabled={disabled}
           onClick={() => {
@@ -220,7 +241,7 @@ export const SkuSelect: React.FC<{
           setVisible(false);
         }}
         footer={
-          type === 'multiple'
+          multiple
             ? [
                 <Button
                   type={'primary'}
@@ -254,7 +275,7 @@ export const SkuSelect: React.FC<{
             };
           }}
           rowSelection={
-            type === 'multiple'
+            multiple
               ? {
                   onChange: (a, b) => {
                     setSelectedEntries(b);
@@ -291,7 +312,7 @@ export enum BussType {
   采购退货订单 = 11,
   采购单 = 12,
   采购退货单 = 13,
-  销货订单 = 20,
+  销售订单 = 20,
   销售退货订单 = 21,
   销售单 = 22,
   销售退货单 = 23,
@@ -336,9 +357,11 @@ export enum BussTypeApiUrl {
   其他收入单 = '/funds/ori',
   其他支出单 = '/funds/ori',
   收款单 = '/funds/receipt',
-  付款单 = '',
-  核销单 = '',
-  资金转账单 = '',
+  付款单 = '/funds/receipt',
+  核销单 = '/funds/verifica',
+  资金转账单 = '/funds/fundTf',
+  销售订单 = '/sales/xhdd',
+  销售单 = '/sales/xhd',
 }
 
 export enum BussTypeComponentUrl {
@@ -352,9 +375,11 @@ export enum BussTypeComponentUrl {
   其他收入单 = '/funds/ori',
   其他支出单 = '/funds/ori',
   收款单 = '/funds/receipt',
-  付款单 = '',
-  核销单 = '',
-  资金转账单 = '',
+  付款单 = '/funds/payment',
+  核销单 = '/funds/verifica',
+  资金转账单 = '/funds/fundTf',
+  销售订单 = '/sales/xhdd',
+  销售单 = '/sales/xhd',
 }
 
 export function getOrderType(orderType: OrderType) {
@@ -371,7 +396,7 @@ export function getOrderType(orderType: OrderType) {
     return [BussType.采购订单, BussType.采购退货订单, BussType.采购单, BussType.采购退货单];
   }
   if (orderType === OrderType.销货) {
-    return [BussType.销货订单, BussType.销售退货订单, BussType.销售单, BussType.销售退货单];
+    return [BussType.销售订单, BussType.销售退货订单, BussType.销售单, BussType.销售退货单];
   }
   if (orderType === OrderType.购销货) {
     return [
@@ -379,7 +404,7 @@ export function getOrderType(orderType: OrderType) {
       BussType.采购退货订单,
       BussType.采购单,
       BussType.采购退货单,
-      BussType.销货订单,
+      BussType.销售订单,
       BussType.销售退货订单,
       BussType.销售单,
       BussType.销售退货单,
@@ -389,7 +414,7 @@ export function getOrderType(orderType: OrderType) {
     return [BussType.采购退货订单, BussType.采购退货单, BussType.销售退货订单, BussType.销售退货单];
   }
   if (orderType === OrderType.订单) {
-    return [BussType.采购订单, BussType.采购退货订单, BussType.销货订单, BussType.销售退货订单];
+    return [BussType.采购订单, BussType.采购退货订单, BussType.销售订单, BussType.销售退货订单];
   }
   return [];
 }
@@ -591,7 +616,7 @@ export const StoreSelectChangeCurrentQty: React.FC<{
   );
 };
 
-type NewOrderFormProps = {
+export type NewOrderFormProps = {
   queryInfo: (
     id: React.Key,
     url: string,
@@ -601,7 +626,7 @@ type NewOrderFormProps = {
   bussType: BussType; // 业务类型
   add: (values: PUR.Purchase, url: string) => Promise<any>; // 新增函数
   upd: (values: PUR.Purchase, url: string) => Promise<any>; // 更新函数
-  dev?: boolean; // 是否开发
+  dev?: string; // 是否开发
   url?: string; // 接口地址
   componentUrl?: string; // 组件地址
   stockType?: StockType; // In 是入库单 Out 出库单
@@ -641,7 +666,7 @@ const generateInitValuesFromBussType = (bussType: BussType, url: string, compone
     };
   }
 
-  if (bussType === BussType.销货订单) {
+  if (bussType === BussType.销售订单) {
     other = {
       codeId: 'XHDD',
     };
@@ -698,7 +723,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
     bussType,
     add,
     upd,
-    dev = false,
+    dev,
     url = '',
     componentUrl = '',
     stockType = StockType.入库,
@@ -955,7 +980,7 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
       accountPayableSum: supp.accountPayableSum,
     });
   };
-  const { loading, run, refresh, data } = useRequest(
+  const { run, refresh, data } = useRequest(
     async () => {
       setIsInfo(id !== 'new');
       if (id === 'new') {
@@ -1070,237 +1095,244 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
     run();
   }, [id, run]);
   return (
-    <PageContainer
-      title={initialValues.title}
-      loading={loading}
-      footer={[
-        <CheckAudit checkStatus={checked} key={'checkImg'} />,
-        <Space key="action">
-          {isInfo ? (
-            <>
-              {checked && (
-                <GenerateButton
-                  bussType={data?.bussType}
-                  billStatus={data?.bussType}
-                  billId={data?.billId}
+    <GlobalWrapper type="descriptions">
+      <PageContainer
+        title={initialValues.title}
+        footer={[
+          <CheckAudit checkStatus={checked} key={'checkImg'} />,
+          <Space key="action">
+            {isInfo ? (
+              <>
+                {checked && (
+                  <GenerateButton
+                    bussType={data?.bussType}
+                    billStatus={data?.bussType}
+                    billId={data?.billId}
+                  />
+                )}
+                <CheckTwoButton
+                  key="check"
+                  url={initialValues.checkButton.url}
+                  selectedRowKeys={[id]}
+                  refresh={refresh}
+                  checkStatus={checked ? 1 : 2}
+                />
+              </>
+            ) : (
+              <div />
+            )}
+          </Space>,
+          <Button
+            key="save"
+            type={'primary'}
+            onClick={async () => {
+              formRef.current?.submit();
+            }}
+            children={'保存'}
+          />,
+          <Button key="refresh" type={'dashed'} onClick={refresh} children={'刷新'} />,
+          <Button
+            key="print"
+            type="link"
+            target="_blank"
+            href={`#/sys/print/${id}/${bussType}`}
+            children={'打印'}
+          />,
+        ]}
+      >
+        <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }}>
+          <ProForm<PUR.Purchase>
+            onFinish={async (values) => {
+              // 新增或修改时,对序列号商品进行基本单位判断.购货订单无需序列号
+              if (bussType !== BussType.采购订单) {
+                const ttt = values?.entries?.filter((item) => {
+                  if (item.isSerNum) {
+                    if (item.unitId !== item.baseUnitId) {
+                      message.error(`商品${item.spuName}录入序列号时，请选择基本计量单位！`);
+                      return true;
+                    }
+                  }
+                  return false;
+                });
+                if (ttt?.length) {
+                  return false;
+                }
+              }
+              if (!isInfo) {
+                // 新增
+                const res = await add({ ...values, dev }, `${url}/add`);
+                message.success(res.msg);
+                history.push(`${initialValues.componentUrl}/${res.data.id}`);
+              } else {
+                await upd({ ...values, dev }, `${url}/upd`);
+                refresh();
+              }
+              return false;
+            }}
+            onValuesChange={async (values) => {
+              if ([BussType.采购单, BussType.采购退货单].indexOf(bussType) > -1) {
+                if (values.suppId) {
+                  await getSuppAccountPayableSum(values.suppId);
+                }
+                calPrice(values, formRef, true);
+                return;
+              }
+              calPrice(values, formRef);
+            }}
+            formRef={formRef}
+            submitter={false}
+          >
+            <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
+            <ProForm.Group>
+              {[BussType.其他入库单, ...getOrderType(OrderType.购货)].indexOf(bussType) > -1 && (
+                <ProFormDependency name={['contactName']}>
+                  {({ contactName }) => (
+                    <ProForm.Item
+                      name="suppId"
+                      label="供应商"
+                      style={{ width: '328px' }}
+                      rules={
+                        [BussType.其他入库单, BussType.盘盈].indexOf(bussType) > -1
+                          ? undefined
+                          : patternMsg.text('供应商')
+                      }
+                    >
+                      <SupplierSelect disabled={checked} suppName={contactName} />
+                    </ProForm.Item>
+                  )}
+                </ProFormDependency>
+              )}
+              {[BussType.其他出库单, ...getOrderType(OrderType.销货)].indexOf(bussType) > -1 && (
+                <ProFormDependency name={['contactName']}>
+                  {({ contactName }) => {
+                    return (
+                      <ProForm.Item name="custId" label="客户" rules={patternMsg.text('客户')}>
+                        <CustomerSelect custName={contactName} disabled={checked} />
+                      </ProForm.Item>
+                    );
+                  }}
+                </ProFormDependency>
+              )}
+              <ProFormDatePicker width="md" name="date" label="单据日期" disabled={checked} />
+              {bussType === BussType.采购订单 && (
+                <ProFormDatePicker
+                  width="md"
+                  name="deliveryDate"
+                  label="交货日期"
+                  disabled={checked}
                 />
               )}
-              <CheckTwoButton
-                key="check"
-                url={initialValues.checkButton.url}
-                selectedRowKeys={[id]}
-                refresh={refresh}
-                checkStatus={checked ? 1 : 2}
-              />
-            </>
-          ) : (
-            <div />
-          )}
-        </Space>,
-        <Button
-          key="save"
-          type={'primary'}
-          onClick={async () => {
-            formRef.current?.submit();
-          }}
-          children={'保存'}
-        />,
-        <Button key="refresh" type={'dashed'} onClick={refresh} children={'刷新'} />,
-        <Button
-          key="print"
-          type="link"
-          target="_blank"
-          href={`#/sys/print/${id}/${bussType}`}
-          children={'打印'}
-        />,
-      ]}
-    >
-      <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }}>
-        <ProForm<PUR.Purchase>
-          onFinish={async (values) => {
-            // 新增或修改时,对序列号商品进行基本单位判断.购货订单无需序列号
-            if (bussType !== BussType.采购订单) {
-              const ttt = values?.entries?.filter((item) => {
-                if (item.isSerNum) {
-                  if (item.unitId !== item.baseUnitId) {
-                    message.error(`商品${item.spuName}录入序列号时，请选择基本计量单位！`);
-                    return true;
-                  }
-                }
-                return false;
-              });
-              if (ttt?.length) {
-                return false;
-              }
-            }
-            if (!isInfo) {
-              // 新增
-              const res = await add({ ...values, dev }, `${url}/add`);
-              message.success(res.msg);
-              history.push(`${initialValues.componentUrl}/${res.data.id}`);
-            } else {
-              await upd({ ...values, dev }, `${url}/upd`);
-              refresh();
-            }
-            return false;
-          }}
-          onValuesChange={async (values) => {
-            if ([BussType.采购单, BussType.采购退货单].indexOf(bussType) > -1) {
-              if (values.suppId) {
-                await getSuppAccountPayableSum(values.suppId);
-              }
-              calPrice(values, formRef, true);
-              return;
-            }
-            calPrice(values, formRef);
-          }}
-          formRef={formRef}
-          submitter={false}
-        >
-          <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
-          <ProForm.Group>
-            {[BussType.其他入库单, ...getOrderType(OrderType.购货)].indexOf(bussType) > -1 && (
-              <ProFormDependency name={['contactName']}>
-                {({ contactName }) => (
-                  <ProForm.Item
-                    name="suppId"
-                    label="供应商"
-                    rules={
-                      [BussType.其他入库单, BussType.盘盈].indexOf(bussType) > -1
-                        ? undefined
-                        : patternMsg.text('供应商')
-                    }
-                  >
-                    <SupplierSelect disabled={checked} suppName={contactName} />
-                  </ProForm.Item>
-                )}
-              </ProFormDependency>
-            )}
-            {[BussType.其他出库单, ...getOrderType(OrderType.销货)].indexOf(bussType) > -1 && (
-              <ProFormDependency name={['contactName']}>
-                {({ contactName }) => {
-                  return (
-                    <ProForm.Item name="custId" label="客户" rules={patternMsg.text('客户')}>
-                      <CustomerSelect custName={contactName} disabled={checked} />
-                    </ProForm.Item>
-                  );
-                }}
-              </ProFormDependency>
-            )}
-            <ProFormDatePicker width="md" name="date" label="单据日期" disabled={checked} />
-            {bussType === BussType.采购订单 && (
-              <ProFormDatePicker
+              <ProFormText
                 width="md"
-                name="deliveryDate"
-                label="交货日期"
-                disabled={checked}
+                name="billNo"
+                label="单据编号"
+                disabled
+                rules={patternMsg.text('单据编号')}
               />
-            )}
-            <ProFormText
-              width="md"
-              name="billNo"
-              label="单据编号"
-              disabled
-              rules={patternMsg.text('单据编号')}
-            />
-            {getOrderType(OrderType.购货).indexOf(bussType) > -1 && (
-              <>
-                <DepSelect name="depId" label="采购部门" showNew disabled={checked} />
-                <UserSelect showNew name="operId" label="采购员" disabled={checked} />
-              </>
-            )}
-            {getOrderType(OrderType.销货).indexOf(bussType) > -1 && (
-              <>
-                <DepSelect name="depId" label="销售部门" showNew disabled={checked} />
-                <UserSelect showNew name="operId" label="销售员" disabled={checked} />
-              </>
-            )}
-          </ProForm.Group>
-          <ProForm.Group>
-            <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
-              <SkuSelect setEditableKeys={setEditableKeys} disabled={checked} />
+              {getOrderType(OrderType.购货).indexOf(bussType) > -1 && (
+                <>
+                  <DepSelect name="depId" label="采购部门" showNew disabled={checked} />
+                  <UserSelect showNew name="operId" label="采购员" disabled={checked} />
+                </>
+              )}
+              {getOrderType(OrderType.销货).indexOf(bussType) > -1 && (
+                <>
+                  <DepSelect name="depId" label="销售部门" showNew disabled={checked} />
+                  <UserSelect showNew name="operId" label="销售员" disabled={checked} />
+                </>
+              )}
+            </ProForm.Group>
+            <ProForm.Group>
+              <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
+                <SkuSelect
+                  setEditableKeys={setEditableKeys}
+                  disabled={checked}
+                  multiple
+                  labelInValue
+                />
+              </ProForm.Item>
+              <BussTypeFormField bussType={bussType} disabled={checked} />
+            </ProForm.Group>
+            <ProForm.Item name="entries" trigger="onValuesChange">
+              <EditableProTable<PUR.Entries>
+                rowKey="autoId"
+                bordered
+                actionRef={actionRef}
+                scroll={
+                  [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1
+                    ? undefined
+                    : { x: 3000 }
+                }
+                recordCreatorProps={false}
+                columns={columns}
+                editable={{
+                  type: 'multiple',
+                  editableKeys,
+                  onChange: setEditableKeys,
+                  actionRender: (row, config, defaultDom) => [defaultDom.delete],
+                }}
+              />
             </ProForm.Item>
-            <BussTypeFormField bussType={bussType} disabled={checked} />
-          </ProForm.Group>
-          <ProForm.Item name="entries" trigger="onValuesChange">
-            <EditableProTable<PUR.Entries>
-              rowKey="autoId"
-              bordered
-              actionRef={actionRef}
-              scroll={
-                [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1
-                  ? undefined
-                  : { x: 3000 }
-              }
-              recordCreatorProps={false}
-              columns={columns}
-              editable={{
-                type: 'multiple',
-                editableKeys,
-                onChange: setEditableKeys,
-                actionRender: (row, config, defaultDom) => [defaultDom.delete],
-              }}
-            />
-          </ProForm.Item>
-          <ProFormTextArea name="memo" label="备注" disabled={checked} />
-          <ProFormDependency name={['totalQty', 'totalAmount']}>
-            {({ totalQty, totalAmount }) => (
-              <Space size={32}>
-                {totalQty > 0 && (
-                  <ProFormDigit width="sm" name="totalQty" label="单据数量" disabled />
-                )}
-                {totalAmount > 0 && (
-                  <ProFormDigit width="sm" name="totalAmount" label="单据总额" disabled />
-                )}
-              </Space>
-            )}
-          </ProFormDependency>
-          {!([BussType.调拨单, getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1) && (
-            <>
-              <ProForm.Group>
-                <ProFormText
-                  width="sm"
-                  name="disRate"
-                  label="优惠率"
-                  disabled={checked}
-                  fieldProps={{
-                    type: 'number',
-                    suffix: '%',
-                  }}
-                />
-                <ProFormDigit
-                  width="sm"
-                  name="disAmount"
-                  label={bussType === BussType.采购退货单 ? '退款优惠' : '优惠金额'}
-                  disabled={checked}
-                />
-                <ProFormDigit disabled width="sm" name="amount" label="优惠后金额" />
-              </ProForm.Group>
-              {[BussType.采购单, BussType.采购退货单].indexOf(bussType) > -1 && (
+            <ProFormTextArea name="memo" label="备注" disabled={checked} />
+            <ProFormDependency name={['totalQty', 'totalAmount']}>
+              {({ totalQty, totalAmount }) => (
+                <Space size={32}>
+                  {totalQty > 0 && (
+                    <ProFormDigit width="sm" name="totalQty" label="单据数量" disabled />
+                  )}
+                  {totalAmount > 0 && (
+                    <ProFormDigit width="sm" name="totalAmount" label="单据总额" disabled />
+                  )}
+                </Space>
+              )}
+            </ProFormDependency>
+            {!([BussType.调拨单, getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1) && (
+              <>
                 <ProForm.Group>
-                  <ProFormDigit width="sm" name="arrears" label="本次欠款" disabled />
-                  <ProFormDigit width="sm" name="accountPayableSum" label="供应商欠款" disabled />
-                  <ProFormDigit width="sm" name="totalArrears" label="总欠款" disabled />
-                  <AccountSelect
-                    name="accountId"
-                    label="结算账户"
-                    formRef={formRef}
+                  <ProFormText
+                    width="sm"
+                    name="disRate"
+                    label="优惠率"
                     disabled={checked}
+                    fieldProps={{
+                      type: 'number',
+                      suffix: '%',
+                    }}
                   />
                   <ProFormDigit
                     width="sm"
-                    name="rpAmount"
-                    label={bussType === BussType.采购单 ? '本次付款' : '本次退款'}
-                    min={0}
+                    name="disAmount"
+                    label={bussType === BussType.采购退货单 ? '退款优惠' : '优惠金额'}
                     disabled={checked}
-                    fieldProps={{ precision: 2 }}
                   />
+                  <ProFormDigit disabled width="sm" name="amount" label="优惠后金额" />
                 </ProForm.Group>
-              )}
-            </>
-          )}
-        </ProForm>
-      </ProCard>
-    </PageContainer>
+                {[BussType.采购单, BussType.采购退货单].indexOf(bussType) > -1 && (
+                  <ProForm.Group>
+                    <ProFormDigit width="sm" name="arrears" label="本次欠款" disabled />
+                    <ProFormDigit width="sm" name="accountPayableSum" label="供应商欠款" disabled />
+                    <ProFormDigit width="sm" name="totalArrears" label="总欠款" disabled />
+                    <AccountSelect
+                      name="accountId"
+                      label="结算账户"
+                      formRef={formRef}
+                      disabled={checked}
+                    />
+                    <ProFormDigit
+                      width="sm"
+                      name="rpAmount"
+                      label={bussType === BussType.采购单 ? '本次付款' : '本次退款'}
+                      min={0}
+                      disabled={checked}
+                      fieldProps={{ precision: 2 }}
+                    />
+                  </ProForm.Group>
+                )}
+              </>
+            )}
+          </ProForm>
+        </ProCard>
+      </PageContainer>
+    </GlobalWrapper>
   );
 };

@@ -76,8 +76,7 @@
       "rows|5": [
         {
           "amount": "@natural(200, 300)", // 收款合计
-          "wayName": ["信用卡"],
-          "adjustRate": 0, // 整单备注
+          "adjustRate": 0, // 整单折扣
           "contactName": "@cname", // 联系
           "memo": null, // 备注
           "billDate": "@date", // 单据日期
@@ -94,8 +93,7 @@
           "checked": 0,
           "payment": ["200"],
           "id": "@id",
-          "billNo": "@id",
-          "order": ["1"]
+          "billNo": "@id"
         }
       ]
     }

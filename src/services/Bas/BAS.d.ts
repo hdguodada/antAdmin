@@ -19,11 +19,11 @@ declare namespace BAS {
     address: string;
   } & DefaultField;
   export type Post = {
-    postId: React.Key;
+    postId: K;
     postName: string;
   } & DefaultField;
   export type Employ = {
-    empId: React.Key;
+    empId: K;
     depId: number;
     empCd: string;
     empName: string;
@@ -54,18 +54,18 @@ declare namespace BAS {
     attrValues: AttrVaue[];
   };
   export type Unit = {
-    unitId: React.Key;
+    unitId: K;
     unitName: string;
-    rate: number; // 1-基准单位
+    rate?: number; // 1-基准单位
     price?: number;
     unitMid?: {
-      key?: string;
-      value: React.Key;
-      label: string;
+      key: string;
+      value: K;
+      label: K;
     };
-    inLocationUnitId?: React.Key;
-    outLocationUnitId?: React.Key;
-    autoId: React.Key;
+    inLocationUnitId?: K;
+    outLocationUnitId?: K;
+    autoId: K;
   } & DefaultField;
   export type Brand = {
     brandId: number;
@@ -90,18 +90,18 @@ declare namespace BAS {
     children: ProductType[];
   } & DefaultField;
   type mulspecListItem = {
-    skuId?: React.Key;
+    skuId?: K;
     skuName?: string;
-    autoId: React.Key;
+    autoId: K;
     skuCode: string; // 商品条码
     skuImageUrl: string;
-    attrList?: { attrId: React.Key; attrValueId: React.Key }[];
+    attrList?: { attrId: K; attrValueId: K }[];
     priceList: Spu['priceList'][];
   };
 
   export type Spu = {
     status: number; // 1上架 0 下架
-    spuId: React.Key;
+    spuId: K;
     spuName: string; // 产品名称
     cateId: ProductType['cateId']; // 商品类别
     cateName: ProductType['cateName'];
@@ -116,10 +116,10 @@ declare namespace BAS {
     selectedValueList: Attr[];
     unitList: Unit[]; // 数组数量为1代表单单位
     unitListText: Unit['unitId'][];
-    storeCd: React.Key; // 默认仓库
-    storeName: React.Key;
-    outLocationUnitId: React.Key; // 默认出库单位
-    inLocationUnitId: React.Key; // 默认入库单位
+    storeCd: K; // 默认仓库
+    storeName: K;
+    outLocationUnitId: K; // 默认出库单位
+    inLocationUnitId: K; // 默认入库单位
     isSerNum: boolean; // 是否启用序列号管理
     isWarranty: boolean; // 有效日期
     isMulUnit: boolean;
@@ -138,25 +138,25 @@ declare namespace BAS {
     mulspecList: mulspecListItem[];
   };
   export type CustDoc = {
-    docId: React.Key;
-    custId: React.Key;
-    docTypeId: React.Key;
+    docId: K;
+    custId: K;
+    docTypeId: K;
     docName: string;
     docPath: string;
     custName: string;
     docTypeName: string;
   } & DefaultField;
   export type CustRecord = {
-    recordId: React.Key;
-    custId: React.Key;
-    relId: React.Key;
-    recordTypeId: React.Key;
+    recordId: K;
+    custId: K;
+    relId: K;
+    recordTypeId: K;
     content: string;
     exeDate: string;
     doc01: string;
     doc02: string;
     doc03: string;
-    userId: React.Key;
+    userId: K;
     delFlag: number;
     custName: string;
     relName: string;
@@ -164,16 +164,16 @@ declare namespace BAS {
     realName: string;
   } & DefaultField;
   export type SuppType = {
-    suppTypeId: number;
-    psuppTypeId: number;
+    suppTypeId: K;
+    psuppTypeId: K;
     suppTypeName: string;
     level?: any;
     children: SuppType[];
   } & DefaultField;
   export type Finance = {
-    suppId?: React.Key;
-    custId?: React.Key;
-    financeId?: React.Key;
+    suppId?: K;
+    custId?: K;
+    financeId?: K;
     taxInvoice: string;
     taxPayerNo: string;
     taxBank: string;
@@ -193,7 +193,7 @@ declare namespace BAS {
   } & DefaultField;
 
   export type CustomerFinance = {
-    custId: React.Key;
+    custId: K;
     invoice: string; // 开票名称
     taxNumber: string; // 开票税号
     invoiceAddress: string; // 开户地址
@@ -234,7 +234,7 @@ declare namespace BAS {
     relName: string; // 联系人
     spell: string;
     suppCd: string;
-    suppId: React.Key;
+    suppId: K;
     suppName: string;
     suppShort: string; // 简称
     suppTypeId: number; // 供应商类型
@@ -253,8 +253,8 @@ declare namespace BAS {
     children: CustArea[];
   } & DefaultField;
   export type Rel = {
-    relId: React.Key; // 联系人Id
-    custId?: React.Key; // 客户Id
+    relId: K; // 联系人Id
+    custId?: K; // 客户Id
     isMain: number; // 主联系人
     relName: string; // 姓名
     job: string; // 职位
@@ -266,14 +266,25 @@ declare namespace BAS {
     relWeiXin: string; // 微信号
     relQq: string; // QQ号码
     relMemo: string; // 备注
-    suppId: React.Key;
+    suppId: K;
     action: 'add' | 'upd';
-    autoId?: React.Key;
+    autoId?: K;
   } & DefaultField;
   export type CustLevel = {
-    levelId: React.Key; // 客户等级Id
+    levelId: K; // 客户等级Id
     levelName: string; // 客户等级名称
     discount: number; // 折扣率
+  } & DefaultField;
+  export type CustAddress = {
+    custId: K:
+    addressId: K;
+    linkman: K;
+    mobile: K;
+    regioncd: string;
+    address: K;
+    fullAddress: k;
+    isDefault: boolean;
+    regioncdMid: K[];
   } & DefaultField;
   export type CustType = {
     custTypeId: string | number; // 客户类别Id

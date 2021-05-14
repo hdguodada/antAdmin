@@ -26,8 +26,9 @@ export function sleep(time: number) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
 
-export function transformRegionCd(RegionCd: string) {
-  return RegionCd.split('-');
+export function transformRegionCd(regionCd: string) {
+  console.log([regionCd.slice(0, 4), regionCd.slice(4, 6), regionCd.slice(7)]);
+  return [regionCd.slice(0, 4), regionCd.slice(0, 6), regionCd];
 }
 
 export function transformTreeData(
@@ -201,7 +202,6 @@ export const mapModId = {
 };
 
 export const filterRoutes = (sysRoutes: any[], apiRoutes: any[]) => {
-  console.log(sysRoutes, apiRoutes);
   const res = sysRoutes.filter((sysRoute) => {
     return apiRoutes.findIndex((apiRoute) => apiRoute.path === sysRoute.path) !== -1;
   });

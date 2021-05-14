@@ -1,6 +1,7 @@
 import { message } from 'antd';
 import { request } from 'umi';
 import { mapModId } from '@/utils/utils';
+import { AdvancedSearchFormField } from '@/utils/columns';
 
 /**
  * 新增购货订单
@@ -88,7 +89,7 @@ export async function openClosePurchase(
  * @returns
  */
 export async function queryPurchase(
-  data: QueryRequest<PUR.Purchase>,
+  data: QueryRequest<AdvancedSearchFormField>,
   url = '/bis/Ghdd/list',
   headers = { modId: mapModId.purchaseGhdd },
 ): Promise<RowResponse<PUR.Purchase>> {
@@ -140,7 +141,7 @@ export async function queryPurchaseUnStockIn(
 }
 
 type PurchaseRequest = {
-  date: [string, string]; // 单据日期
+  data: [string, string]; // 单据日期
   deliveryDate: [string, string]; // 交割日期
   suppId: React.Key; // 供应商
   skuId: React.Key;
@@ -166,19 +167,16 @@ export async function purchaseOrderListByGhdd(
 /**
  * 采购明细表
  * @returns
- * @param date
+ * @param data
  * @param headers
  */
-export async function purchaseOrderListByDetail(
-  date: QueryRequest<PurchaseRequest>,
+export async function purchaseDtl(
+  data: QueryRequest<PurchaseRequest>,
   headers = { modId: mapModId.purchaseGhdd },
-): Promise<RowResponse<PUR.PurchaseOrder>> {
-  return request('/bas/purchaseOrderList/purchaseDetail', {
+): Promise<ReportsResponse<PUR.PurchaseOrder>> {
+  return request('/report/purchase/purchaseDtl', {
     method: 'POST',
-    data: {
-      ...date,
-      dev: 'bas',
-    },
+    data,
     headers,
   });
 }
@@ -186,19 +184,16 @@ export async function purchaseOrderListByDetail(
 /**
  * 采购汇总表(按商品)
  * @returns
- * @param date
+ * @param data
  * @param headers
  */
-export async function purchaseDetailBySku(
-  date: QueryRequest<PurchaseRequest>,
+export async function purcSumBySku(
+  data: QueryRequest<PurchaseRequest>,
   headers = { modId: mapModId.purchaseGhdd },
 ): Promise<RowResponse<PUR.PurchaseOrder>> {
-  return request('/bas/purchaseOrderList/purchaseDetailBySku', {
+  return request('/report/purchase/purcSumBySku', {
     method: 'POST',
-    data: {
-      ...date,
-      dev: 'bas',
-    },
+    data,
     headers,
   });
 }
@@ -206,32 +201,29 @@ export async function purchaseDetailBySku(
 /**
  * 采购汇总表(按供应商)
  * @returns
- * @param date
+ * @param data
  */
-export async function purchaseDetailBySupp(
-  date: QueryRequest<PurchaseRequest>,
+export async function purcSumBySupp(
+  data: QueryRequest<PurchaseRequest>,
 ): Promise<RowResponse<PUR.PurchaseOrder>> {
-  return request('/bas/purchaseOrderList/purchaseDetailBySupp', {
+  return request('/report/purchase/purcSumBySupp', {
     method: 'POST',
-    data: {
-      ...date,
-      dev: 'bas',
-    },
+    data,
   });
 }
 
 /**
  * 采购汇总表(按供应商)
  * @returns
- * @param date
+ * @param data
  */
-export async function purchaseDetailByPay(
-  date: QueryRequest<PurchaseRequest>,
+export async function purcAndPay(
+  data: QueryRequest<PurchaseRequest>,
 ): Promise<RowResponse<PUR.PurchaseOrder>> {
-  return request('/bas/purchaseOrderList/purchaseDetailByPay', {
+  return request('/report/purchase/purcAndPay', {
     method: 'POST',
     data: {
-      ...date,
+      ...data,
     },
   });
 }

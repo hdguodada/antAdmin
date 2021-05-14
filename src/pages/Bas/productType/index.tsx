@@ -6,10 +6,13 @@ import { Tag } from 'antd';
 import { delProductType, queryProductTypesInfo } from '@/services/Bas';
 import ProductTypeForm from './form';
 import { optionColumns, refreshAndNew } from '@/utils/columns';
+import Style from '@/global.less';
 
-const SuppType: React.FC<{
-  columns?: ProColumns<BAS.SuppType>[];
-}> = () => {
+export const ProdcutTypeTable: React.FC<{
+  inSpuPage?: boolean;
+  cateId?: K;
+  onChange?: (id: K) => void;
+}> = ({ inSpuPage, cateId, onChange }) => {
   const { tree, queryProductType } = useModel('productType', (model) => ({
     queryProductType: model.query,
     tree: model.tree,
@@ -20,15 +23,17 @@ const SuppType: React.FC<{
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const columns: ProColumns<BAS.ProductType>[] = [
     {
-      title: '分类名称',
-      dataIndex: 'cateName',
+      title: '商品类别',
+      dataIndex: 'cateId',
       search: false,
       fixed: 'left',
+      render: (_, record) => <div>{record.cateName}</div>,
     },
     {
       title: '图标',
       dataIndex: 'iconUrl',
       search: false,
+      hideInTable: inSpuPage,
     },
     {
       title: '属性',
@@ -37,6 +42,7 @@ const SuppType: React.FC<{
       render: (_, record) => {
         return record.attrList.map((item) => <Tag key={item.attrId}>{item.attrName}</Tag>);
       },
+      hideInTable: inSpuPage,
     },
     optionColumns({
       modify: async ({ record }) => {
@@ -62,7 +68,7 @@ const SuppType: React.FC<{
     <>
       <ProTable<BAS.ProductType>
         expandable={{
-          defaultExpandAllRows: true,
+          defaultExpandedRowKeys: tree[0].children.map((i) => i.cateId),
         }}
         pagination={false}
         search={false}
@@ -76,11 +82,26 @@ const SuppType: React.FC<{
             refresh: queryProductType,
           })
         }
+        onRow={(record) => {
+          return {
+            onClick: () => {
+              if (record.cateId) {
+                onChange?.(record.cateId);
+              }
+            },
+          };
+        }}
         rowKey="cateId"
+        rowClassName={(record) => {
+          return record.cateId === cateId ? Style.myLink : '';
+        }}
         actionRef={actionRef}
         options={false}
         columns={columns}
-        dataSource={tree[0].children}
+        postData={(v) => v[0].children}
+        request={async (params) => {
+          return queryProductType(params);
+        }}
       />
       <ProductTypeForm
         action={formAction}
@@ -93,5 +114,5 @@ const SuppType: React.FC<{
   );
 };
 export default () => {
-  return <SuppType />;
+  return <ProdcutTypeTable />;
 };

@@ -8,12 +8,11 @@ export default () => {
   return (
     <NewOrderForm
       queryInfo={queryPurchaseInfo}
-      bussType={BussType.销货订单}
+      bussType={BussType.销售订单}
       add={addPurchase}
       upd={updPurchase}
       url={url}
       componentUrl={url}
-      stockType="Out"
     />
   );
 };

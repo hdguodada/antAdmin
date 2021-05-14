@@ -1,22 +1,29 @@
 declare namespace FUND {
   export type Entries = {
-    autoId: React.Key;
-    Raccttype?: React.Key;
+    autoId: K;
+    raccttype?: K;
     amount?: number;
-    memo?: string;
+    remark?: string;
   };
   export type Accounts = {
-    autoId: React.Key;
-    accountId?: React.Key;
+    autoId: K;
+    accountId?: K;
+    accountName?: string;
     payment?: number;
-    settlement?: React.Key;
+    settlement?: K;
+    settlementName?: string;
     settlementNo?: string;
-    memo?: string;
+    remark?: string;
+    recAccountName?: string;
+    recAccountId?: K;
+    payAccountName?: K;
+    payAccountId?: K;
+    amount?: number;
   };
   export type fundItem = {
     date: string | number;
-    billNo: React.Key;
-    billId: React.Key;
+    billNo: K;
+    billId: K;
     amount: number; // 采购金额
     contactName: string;
     crtName: string;
@@ -24,11 +31,11 @@ declare namespace FUND {
     acceptedAmount: number;
     billStatus: number;
     memo: string;
-    custId?: React.Key;
+    custId?: K;
     entries?: Entries[];
     accounts?: Accounts[];
     rpAmount: number; // 收款金额
-    accountId: React.Key;
+    accountId: K;
     totalAmount: number; // 合计
     arrears: number; // 本次欠款
     checkStatus?: 1 | 2 | 3; // 审核状态

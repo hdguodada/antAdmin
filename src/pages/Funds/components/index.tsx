@@ -5,6 +5,7 @@ import {
   BussTypeApiUrl,
   BussTypeComponentUrl,
   CheckAudit,
+  SupplierSelect,
 } from '@/pages/Purchase/components';
 import { fundUnHxList } from '@/services/Funds';
 import { getCode } from '@/services/Sys';
@@ -12,6 +13,7 @@ import {
   baseSearch,
   billNoColumns,
   checkName,
+  checkStatusColumns,
   crtNameColumns,
   indexColumns,
   keywordColumns,
@@ -21,7 +23,8 @@ import {
 import { AccountSelect, UserSelect } from '@/utils/form';
 import { patternMsg } from '@/utils/validator';
 import ProCard from '@ant-design/pro-card';
-import type { FormInstance } from '@ant-design/pro-form';
+import { FormInstance, ProFormTextArea } from '@ant-design/pro-form';
+import { ProFormSelect } from '@ant-design/pro-form';
 import ProForm, {
   ProFormDatePicker,
   ProFormDependency,
@@ -39,7 +42,24 @@ import { useRequest, history, useParams, request, useModel } from 'umi';
 export enum FundTypeCode {
   其他收入单 = 'QTSR',
   收款单 = 'SKD',
+  付款单 = 'FKD',
+  核销单 = 'HXD',
+  资金转账单 = 'ZJZZD',
 }
+export enum HxType {
+  预收冲应收 = 1,
+  预付冲应付 = 2,
+  应收冲应付 = 3,
+  应收转应收 = 4,
+  应付转应付 = 5,
+}
+export const HxTypeEnum = new Map([
+  [1, { text: '预收冲应收' }],
+  [2, { text: '预付冲应付' }],
+  [3, { text: '应收冲应付' }],
+  [4, { text: '应收转应收' }],
+  [5, { text: '应付转应付' }],
+]);
 export const FundsTable: React.FC<{
   bussType: BussType;
 }> = ({ bussType }) => {
@@ -59,76 +79,274 @@ export const FundsTable: React.FC<{
       manual: true,
     },
   );
-  const FundsColumns: ProColumns<FUND.fundItem>[] = [
-    keywordColumns({
-      placeholder: '请输入单据号或客户名或备注',
-    }),
-    indexColumns,
-    {
-      title: '单据日期',
-      dataIndex: 'date',
-      valueType: 'dateRange',
-      hideInTable: true,
-      initialValue: [moment().startOf('month'), moment()],
-      search: {
-        transform: (value) => ({
-          beginDate: value[0],
-          endDate: value[1],
-        }),
+  function FundsColumns(): ProColumns<FUND.fundItem>[] {
+    const base: ProColumns<FUND.fundItem>[] = [
+      keywordColumns({
+        placeholder: '请输入单据号或客户名或备注',
+      }),
+      indexColumns,
+      {
+        title: '单据日期',
+        dataIndex: 'date',
+        valueType: 'dateRange',
+        hideInTable: true,
+        initialValue: [moment().startOf('month'), moment()],
+        search: {
+          transform: (value) => ({
+            beginDate: value[0],
+            endDate: value[1],
+          }),
+        },
       },
-    },
-    billNoColumns(),
-    {
-      title: [BussType.其他收入单, BussType.收款单].indexOf(bussType) > -1 ? '客户' : '供应商',
-      dataIndex: 'contactName',
-      search: false,
-    },
-    {
-      title: '金额',
-      dataIndex: 'amount',
-      search: false,
-      valueType: 'money',
-    },
-    {
-      title: '收款方式',
-      dataIndex: 'amount',
-      search: false,
-      valueType: 'money',
-    },
-    crtNameColumns(),
-    checkName(),
-    {
-      title: [BussType.其他收入单].indexOf(bussType) > -1 ? '已收金额' : '应付金额',
-      dataIndex: 'acceptedAmount',
-      valueType: 'money',
-      search: false,
-    },
-    {
-      title: [BussType.其他收入单].indexOf(bussType) > -1 ? '收款状态' : '付款状态',
-      dataIndex: 'billStatus',
-      valueType: 'select',
-      valueEnum:
-        [BussType.其他收入单].indexOf(bussType) > -1
-          ? new Map([
-              [1, { text: '未收款', status: 'Processing' }],
-              [2, { text: '部分收款', status: 'Warning' }],
-              [3, { text: '已收款', status: 'Success' }],
-            ])
-          : new Map([
-              [1, { text: '未付款', status: 'Processing' }],
-              [2, { text: '部分付款', status: 'Warning' }],
-              [3, { text: '已付款', status: 'Success' }],
-            ]),
-      search: false,
-    },
-    memoColumns(),
-    optionColumns({
-      modify: async ({ record }) => {
-        history.push(`${BussTypeComponentUrl.其他收入单}/${record.billId}`);
-      },
-      del: async () => {},
-    }),
-  ];
+      billNoColumns(),
+      crtNameColumns(),
+      checkName(),
+      memoColumns(),
+      checkStatusColumns(undefined),
+      optionColumns({
+        modify: async ({ record }) => {
+          history.push(`${BussTypeComponentUrl[BussType[bussType]]}/${record.billId}`);
+        },
+        del: async () => {},
+      }),
+    ];
+    if ([BussType.其他收入单, BussType.其他支出单].indexOf(bussType) > -1) {
+      return base.concat([
+        {
+          title: '供应商',
+          dataIndex: 'suppName',
+          search: false,
+          hideInTable: BussType.其他收入单 === bussType,
+        },
+        {
+          title: '客户',
+          dataIndex: 'custName',
+          search: false,
+          hideInTable: BussType.其他支出单 === bussType,
+        },
+        {
+          title: '金额',
+          dataIndex: 'amount',
+          search: false,
+          valueType: 'money',
+        },
+
+        {
+          title: [BussType.其他收入单].indexOf(bussType) > -1 ? '已收金额' : '应付金额',
+          dataIndex: 'acceptedAmount',
+          valueType: 'money',
+          search: false,
+        },
+        {
+          title: [BussType.其他收入单].indexOf(bussType) > -1 ? '收款状态' : '付款状态',
+          dataIndex: 'billStatus',
+          valueType: 'select',
+          valueEnum:
+            [BussType.其他收入单].indexOf(bussType) > -1
+              ? new Map([
+                  [1, { text: '未收款', status: 'Processing' }],
+                  [2, { text: '部分收款', status: 'Warning' }],
+                  [3, { text: '已收款', status: 'Success' }],
+                ])
+              : new Map([
+                  [1, { text: '未付款', status: 'Processing' }],
+                  [2, { text: '部分付款', status: 'Warning' }],
+                  [3, { text: '已付款', status: 'Success' }],
+                ]),
+          search: false,
+        },
+      ]);
+    }
+    if ([BussType.收款单, BussType.付款单].indexOf(bussType) > -1) {
+      return base.concat([
+        {
+          title: '供应商',
+          dataIndex: 'suppName',
+          search: false,
+          hideInTable: BussType.收款单 === bussType,
+        },
+        {
+          title: '客户',
+          dataIndex: 'custName',
+          search: false,
+          hideInTable: BussType.付款单 === bussType,
+        },
+        {
+          title: BussType.收款单 === bussType ? '收款信息' : '付款信息',
+          children: [
+            {
+              title: '结算账户',
+              search: false,
+              render: (_, record) => (
+                <Space direction="vertical">
+                  {record.accounts?.map((item) => (
+                    <div key={item.accountId}>{item.accountName}</div>
+                  ))}
+                </Space>
+              ),
+            },
+            {
+              title: BussType.收款单 === bussType ? '收款金额' : '付款金额',
+              search: false,
+              render: (_, record) => (
+                <Space direction="vertical">
+                  {record.accounts?.map((item) => (
+                    <div key={item.accountId}>{item.payment}</div>
+                  ))}
+                </Space>
+              ),
+            },
+            {
+              title: BussType.收款单 === bussType ? '收款方式' : '付款方式',
+              search: false,
+              render: (_, record) => (
+                <Space direction="vertical">
+                  {record.accounts?.map((item) => (
+                    <div key={item.accountId}>{item.settlementName}</div>
+                  ))}
+                </Space>
+              ),
+            },
+            {
+              title: '结算号',
+              search: false,
+              render: (_, record) => (
+                <Space direction="vertical">
+                  {record.accounts?.map((item) => (
+                    <div key={item.accountId}>{item.settlementNo}</div>
+                  ))}
+                </Space>
+              ),
+            },
+            {
+              title: '分录备注',
+              search: false,
+              render: (_, record) => (
+                <Space direction="vertical">
+                  {record.accounts?.map((item) => (
+                    <div key={item.accountId}>{item.remark}</div>
+                  ))}
+                </Space>
+              ),
+            },
+            {
+              title: BussType.收款单 === bussType ? '收款合计' : '付款合计',
+              dataIndex: 'amount',
+              search: false,
+              valueType: 'money',
+            },
+          ],
+        },
+        {
+          title: '本次核销金额',
+          dataIndex: 'bDeAmount',
+          search: false,
+          valueType: 'money',
+        },
+        {
+          title: '整单折扣',
+          dataIndex: 'adjustRate',
+          search: false,
+          valueType: 'percent',
+        },
+        {
+          title: '本次预收款',
+          dataIndex: 'deAmount',
+          search: false,
+          valueType: 'money',
+        },
+        {
+          title: BussType.收款单 === bussType ? '收款人' : '付款人',
+          dataIndex: 'operName',
+          search: false,
+        },
+      ]);
+    }
+    if ([BussType.核销单].indexOf(bussType) > -1) {
+      return base.concat([
+        {
+          title: '供应商',
+          dataIndex: 'suppName',
+          search: false,
+        },
+        {
+          title: '客户',
+          dataIndex: 'custName',
+          search: false,
+        },
+        {
+          title: '核销类型',
+          dataIndex: 'hxType',
+          valueType: 'select',
+          valueEnum: HxType,
+          search: false,
+        },
+        {
+          title: '核销金额',
+          dataIndex: 'hxAmount',
+          valueType: 'money',
+          search: false,
+        },
+      ]);
+    }
+    if (bussType === BussType.资金转账单) {
+      return base.concat([
+        {
+          dataIndex: 'billDate',
+          title: '转账日期',
+          search: false,
+        },
+        {
+          title: '转账信息',
+          children: [
+            {
+              title: '转出账户',
+              render: (_, record) => (
+                <ProCard ghost split="horizontal">
+                  {record.accounts?.map((item) => (
+                    <ProCard layout="center" ghost style={{ padding: '3px' }} key={item.autoId}>
+                      {item.payAccountName}
+                    </ProCard>
+                  ))}
+                </ProCard>
+              ),
+            },
+            {
+              title: '转入账户',
+              align: 'center',
+              render: (_, record) => (
+                <ProCard ghost split="horizontal">
+                  {record.accounts?.map((item) => (
+                    <ProCard ghost layout="center" style={{ padding: '3px' }} key={item.autoId}>
+                      {item.recAccountName}
+                    </ProCard>
+                  ))}
+                </ProCard>
+              ),
+            },
+            {
+              title: '金额',
+              render: (_, record) => (
+                <ProCard ghost split="horizontal">
+                  {record.accounts?.map((item) => (
+                    <ProCard ghost layout="center" style={{ padding: '3px' }} key={item.autoId}>
+                      ￥{item.amount}
+                    </ProCard>
+                  ))}
+                </ProCard>
+              ),
+            },
+          ],
+        },
+        {
+          dataIndex: 'totalAmount',
+          title: '合计金额',
+          search: false,
+        },
+      ]);
+    }
+    return [];
+  }
   return (
     <ProTable<FUND.fundItem>
       loading={loading}
@@ -139,11 +357,13 @@ export const FundsTable: React.FC<{
           success: !error,
         };
       }}
+      bordered
+      className="proCardNoPadding"
       options={false}
       search={baseSearch({
         url: `${BussTypeComponentUrl[BussType[bussType]]}/new`,
       })}
-      columns={FundsColumns}
+      columns={FundsColumns()}
       rowKey="billId"
       pagination={{ pageSize: 10 }}
     />
@@ -170,7 +390,6 @@ export function FindUnHxListColumns(select = true): ProColumns<FUND.Entries>[] {
       title: '源单编号',
       search: false,
       editable: false,
-      hideInTable: !select,
     },
     {
       dataIndex: 'bussType',
@@ -360,7 +579,7 @@ export const FundsForm: React.FC<{
   const { SettlementEnum } = useModel('options', (model) => ({
     SettlementEnum: model.valueEnum('Settlement'),
   }));
-  const { run, loading, refresh } = useRequest(
+  const { run, loading, refresh, data } = useRequest(
     async () => {
       if (id === 'new') {
         const billNo = (await getCode(FundTypeCode[BussType[bussType]])).data;
@@ -413,6 +632,38 @@ export const FundsForm: React.FC<{
       onSuccess: async (values: any) => {
         formRef.current?.setFieldsValue(values);
       },
+    },
+  );
+  const addUpd = useRequest(
+    async (v: FUND.fundItem) => {
+      if (id === 'new') {
+        const res = await request(`${BussTypeApiUrl[BussType[bussType]]}/add`, {
+          data: {
+            ...v,
+            dev: 'funds',
+          },
+          method: 'POST',
+        });
+        return {
+          data: res.id,
+          success: true,
+        };
+      }
+      const res = await request(`${BussTypeApiUrl[BussType[bussType]]}/upd`, {
+        data: {
+          ...data,
+          ...v,
+          dev: 'funds',
+        },
+        method: 'POST',
+      });
+      return {
+        data: res.id,
+        success: true,
+      };
+    },
+    {
+      manual: true,
     },
   );
   useEffect(() => {
@@ -509,24 +760,47 @@ export const FundsForm: React.FC<{
               });
             }
           }}
+          onFinish={async (v) => {
+            addUpd.run(v);
+          }}
         >
           <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
           <ProForm.Group>
-            <ProFormDependency name={['contactName']}>
-              {({ contactName }) => {
-                return (
-                  <ProForm.Item
-                    name="custId"
-                    label="客户"
-                    rules={
-                      [BussType.收款单].indexOf(bussType) > -1 ? patternMsg.select('') : undefined
-                    }
-                  >
-                    <CustomerSelect custName={contactName} disabled={checked} />
-                  </ProForm.Item>
-                );
-              }}
-            </ProFormDependency>
+            {bussType === BussType.核销单 && (
+              <ProFormSelect name="hxType" label="业务类型" width="md" valueEnum={HxTypeEnum} />
+            )}
+            {bussType !== BussType.资金转账单 && (
+              <ProFormDependency name={['contactName']}>
+                {({ contactName }) => {
+                  if ([BussType.付款单, BussType.其他支出单].indexOf(bussType) > -1) {
+                    return (
+                      <ProForm.Item
+                        name="suppId"
+                        label="供应商"
+                        rules={
+                          [BussType.付款单].indexOf(bussType) > -1
+                            ? patternMsg.select('')
+                            : undefined
+                        }
+                      >
+                        <SupplierSelect suppName={contactName} disabled={checked} />
+                      </ProForm.Item>
+                    );
+                  }
+                  return (
+                    <ProForm.Item
+                      name="custId"
+                      label="客户"
+                      rules={
+                        [BussType.收款单].indexOf(bussType) > -1 ? patternMsg.select('') : undefined
+                      }
+                    >
+                      <CustomerSelect custName={contactName} disabled={checked} />
+                    </ProForm.Item>
+                  );
+                }}
+              </ProFormDependency>
+            )}
             <ProFormDatePicker width="md" name="date" label="单据日期" disabled={checked} />
             <ProFormText
               width="md"
@@ -646,6 +920,100 @@ export const FundsForm: React.FC<{
               </ProFormDependency>
             </ProForm.Group>
           )}
+
+          {bussType === BussType.核销单 && (
+            <>
+              <ProForm.Item name="entriesA" trigger="onValuesChange">
+                <EditableProTable<FUND.Entries>
+                  rowKey="autoId"
+                  toolbar={{
+                    actions: [
+                      <ProForm.Item key="select" name="entries" noStyle>
+                        <FindUnHxList children="选择源单" formRef={formRef} bussType={bussType} />
+                      </ProForm.Item>,
+                    ],
+                  }}
+                  bordered
+                  recordCreatorProps={false}
+                  columns={FindUnHxListColumns(false)}
+                />
+              </ProForm.Item>
+
+              <ProForm.Item name="entriesB" trigger="onValuesChange">
+                <EditableProTable<FUND.Entries>
+                  rowKey="autoId"
+                  toolbar={{
+                    actions: [
+                      <ProForm.Item key="select" name="entries" noStyle>
+                        <FindUnHxList children="选择源单" formRef={formRef} bussType={bussType} />
+                      </ProForm.Item>,
+                    ],
+                  }}
+                  bordered
+                  recordCreatorProps={false}
+                  columns={FindUnHxListColumns(false)}
+                />
+              </ProForm.Item>
+            </>
+          )}
+
+          {bussType === BussType.资金转账单 && (
+            <>
+              <ProForm.Item name="accounts" trigger="onValuesChange">
+                <EditableProTable<FUND.Accounts>
+                  rowKey="autoId"
+                  bordered
+                  recordCreatorProps={{
+                    newRecordType: 'dataSource',
+                    record: {
+                      autoId: +(Math.random() * 1000000).toFixed(0),
+                    },
+                  }}
+                  editable={{
+                    type: 'multiple',
+                    editableKeys,
+                    onChange: setEditableKeys,
+                    actionRender: (row, config, defaultDom) => [defaultDom.delete],
+                  }}
+                  columns={[
+                    indexColumns,
+                    {
+                      dataIndex: 'payAccountId',
+                      title: '转出账户',
+                      valueType: 'select',
+                      valueEnum: accountEnum,
+                    },
+                    {
+                      dataIndex: 'recAccountId',
+                      title: '转入账户',
+                      valueType: 'select',
+                      valueEnum: accountEnum,
+                    },
+                    {
+                      dataIndex: 'amount',
+                      title: '金额',
+                      valueType: 'money',
+                    },
+                    {
+                      dataIndex: 'settlement',
+                      title: '结算方式',
+                      valueType: 'select',
+                      valueEnum: SettlementEnum,
+                    },
+                    {
+                      dataIndex: 'settlementNo',
+                      title: '结算号',
+                    },
+                    {
+                      dataIndex: 'remark',
+                      title: '备注',
+                    },
+                  ]}
+                />
+              </ProForm.Item>
+            </>
+          )}
+          <ProFormTextArea name="memo" label="备注" />
         </ProForm>
       </ProCard>
     </PageContainer>

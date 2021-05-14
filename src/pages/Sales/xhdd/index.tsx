@@ -1,21 +1,12 @@
 import React from 'react';
-import OrderTable from '@/pages/Purchase/components/OrderTable';
-import { queryPurchase } from '@/services/Purchase';
 import { BussType } from '@/pages/Purchase/components';
+import { XhTable } from '../components';
+import GlobalWrapper from '@/components/GlobalWrapper';
 
 export default () => {
-  const url = '/bas/sales/xhdd';
-  const componentUrl = '/sales/xhdd';
   return (
-    <OrderTable<PUR.Purchase>
-      url={url}
-      componentUrl={componentUrl}
-      checkUrl={''}
-      openCloseFn={() => {}}
-      del={async () => {}}
-      dev={'bas'}
-      queryList={queryPurchase}
-      bussType={BussType.销货订单}
-    />
+    <GlobalWrapper type="list">
+      <XhTable openCloseFn={() => {}} dev={'xsdj'} bussType={BussType.销售订单} />
+    </GlobalWrapper>
   );
 };

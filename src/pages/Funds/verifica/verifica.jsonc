@@ -1,0 +1,33 @@
+{
+  "bussType": 153201, //核销单
+  "hxType": "888888", // 核销类型
+  "custNameA": "888888 零售客户", // 客户A
+  "custIdA": "@id",
+  "date": "@date",
+  "billNo": "HXD20210513001",
+  "entriesA": [
+    {
+      "billId": "@id",
+      "billNo": "@id",
+      "bussType": "Receipt",
+      "billDate": "@date",
+      "billPrice": "1000.00",
+      "hasCheck": "0.00",
+      "notCheck": "1000.00",
+      "nowCheck": "1000.00"
+    }
+  ],
+  "entriesB": [
+    {
+      "billId": "@id",
+      "billNo": "@id",
+      "bussType": "QTSR",
+      "billDate": "2021-05-08",
+      "billPrice": "200.00",
+      "hasCheck": "0.00",
+      "notCheck": "200.00",
+      "nowCheck": "3000.00"
+    }
+  ],
+  "description": ""
+}

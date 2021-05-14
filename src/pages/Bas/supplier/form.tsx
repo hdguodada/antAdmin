@@ -22,7 +22,7 @@ import { useRequest } from 'umi';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import { relColumns } from '@/pages/Bas/customer/detail';
 import { BaseSupplierFormGroup, SupplierFinanceGroup } from './addForm';
-import { checkStatus } from '@/utils/columns';
+import { checkStatusColumns } from '@/utils/columns';
 import { UserOutlined } from '@ant-design/icons';
 import { BussType, BussTypeApiUrl, BussTypeComponentUrl } from '@/pages/Purchase/components';
 import { StatisticCard } from '@ant-design/pro-card';
@@ -384,7 +384,7 @@ export default () => {
                             dataIndex: 'memo',
                             title: '备注',
                           },
-                          checkStatus(undefined),
+                          checkStatusColumns(undefined),
                         ]}
                         dataSource={data?.supplier}
                       />

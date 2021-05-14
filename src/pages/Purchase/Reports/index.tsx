@@ -1,10 +1,10 @@
 import React from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import Ghdd from './PurcOrderTrack';
-import Pay from './purchaseDetailByPay';
-import Sku from './purchaseDetailBySku';
-import Supp from './purchaseDetailBySupp';
-import Detail from './purchaseOrderListByDetail';
+import Pay from './purcAndPay';
+import Sku from './purcSumBySku';
+import Supp from './purcSumBySupp';
+import Detail from './purchaseDtl';
 import GlobalWrapper from '@/components/GlobalWrapper';
 
 export default () => {
@@ -38,6 +38,9 @@ export default () => {
             children: <Detail />,
           },
         ]}
+        tabProps={{
+          defaultActiveKey: 'Pay',
+        }}
       />
     </GlobalWrapper>
   );

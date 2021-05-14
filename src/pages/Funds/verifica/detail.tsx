@@ -1,13 +1,12 @@
 import GlobalWrapper from '@/components/GlobalWrapper';
 import { BussType } from '@/pages/Purchase/components';
-import { PageContainer } from '@ant-design/pro-layout';
 import React from 'react';
-import { FundsTable } from '../components';
+import { FundsForm } from '../components';
 
-export default () => {
+export default function OriDetail() {
   return (
     <GlobalWrapper type="list">
-      <PageContainer content={<FundsTable bussType={BussType.付款单} />} />
+      <FundsForm bussType={BussType.核销单} />
     </GlobalWrapper>
   );
-};
+}

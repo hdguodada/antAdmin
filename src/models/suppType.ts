@@ -5,10 +5,13 @@ export default () => {
   const [list, setList] = useState<BAS.SuppType[]>([]);
   const [tree, setTree] = useState<BAS.SuppType[]>([]);
   const [options, setOptions] = useState<SelectOptions>([]);
+  const [valueEnum, setValueEnum] = useState<Map<React.Key, string>>();
+
   const [treeDataSimpleMode, setTreeDataSimpleMode] = useState<TreeData>([]);
   const query = useCallback(async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
     const response = await querySuppType(data, headers);
     setList(response.data.rows);
+    setValueEnum(new Map(response.data.rows.map((i) => [i.suppTypeId, i.suppTypeName])));
     setOptions(response.data.rows.map((i) => ({ label: i.suppTypeName, value: i.suppTypeId })));
     setTreeDataSimpleMode(
       response.data.rows.map((i) => ({
@@ -32,5 +35,6 @@ export default () => {
     treeDataSimpleMode,
     query,
     queryTree,
+    valueEnum,
   };
 };

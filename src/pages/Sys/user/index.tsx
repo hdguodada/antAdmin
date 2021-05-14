@@ -5,7 +5,7 @@ import ProTable from '@ant-design/pro-table';
 import ProCard from '@ant-design/pro-card';
 import styles from './index.less';
 import { message } from 'antd';
-import { delUser, queryUsers, resetPassword, updUser } from '@/services/Sys/user';
+import { delUser, resetPassword, updUser } from '@/services/Sys/user';
 import { queryDepTreelist } from '@/services/Sys/dep';
 import UserForm from './form';
 import { baseSearch, indexColumns, optionColumns, stateColumns } from '@/utils/columns';

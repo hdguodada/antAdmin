@@ -4,7 +4,7 @@ import { queryAccount } from '@/services/Bas/account';
 export default () => {
   const [list, setList] = useState<BAS.Account[]>([]);
   const [options, setOptions] = useState<SelectOptions>([]);
-  const [valueEnum, setValueEnum] = useState<Map<string, string>>();
+  const [valueEnum, setValueEnum] = useState<Map<React.Key, string>>();
   const query = useCallback(async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
     const response = await queryAccount(data, headers);
     setList(response.data.rows);

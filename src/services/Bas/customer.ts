@@ -13,6 +13,28 @@ export async function queryCustomers(
   });
 }
 
+export async function queryCustomerAddress(
+  data: QueryRequest<BAS.CustAddress>,
+  headers = { modId: mapModId.customer },
+): Promise<RowResponse<BAS.CustAddress>> {
+  return request('/bas/custAddress/list', {
+    method: 'POST',
+    headers,
+    data,
+  });
+}
+
+export async function delCustomerAddress(
+  data: K[],
+  headers = { modId: mapModId.customer },
+): Promise<RowResponse<BAS.CustAddress>> {
+  return request('/bas/custAddress/del', {
+    method: 'POST',
+    headers,
+    data,
+  });
+}
+
 export async function delCustomer(data: React.Key[], headers = { modId: mapModId.customer }) {
   return request('/bas/customer/del', {
     method: 'POST',

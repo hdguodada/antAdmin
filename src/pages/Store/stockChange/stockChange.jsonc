@@ -1,0 +1,43 @@
+{
+  "id": 796196089548671,
+  "date": "2021-05-14",
+  "billNo": "DB20210514001",
+  "entries": [
+    {
+      "invId": "129719133591171132",
+      "invNumber": "SL001635",
+      "invName": "示例(笔记本)",
+      "invSpec": "MacBook Air",
+      "skuId": -1,
+      "skuName": "",
+      "unitId": "129719133591171131",
+      "mainUnit": "件",
+      "qty": "1",
+      "description": "",
+      "outLocationId": "129719133591171125",
+      "outLocationName": "默认仓库",
+      "inLocationId": "129629220791822024",
+      "inLocationName": "ck2",
+      "snapshotQty": "5"
+    },
+    {
+      "invId": "129719133591171132",
+      "invNumber": "SL001635",
+      "invName": "示例(笔记本)",
+      "invSpec": "MacBook Air",
+      "skuId": -1,
+      "skuName": "",
+      "unitId": "129719133591171131",
+      "mainUnit": "件",
+      "qty": "1",
+      "description": "",
+      "outLocationId": "129719133591171125",
+      "outLocationName": "默认仓库",
+      "inLocationId": "129629220791822024",
+      "inLocationName": "ck2",
+      "snapshotQty": "5"
+    }
+  ],
+  "totalQty": "2",
+  "description": ""
+}

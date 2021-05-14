@@ -16,7 +16,7 @@ export default () => {
       queryList={queryPurchase}
       componentUrl={componentUrl}
       bussType={BussType.调拨单}
-      dev
+      dev={'funds'}
     />
   );
 };

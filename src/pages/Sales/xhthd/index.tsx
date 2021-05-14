@@ -13,7 +13,7 @@ export default () => {
       checkUrl={''}
       openCloseFn={() => {}}
       del={async () => {}}
-      bussType={BussType.销货订单}
+      bussType={BussType.销售订单}
       dev={'bas'}
       queryList={queryPurchase}
     />

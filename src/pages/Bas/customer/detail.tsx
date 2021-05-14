@@ -12,7 +12,6 @@ import { EditableProTable } from '@ant-design/pro-table';
 import React, { useRef, useState } from 'react';
 import { useModel, useParams } from 'umi';
 import ProCard, { StatisticCard } from '@ant-design/pro-card';
-import { Divider } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import CustRecord from './custRecord';
 import CustDoc from './custDoc';
@@ -26,6 +25,7 @@ import RcResizeObserver from 'rc-resize-observer';
 import OrderTable from '@/pages/Purchase/components/OrderTable';
 import { BussType, BussTypeApiUrl, BussTypeComponentUrl } from '@/pages/Purchase/components';
 import { delPurchase, openClosePurchase, queryPurchase } from '@/services/Purchase';
+import { CustAddressTable } from './cusAddress';
 
 const imgStyle = {
   display: 'block',
@@ -276,7 +276,7 @@ export default (): React.ReactNode => {
                       {detail ? <CustDoc customer={detail} /> : ''}
                     </ProCard>
                   </ProCard>
-                  <ProCard colSpan={8} direction="column" ghost>
+                  <ProCard colSpan={8} direction="column" ghost split="horizontal">
                     <ProCard
                       title="基本信息"
                       collapsible
@@ -319,7 +319,6 @@ export default (): React.ReactNode => {
                         dataSource={data?.customerInfo}
                       />
                     </ProCard>
-                    <Divider />
                     <ProCard
                       title="财务信息"
                       collapsible
@@ -426,7 +425,9 @@ export default (): React.ReactNode => {
                         dataSource={data?.finance}
                       />
                     </ProCard>
-                    <Divider />
+                    <ProCard title="收货地址" collapsible>
+                      <CustAddressTable custId={id} />
+                    </ProCard>
                   </ProCard>
                 </ProCard>
               </ProCard>

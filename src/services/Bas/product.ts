@@ -14,7 +14,7 @@ export async function queryProducts(
 }
 
 export async function queryProductInfo(
-  id: BAS.Spu['spuId'],
+  id: K,
   headers = { modId: mapModId.product },
 ): Promise<InfoResponse<BAS.Spu>> {
   return request('/bas/product/info', {

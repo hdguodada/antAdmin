@@ -8,13 +8,13 @@
         "contactName": "@cname",
         "rpAmount": 300,
         "memo": null,
-        "date": "2021-05-08",
+        "billDate": "2021-05-08",
         "crtName": "@cname",
         "checkName": "@cname",
         "totalAmount": 500, // 金额
         "acceptedAmount": 300, // 已收金额
         "checkStatus|1": [1, 2, 3], // 审核
-        "billStatus|1": [1, 2, 3], // 收款状态 1-未收款 2-部门分收款 3-已收款
+        "billStatus|1": [1, 2, 3], // 收款状态 1-未收款 2-部分收款 3-已收款
         "billId": " @id",
         "billNo": "@id"
       }
@@ -27,11 +27,11 @@
   "add": {
     "custId": "@id",
     "contactName": "@cname",
-    "date": "@date",
+    "billDate": "@date",
     "billNo": "QTSR20210510001",
     "entries": [
-      { "raccttype": "@id", "amount": "5.00", "memo": "" },
-      { "raccttype": "@id", "amount": "6.00", "memo": "" }
+      { "raccttype": "@id", "amount": "5.00", "remark": "" }, // raccttype 字典,收入方式
+      { "raccttype": "@id", "amount": "6.00", "remark": "" }
     ],
     "rpAmount": "11.00", // 收款金额
     "arrears": "0", // 本次欠款

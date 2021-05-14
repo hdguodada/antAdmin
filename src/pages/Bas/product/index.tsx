@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { history, useModel } from 'umi';
+import { history } from 'umi';
 import { Image } from 'antd';
 import { delProduct, queryProducts } from '@/services/Bas';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -14,13 +14,33 @@ import {
   tableAlertOptionRenderDom,
 } from '@/utils/columns';
 import BatchDel from '@/components/DelPopconfirm';
+import GlobalWrapper from '@/components/GlobalWrapper';
+import { Typography } from 'antd';
+import ProCard from '@ant-design/pro-card';
+import { ProdcutTypeTable } from '../productType';
 
+const { Link } = Typography;
 const ProductsTable: React.FC<{
-  columns?: ProColumns<BAS.CustType>[];
-}> = () => {
+  cateId?: K;
+}> = ({ cateId }) => {
   const actionRef = useRef<ActionType>();
   const columns: ProColumns<BAS.Spu>[] = [
     indexColumns,
+    {
+      title: '商品名称',
+      dataIndex: 'spuId',
+      width: 150,
+      fixed: 'left',
+      render: (_, record) => (
+        <Link
+          onClick={() => {
+            history.push(`/bas/product/${record.spuId}`);
+          }}
+        >
+          {record.spuName}
+        </Link>
+      ),
+    },
     {
       dataIndex: 'albumList',
       width: 50,
@@ -33,15 +53,8 @@ const ProductsTable: React.FC<{
         />
       ),
     },
-    {
-      title: '商品名称',
-      dataIndex: 'spuName',
-    },
     spuCodeColumns,
-    {
-      title: '分类',
-      dataIndex: 'cateName',
-    },
+
     {
       title: '规格',
       dataIndex: 'spec',
@@ -65,7 +78,7 @@ const ProductsTable: React.FC<{
       <ProTable<BAS.Spu>
         options={false}
         search={baseSearch({
-          url: '/bas/product/new',
+          url: `/bas/product/new?cateId=${cateId}`,
         })}
         rowSelection={{}}
         tableAlertOptionRender={({ selectedRowKeys }) => {
@@ -79,6 +92,7 @@ const ProductsTable: React.FC<{
             />,
           ]);
         }}
+        params={{ cateId }}
         rowKey="spuId"
         actionRef={actionRef}
         columns={columns}
@@ -99,8 +113,29 @@ const ProductsTable: React.FC<{
   );
 };
 export default () => {
-  const { globalDataLoaded } = useModel('@@initialState', (model) => ({
-    globalDataLoaded: model.initialState?.globalDataLoaded,
-  }));
-  return globalDataLoaded && <PageContainer content={<ProductsTable />} />;
+  const [cateId, setCateId] = useState<K>(-1);
+  return (
+    <GlobalWrapper type="descriptions">
+      <PageContainer
+        content={
+          <ProCard split="vertical">
+            <ProCard colSpan="384px">
+              <div style={{ height: 25 }} />
+              <ProdcutTypeTable
+                inSpuPage
+                cateId={cateId}
+                onChange={(id) => {
+                  setCateId(id);
+                }}
+              />
+            </ProCard>
+            <ProCard>
+              <ProductsTable cateId={cateId} />
+            </ProCard>
+          </ProCard>
+        }
+      />
+      ;
+    </GlobalWrapper>
+  );
 };

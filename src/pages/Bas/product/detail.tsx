@@ -1,4 +1,4 @@
-import { addProduct, queryProductInfo, updProduct } from '@/services/Bas';
+import { addProduct, queryProductInfo, queryProductTypesInfo, updProduct } from '@/services/Bas';
 import { getCode, getCodeList } from '@/services/Sys';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { patternMsg } from '@/utils/validator';
@@ -17,23 +17,13 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
 import type { FormInstance } from 'antd';
-import {
-  Upload,
-  Tooltip,
-  Space,
-  message,
-  Button,
-  Select,
-  Form,
-  Input,
-  TreeSelect,
-  Image,
-} from 'antd';
+import { Upload, Tooltip, Space, message, Button, Select, Input, TreeSelect, Image } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import { useModel, useParams, useRequest, history } from 'umi';
+import { useModel, useParams, useRequest, history, useLocation } from 'umi';
 import Style from '@/global.less';
-import { errImage, toDecimal2 } from '@/utils/utils';
 import GlobalWrapper from '@/components/GlobalWrapper';
+import { optionColumns } from '@/utils/columns';
+import { RefTreeSelectProps } from 'antd/lib/tree-select';
 
 const { Option } = Select;
 
@@ -170,6 +160,7 @@ export const UnitSelect: React.FC<{
 export const ProductDetail = () => {
   const formRef = useRef<FormInstance>();
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const isNew = id === 'new';
   const mulspecListTableRef = useRef<ActionType>();
   // 全局模块的加载 Start
@@ -198,38 +189,6 @@ export const ProductDetail = () => {
 
   const initUnitList: BAS.Unit[] = [
     { unitId: '', rate: 1, autoId: +(Math.random() * 1000000).toFixed(0), unitName: '' },
-  ];
-  const initAttrList = [
-    {
-      attrId: 19,
-      attrName: '颜色',
-      attrValues: [
-        {
-          attrValueId: 75,
-          attrValueName: '红色',
-        },
-        {
-          attrValueId: 76,
-          attrValueName: '白色',
-        },
-      ],
-      autoId: +(Math.random() * 1000000).toFixed(0),
-    },
-    {
-      attrId: 20,
-      attrName: '尺寸',
-      attrValues: [
-        {
-          attrValueId: 85,
-          attrValueName: '大',
-        },
-        {
-          attrValueId: 86,
-          attrValueName: '中等',
-        },
-      ],
-      autoId: +(Math.random() * 1000000).toFixed(0),
-    },
   ];
   const transAttrList = (arr: BAS.Attr[]) =>
     arr.map((item) =>
@@ -271,15 +230,12 @@ export const ProductDetail = () => {
       newArr[0] = items;
       return generateAttrList(newArr);
     }
-    return arr[0].map((i: any) => [i]);
+    return arr[0];
   }
   // 表单初始化字段
   const [initialValues, setInitialValues] = useState<Partial<BAS.Spu>>({
-    spuName: '',
     unitList: initUnitList,
-    isMulUnit: false,
-    isMulSpec: false,
-    selectedValueList: initAttrList,
+    selectedValueList: [],
     unitListText: [],
     albumList: [],
   });
@@ -289,11 +245,7 @@ export const ProductDetail = () => {
       return item.autoId;
     }),
   );
-  const [specListEditableKeys, setSpecListEditableKeys] = useState<React.Key[]>(() =>
-    initAttrList.map((item) => {
-      return item.attrId;
-    }),
-  );
+  const [specListEditableKeys, setSpecListEditableKeys] = useState<React.Key[]>([]);
   const [prodColumns, setProdColumns] = useState<ProColumns<BAS.mulspecListItem>[]>();
   const specColumns: ProColumns<BAS.Attr>[] = [
     {
@@ -323,7 +275,7 @@ export const ProductDetail = () => {
   ];
   const updReload = async () => {
     const res = await queryProductInfo(id);
-    const unitList = res.data.unitList.map((unit) => ({
+    const unitList: BAS.Unit[] = res.data.unitList.map((unit) => ({
       ...unit,
       autoId: +(Math.random() * 1000000).toFixed(0),
       unitMid: {
@@ -354,74 +306,50 @@ export const ProductDetail = () => {
         uid: +(Math.random() * 1000000).toFixed(0),
       })),
     });
+    return {
+      data: {
+        ...res.data,
+        mulspecList,
+        unitList,
+        albumList: res.data.albumList.map((alb) => ({
+          ...alb,
+          uid: +(Math.random() * 1000000).toFixed(0),
+        })),
+      },
+      success: true,
+    };
   };
-  const [loaded, setLoaded] = useState<boolean>(false);
   const { run, loading, refresh } = useRequest(
     async () => {
-      setLoaded(false);
       const baseLevelColumns: ProColumns<BAS.mulspecListItem>[] = [
+        optionColumns({
+          fixed: 'left',
+          modify: async ({ record, action }) => {
+            action.startEditable(record.autoId);
+          },
+          width: 100,
+        }),
         {
           dataIndex: 'skuImageUrl',
           title: '主图',
           width: 80,
-          fixed: 'left',
-          render: (_, record) => (
-            <Image width={102} height={102} src={record.skuImageUrl} fallback={errImage} />
-          ),
           renderFormItem: () => {
             return <ImageEdit />;
           },
+          render: (_, record) => <Image src={record.skuImageUrl} />,
         },
         {
           dataIndex: 'skuCode',
           title: '商品条码',
-          copyable: true,
           width: 120,
+          editable: false,
         },
         {
-          title: '操作',
-          valueType: 'option',
-          width: 150,
-          fixed: 'right',
-          render: (text, record, _index, action) => [
-            <a
-              key="editable"
-              onClick={() => {
-                action.startEditable?.(record.autoId);
-              }}
-            >
-              编辑
-            </a>,
-            <a
-              key="quick"
-              onClick={() => {
-                const basePrice = formRef.current?.getFieldValue('basePrice');
-                const mulspecList: BAS.Spu['mulspecList'] = formRef.current?.getFieldValue(
-                  'mulspecList',
-                );
-                const newRecordPrice = record.priceList.map((price) => ({
-                  ...price,
-                  unitPrices: price.unitPrices?.map((unit) => ({
-                    ...unit,
-                    price: toDecimal2((basePrice * unit.rate * price.discount) / 100),
-                  })),
-                }));
-                formRef.current?.setFieldsValue({
-                  mulspecList: mulspecList.map((mul, mulIndex) =>
-                    mulIndex === _index
-                      ? {
-                          ...mul,
-                          priceList: newRecordPrice,
-                        }
-                      : mul,
-                  ),
-                });
-                message.success('批量设置当前sku价格成功');
-              }}
-            >
-              批量
-            </a>,
-          ],
+          dataIndex: 'skuName',
+          title: 'Sku名称',
+          copyable: true,
+          editable: false,
+          width: 100,
         },
       ];
       setProdColumns(() => {
@@ -451,37 +379,43 @@ export const ProductDetail = () => {
         );
       });
       if (id !== 'new') {
-        await updReload();
-      } else {
-        const res = await getCode('ProdCd');
-        const mulspecList = [
-          {
-            autoId: +(Math.random() * 1000000).toFixed(0),
-            code: res.data,
-            skuImageUrl: '',
-            attrList: [],
-            priceList: custLevel.map((level) => ({
-              levelId: level.levelId,
-              levelName: level.levelName,
-              discount: level.discount,
-              unitPrices: [],
-            })),
-          },
-        ];
-        setInitialValues((i) => ({
-          ...i,
-          mulspecList,
-        }));
+        return updReload();
       }
+      const cateId = +(location as any).query.cateId;
+      const res = await getCode('BarCode'); // 产品条码
+      const spuCode = (await getCode('ProdCd')).data; // 产品编码
+      const mulspecList = [
+        {
+          autoId: +(Math.random() * 1000000).toFixed(0),
+          skuCode: res.data,
+          skuImageUrl: '',
+          attrList: [],
+          priceList: custLevel.map((level) => ({
+            levelId: level.levelId,
+            levelName: level.levelName,
+            discount: level.discount,
+            unitPrices: [],
+          })),
+        },
+      ];
+      const selectedValueList =
+        cateId > -1 ? (await queryProductTypesInfo(cateId)).data.attrList : [];
+      setSpecListEditableKeys(selectedValueList.map((item) => item.attrId as React.Key));
       return {
         success: true,
-        data: null,
+        data: {
+          ...initialValues,
+          mulspecList,
+          spuCode,
+          cateId: +(location as any).query.cateId,
+          selectedValueList,
+        },
       };
     },
     {
       manual: true,
-      onSuccess() {
-        setLoaded(true);
+      onSuccess(values) {
+        formRef.current?.setFieldsValue(values);
       },
     },
   );
@@ -496,6 +430,7 @@ export const ProductDetail = () => {
     isMulSpec: number,
     unitList: BAS.Spu['unitList'],
     selectedValueList: BAS.Spu['selectedValueList'],
+    spuName: string,
   ): Promise<boolean> => {
     if (!unitList[0].unitId) {
       // 没有输入基本单位
@@ -503,25 +438,31 @@ export const ProductDetail = () => {
       return false;
     }
     if (isMulSpec) {
+      const attrList = transAttrList(selectedValueList);
       const a: {
         attrId: React.Key;
         attrValueId: React.Key;
-      }[][] = generateAttrList(transAttrList(selectedValueList));
-      const codeList = (await getCodeList('ProdCd', a.length)).data;
+        attrName: string;
+        attrValueName: string;
+      }[][] = attrList.length === 1 ? attrList[0].map((i) => [i]) : generateAttrList(attrList);
+      const codeList = (await getCodeList('BarCode', a.length)).data;
       // @ts-ignore
-      const newMulspecList: BAS.Spu['mulspecList'] = a.map((item, index) => ({
-        autoId: +(Math.random() * 1000000).toFixed(0),
-        code: codeList[index],
-        skuImageUrl: '',
-        attrList: item,
-        priceList: custLevel.map((level) => ({
-          ...level,
-          unitPrices: unitList?.map((unit) => ({
-            ...unit,
-            price: unit.price || undefined,
+      const newMulspecList: BAS.Spu['mulspecList'] = a.map((item, index) => {
+        return {
+          autoId: +(Math.random() * 1000000).toFixed(0),
+          skuCode: codeList[index],
+          skuImageUrl: '',
+          attrList: item,
+          skuName: `${spuName}: ${item.map((i) => i.attrValueName).join('-')}`,
+          priceList: custLevel.map((level) => ({
+            ...level,
+            unitPrices: unitList?.map((unit) => ({
+              ...unit,
+              price: unit.price || undefined,
+            })),
           })),
-        })),
-      }));
+        };
+      });
       if (isNew) {
         // 如果是新增商品, 则直接替换全新的mulspecList
         formRef.current?.setFieldsValue({
@@ -530,26 +471,32 @@ export const ProductDetail = () => {
       } else {
         // 如果是修改商品,则需比对后插入,原数据不应该有变化,新生成的条目插入底部.
         const oldMulspecList = initialValues.mulspecList;
-        const aaaa = newMulspecList.map((newMul) => {
-          return (
-            oldMulspecList?.find((oldMul) => {
-              return (
-                oldMul.attrList?.reduce((c, d) => `${c}${d.attrId}-${d.attrValueId}:`, '') ===
-                newMul.attrList?.reduce((c, d) => `${c}${d.attrId}-${d.attrValueId}:`, '')
-              );
-            }) || newMul
-          );
+        const mulspecList = newMulspecList.map((newMul) => {
+          const ttt = oldMulspecList?.find((oldMul) => {
+            return (
+              oldMul.attrList?.reduce((c, d) => `${c}${d.attrId}-${d.attrValueId}:`, '') ===
+              newMul.attrList?.reduce((c, d) => `${c}${d.attrId}-${d.attrValueId}:`, '')
+            );
+          });
+          if (ttt?.skuId) {
+            return {
+              ...newMul,
+              skuId: ttt.skuId,
+            };
+          }
+          return newMul;
         });
         formRef.current?.setFieldsValue({
-          mulspecList: aaaa,
+          mulspecList,
         });
       }
-    } else {
-      const code = (await getCode('ProdCd')).data;
+    } else if (isNew) {
+      const code = (await getCode('BarCode')).data;
       const mulspecList = [
         {
           autoId: +(Math.random() * 1000000).toFixed(0),
-          code,
+          skuCode: code,
+          skuName: formRef.current?.getFieldValue('spuName'),
           skuImageUrl: '',
           attrList: '',
           priceList: custLevel.map((level) => ({
@@ -566,197 +513,217 @@ export const ProductDetail = () => {
       formRef.current?.setFieldsValue({
         mulspecList,
       });
+    } else {
+      const oldMulspecList = initialValues.mulspecList;
+      const mulspecList = oldMulspecList?.map((item) => ({
+        ...item,
+        priceList: custLevel.map((level) => ({
+          levelId: level.levelId,
+          levelName: level.levelName,
+          discount: level.discount,
+          unitPrices: unitList?.map((unit) => ({
+            ...unit,
+            price: unit.price || undefined,
+          })),
+        })),
+      }));
+      formRef.current?.setFieldsValue({
+        mulspecList,
+      });
     }
+    message.success('生成组合成功');
     return true;
   };
   return (
-    <GlobalWrapper type="descriptions">
-      <PageContainer
-        loading={loading}
-        title={isNew ? '新建商品' : initialValues.spuName}
-        footer={[
-          <Button
-            key="rest"
-            onClick={() => {
+    <PageContainer
+      title={isNew ? '新建商品' : initialValues.spuName}
+      footer={[
+        <Button
+          key="rest"
+          onClick={() => {
+            refresh();
+          }}
+          loading={loading}
+        >
+          重置
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          onClick={() => {
+            formRef.current?.submit();
+          }}
+          loading={loading}
+        >
+          提交
+        </Button>,
+      ]}
+      content={
+        <ProForm<BAS.Spu>
+          formRef={formRef}
+          submitter={false}
+          initialValues={initialValues}
+          onValuesChange={async (values) => {
+            if (values.isMulUnit !== undefined) {
+              const checked: boolean = values.isMulUnit;
+              if (checked) {
+                // 勾选多单位 -- > 取当前unitList
+                const curUnitList: BAS.Spu['unitList'] = formRef.current?.getFieldValue('unitList');
+                const preUnitList = curUnitList.concat([
+                  {
+                    unitId: '',
+                    rate: 2,
+                    autoId: +(Math.random() * 1000000).toFixed(0),
+                    unitName: '',
+                  },
+                ]);
+                setUnitListEditableKeys(() => preUnitList.map((i) => i.autoId));
+                formRef.current?.setFieldsValue({
+                  unitList: preUnitList,
+                });
+              } else {
+                const curUnitList: BAS.Spu['unitList'] = formRef.current?.getFieldValue('unitList');
+                formRef.current?.setFieldsValue({
+                  unitList: curUnitList.slice(0, 1),
+                });
+              }
+            }
+            if (values.unitList !== undefined) {
+              const recordList: BAS.Unit[] = values.unitList;
+              const unitList = recordList.map((item) => ({
+                ...item,
+                unitId: item.unitMid?.value,
+                unitName: item.unitMid?.label,
+              }));
+              // const mulspecList:
+              //   | BAS.Spu['mulspecList']
+              //   | undefined = formRef.current?.getFieldValue('mulspecList');
+              // 为mulspecList的priceList 赋值
+              formRef.current?.setFieldsValue({
+                unitList,
+                // mulspecList: mulspecList?.map((mul) => ({
+                //   ...mul,
+                //   priceList: mul.priceList.map((price) => ({
+                //     ...price,
+                //     unitPrices: unitList.map((unit, index) => ({
+                //       ...unit,
+                //       price: price.unitPrices?.[index]?.price,
+                //     })),
+                //   })),
+                // })),
+              });
+            }
+          }}
+          onFinish={async (values) => {
+            const submitForm = {
+              ...values,
+              albumList:
+                values.albumList.map((item) => ({
+                  url: item.response?.data?.path || item.url,
+                })) || [],
+            };
+            if (isNew) {
+              const res = await addProduct(submitForm);
+              history.push(`/bas/product/${res.data.id}`);
+            } else {
+              await updProduct(submitForm);
+              message.success('修改商品成功');
               refresh();
-            }}
-          >
-            重置
-          </Button>,
-          <Button
-            key="submit"
-            type="primary"
-            onClick={() => {
-              formRef.current?.submit();
-            }}
-          >
-            提交
-          </Button>,
-        ]}
-        content={
-          loaded && (
-            <ProForm<BAS.Spu>
-              formRef={formRef}
-              submitter={false}
-              initialValues={initialValues}
-              onValuesChange={async (values) => {
-                if (values.isMulUnit !== undefined) {
-                  const checked: boolean = values.isMulUnit;
-                  if (checked) {
-                    // 勾选多单位 -- > 取当前unitList
-                    const curUnitList: BAS.Spu['unitList'] = formRef.current?.getFieldValue(
-                      'unitList',
-                    );
-                    const preUnitList = curUnitList.concat([
-                      {
-                        unitId: '',
-                        rate: 5,
-                        autoId: +(Math.random() * 1000000).toFixed(0),
-                        unitName: '',
-                      },
-                      {
-                        unitId: '',
-                        rate: 10,
-                        autoId: +(Math.random() * 1000000).toFixed(0),
-                        unitName: '',
-                      },
-                    ]);
-                    setUnitListEditableKeys(() => preUnitList.map((i) => i.autoId));
-                    formRef.current?.setFieldsValue({
-                      unitList: preUnitList,
-                    });
-                  } else {
-                    const curUnitList: BAS.Spu['unitList'] = formRef.current?.getFieldValue(
-                      'unitList',
-                    );
-                    formRef.current?.setFieldsValue({
-                      unitList: curUnitList.slice(0, 1),
-                    });
-                  }
-                }
-                if (values.unitList !== undefined) {
-                  const recordList: BAS.Unit[] = values.unitList;
-                  const unitList = recordList.map((item) => ({
-                    ...item,
-                    unitId: item.unitMid?.value,
-                    unitName: item.unitMid?.label,
-                  }));
-                  const mulspecList:
-                    | BAS.Spu['mulspecList']
-                    | undefined = formRef.current?.getFieldValue('mulspecList');
-                  // 为mulspecList的priceList 赋值
-                  formRef.current?.setFieldsValue({
-                    unitList,
-                    mulspecList: mulspecList?.map((mul) => ({
-                      ...mul,
-                      priceList: mul.priceList.map((price) => ({
-                        ...price,
-                        unitPrices: unitList.map((unit, index) => ({
-                          ...unit,
-                          price: price.unitPrices?.[index]?.price,
-                        })),
-                      })),
-                    })),
-                  });
-                }
-              }}
-              onFinish={async (values) => {
-                const submitForm = {
-                  ...values,
-                  albumList:
-                    values.albumList.map((item) => ({
-                      url: item.response?.data?.path || item.url,
-                    })) || [],
-                };
-                if (isNew) {
-                  const res = await addProduct(submitForm);
-                  history.push(`/bas/product/${res.data.id}`);
-                } else {
-                  await updProduct(submitForm);
-                  message.success('修改商品成功');
-                  updReload();
-                }
-              }}
+            }
+          }}
+        >
+          <ProFormText width="md" name="spuId" label="spuId" disabled hidden />
+          <ProForm.Group title="基本信息">
+            <ProFormText
+              width="md"
+              name="spuName"
+              label="商品名称"
+              rules={patternMsg.text('商品名称')}
+            />
+            <ProFormSelect
+              width="md"
+              name="brandId"
+              label="品牌"
+              options={brandOptions}
+              rules={patternMsg.select('商品名称')}
+            />
+            <ProForm.Item
+              label="商品类别"
+              name="cateId"
+              style={{ width: '328px' }}
+              rules={patternMsg.select('商品类别')}
             >
-              <ProFormText width="md" name="spuId" label="spuId" disabled hidden />
-              <ProForm.Group title="基本信息">
-                <ProFormText
-                  width="md"
-                  name="spuName"
-                  label="商品名称"
-                  rules={patternMsg.text('商品名称')}
-                />
-                <ProFormSelect
-                  width="md"
-                  name="brandId"
-                  label="品牌"
-                  options={brandOptions}
-                  rules={patternMsg.select('商品名称')}
-                />
-                <Form.Item
-                  label="商品类别"
-                  name="cateId"
-                  style={{ width: '328px' }}
-                  rules={patternMsg.select('商品类别')}
-                >
-                  <TreeSelect
-                    showSearch
-                    allowClear
-                    treeDefaultExpandAll
-                    treeData={treeDataSimpleMode}
-                    treeNodeFilterProp="title"
-                    onSelect={async (_, option) => {
-                      if (!option.attrList.length) {
-                        message.warn('此类别下没有属性');
-                      }
-                      setSpecListEditableKeys(
-                        (option.attrList as BAS.Attr[]).map((item) => item.attrId as React.Key),
-                      );
-                      formRef.current?.setFieldsValue({
-                        selectedValueList: option.attrList,
-                      });
-                    }}
-                  />
-                </Form.Item>
-                <ProFormText
-                  label="商品编号"
-                  name="spuCode"
-                  width="md"
-                  rules={patternMsg.text('商品编号')}
-                />
-                <ProFormSelect
-                  width="md"
-                  name="storeCd"
-                  label="首选仓库"
-                  options={storeOptions}
-                  rules={patternMsg.select('仓库')}
-                />
-                <ProFormText width="md" name="keyword" label="搜索关键字" />
-                <ProFormSelect
-                  mode="multiple"
-                  width="md"
-                  name="prodTag"
-                  label="商品标签"
-                  options={typeOption('ProdTag')}
-                />
-                <ProFormSwitch label="启用序列号管理" name="isSerNum" />
-                <ProFormSwitch label="启用有效期管理" name="isWarranty" />
-                <ProFormSlider label="排序" width="md" name="sortNum" max={100} min={1} />
-                <ProFormTextArea label="备注" width="lg" name="memo" />
-              </ProForm.Group>
-              <ProForm.Group title="价格设置">
-                <ProCard>
-                  <ProFormText label="基准价格" width="md" name="basePrice" required />
-                </ProCard>
-              </ProForm.Group>
-              <ProCard ghost>
-                {/* 多单位 Start */}
-                <ProCard>
-                  <ProFormCheckbox name="isMulUnit" label="启用多单位" />
+              <TreeSelect
+                showSearch
+                allowClear
+                treeDefaultExpandAll
+                treeData={treeDataSimpleMode}
+                treeNodeFilterProp="title"
+                onSelect={async (_, option) => {
+                  if (!option.attrList.length) {
+                    message.warn('此类别下没有属性');
+                  }
+                  setSpecListEditableKeys(
+                    (option.attrList as BAS.Attr[]).map((item) => item.attrId as React.Key),
+                  );
+                  formRef.current?.setFieldsValue({
+                    selectedValueList: option.attrList,
+                  });
+                }}
+              />
+            </ProForm.Item>
+            <ProFormText
+              label="商品编号"
+              name="spuCode"
+              width="md"
+              rules={patternMsg.text('商品编号')}
+            />
+            <ProFormSelect
+              width="md"
+              name="storeCd"
+              label="首选仓库"
+              options={storeOptions}
+              rules={patternMsg.select('仓库')}
+            />
+            <ProFormText width="md" name="keyword" label="搜索关键字" />
+            <ProFormSelect
+              mode="multiple"
+              width="md"
+              name="prodTag"
+              label="商品标签"
+              options={typeOption('ProdTag')}
+            />
+            <ProFormSwitch label="启用序列号管理" name="isSerNum" />
+            <ProFormSwitch label="启用有效期管理" name="isWarranty" />
+            <ProFormSlider label="排序" width="md" name="sortNum" max={100} min={1} />
+            <ProFormTextArea label="备注" width="lg" name="memo" />
+          </ProForm.Group>
+          <ProForm.Group title="价格设置">
+            <ProCard>
+              <ProFormText label="基准价格" width="md" name="basePrice" required />
+            </ProCard>
+          </ProForm.Group>
+          <ProCard ghost>
+            {/* 多单位 Start */}
+            <ProCard>
+              <ProFormCheckbox name="isMulUnit" label="启用多单位" />
+              <ProFormDependency name={['isMulUnit']}>
+                {({ isMulUnit }) => (
                   <ProForm.Item name="unitList" trigger="onValuesChange">
                     <EditableProTable<BAS.Unit>
                       rowKey="autoId"
-                      recordCreatorProps={false}
+                      recordCreatorProps={
+                        isMulUnit
+                          ? {
+                              newRecordType: 'dataSource',
+                              record: () => ({
+                                autoId: Date.now(),
+                                unitId: '',
+                                unitName: '',
+                              }),
+                            }
+                          : false
+                      }
                       bordered
                       columns={[
                         {
@@ -782,173 +749,187 @@ export const ProductDetail = () => {
                           dataIndex: 'rate',
                           title: '比例',
                           valueType: 'digit',
-                          width: '50%',
+                          width: '40%',
+                        },
+                        {
+                          dataIndex: 'option',
+                          title: '操作',
+                          valueType: 'option',
                         },
                       ]}
+                      maxLength={3}
                       editable={{
                         type: 'multiple',
                         editableKeys: unitListEditableKeys,
+                        onChange: setUnitListEditableKeys,
+                        actionRender: (row, config, defaultDom) => [defaultDom.delete],
                       }}
                     />
                   </ProForm.Item>
-                  <ProFormDependency name={['isMulUnit', 'unitList']}>
-                    {({ isMulUnit, unitList }) => {
-                      return (
-                        isMulUnit && (
-                          <>
-                            <ProForm.Group>
-                              <ProFormSelect
-                                label="默认入库单位"
-                                name="inLocationUnitId"
-                                width="md"
-                                options={unitList.map((item: any) => ({
-                                  label: item.unitName,
-                                  value: item.unitId,
-                                }))}
-                              />
-                              <ProFormSelect
-                                label="默认出库单位"
-                                name="outLocationUnitId"
-                                width="md"
-                                options={unitList.map((item: any) => ({
-                                  label: item.unitName,
-                                  value: item.unitId,
-                                }))}
-                              />
-                            </ProForm.Group>
-                          </>
-                        )
-                      );
-                    }}
-                  </ProFormDependency>
-                </ProCard>
-                {/* 多单位 End */}
-                <ProCard>
-                  <ProFormDependency name={['cateId']}>
-                    {({ cateId }) => (
-                      <ProFormCheckbox
-                        tooltip="选择商品类别后可启用多规格"
-                        disabled={!cateId || !isNew}
-                        labelAlign="right"
-                        name="isMulSpec"
-                        label="启用多规格"
-                      />
-                    )}
-                  </ProFormDependency>
-                  <ProFormDependency name={['isMulSpec', 'unitList']}>
-                    {({ isMulSpec, unitList }) => {
-                      return isMulSpec ? (
-                        <ProForm.Item name="selectedValueList">
-                          <EditableProTable
-                            rowKey="attrId"
-                            bordered
-                            recordCreatorProps={false}
-                            columns={specColumns}
-                            editable={{
-                              type: 'multiple',
-                              editableKeys: specListEditableKeys,
-                              onChange: setSpecListEditableKeys,
-                              onValuesChange: async (record, recordList) => {
-                                formRef.current?.setFieldsValue({
-                                  selectedValueList: recordList,
-                                });
-                                generateMulspecList(isMulSpec, unitList, recordList);
-                              },
-                            }}
-                          />
-                        </ProForm.Item>
-                      ) : (
-                        <ProFormText name="spec" label="商品规格" width="lg" />
-                      );
-                    }}
-                  </ProFormDependency>
-                </ProCard>
-              </ProCard>
-              <ProFormDependency name={['isMulSpec', 'selectedValueList', 'unitList']}>
-                {({ isMulSpec, selectedValueList, unitList }) => {
+                )}
+              </ProFormDependency>
+
+              <ProFormDependency name={['isMulUnit', 'unitList']}>
+                {({ isMulUnit, unitList }) => {
                   return (
-                    <ProForm.Item name="mulspecList" trigger="onValuesChange">
-                      <EditableProTable<BAS.mulspecListItem>
-                        bordered
-                        headerTitle={
-                          <Space align="start">
-                            <Tooltip key="1" title="根据规格和计量单位自动生成商品组合">
-                              <Button
-                                type="primary"
-                                onClick={async () => {
-                                  await generateMulspecList(isMulSpec, unitList, selectedValueList);
-                                }}
-                              >
-                                重新生成组合
-                              </Button>
-                            </Tooltip>
-                            <Tooltip key="2" title="根据基准价格批量设置">
-                              <Button
-                                onClick={() => {
-                                  const mulspecList: BAS.Spu['mulspecList'] = formRef.current?.getFieldValue(
-                                    'mulspecList',
-                                  );
-                                  const basePrice: BAS.Spu['basePrice'] =
-                                    formRef.current?.getFieldValue('basePrice') || 0;
-                                  if (mulspecList) {
-                                    try {
-                                      formRef.current?.setFieldsValue({
-                                        mulspecList: mulspecList.map((mul) => ({
-                                          ...mul,
-                                          priceList: mul.priceList.map((price) => ({
-                                            ...price,
-                                            unitPrices: price.unitPrices?.map((unit) => {
-                                              return {
-                                                ...unit,
-                                                price:
-                                                  (basePrice * unit.rate * price.discount) / 100,
-                                              };
-                                            }),
-                                          })),
-                                        })),
-                                      });
-                                      message.success('批量设置价格成功');
-                                    } catch (e) {
-                                      message.warn(e);
-                                    }
-                                  } else {
-                                    message.warn('生成商品组合后再批量设置价格');
-                                  }
-                                }}
-                              >
-                                批量设置价格
-                              </Button>
-                            </Tooltip>
-                          </Space>
-                        }
-                        actionRef={mulspecListTableRef}
-                        scroll={{ x: 2000 }}
-                        rowKey="autoId"
-                        recordCreatorProps={false}
-                        columns={prodColumns}
-                        editable={{
-                          type: 'multiple',
-                        }}
-                      />
-                    </ProForm.Item>
+                    isMulUnit && (
+                      <>
+                        <ProForm.Group>
+                          <ProFormSelect
+                            label="默认入库单位"
+                            name="inLocationUnitId"
+                            width="md"
+                            options={unitList.map((item: any) => ({
+                              label: item.unitName,
+                              value: item.unitId,
+                            }))}
+                          />
+                          <ProFormSelect
+                            label="默认出库单位"
+                            name="outLocationUnitId"
+                            width="md"
+                            options={unitList.map((item: any) => ({
+                              label: item.unitName,
+                              value: item.unitId,
+                            }))}
+                          />
+                        </ProForm.Group>
+                      </>
+                    )
                   );
                 }}
               </ProFormDependency>
-              <ProForm.Group title="商品图片">
-                <ProFormUploadDragger
-                  width="lg"
-                  name="albumList"
-                  action={`${BASE_URL}/sys/upload/upload?type=prodImage`}
-                  fieldProps={{
-                    listType: 'picture-card',
-                  }}
-                />
-              </ProForm.Group>
-            </ProForm>
-          )
-        }
-      />
-    </GlobalWrapper>
+            </ProCard>
+            {/* 多单位 End */}
+            <ProCard>
+              <ProFormDependency name={['cateId']}>
+                {({ cateId }) => (
+                  <ProFormCheckbox
+                    tooltip="选择商品类别后可启用多规格"
+                    disabled={!cateId || !isNew}
+                    labelAlign="right"
+                    name="isMulSpec"
+                    label="启用多规格"
+                  />
+                )}
+              </ProFormDependency>
+              <ProFormDependency name={['isMulSpec']}>
+                {({ isMulSpec }) => {
+                  return isMulSpec ? (
+                    <ProForm.Item name="selectedValueList">
+                      <EditableProTable
+                        rowKey="attrId"
+                        bordered
+                        recordCreatorProps={false}
+                        columns={specColumns}
+                        editable={{
+                          type: 'multiple',
+                          editableKeys: specListEditableKeys,
+                          onChange: setSpecListEditableKeys,
+                          onValuesChange: async (record, recordList) => {
+                            formRef.current?.setFieldsValue({
+                              selectedValueList: recordList,
+                            });
+                          },
+                        }}
+                      />
+                    </ProForm.Item>
+                  ) : (
+                    <ProFormText name="spec" label="商品规格" width="lg" />
+                  );
+                }}
+              </ProFormDependency>
+            </ProCard>
+          </ProCard>
+          <ProFormDependency name={['isMulSpec', 'selectedValueList', 'unitList', 'spuName']}>
+            {({ isMulSpec, selectedValueList, unitList, spuName }) => {
+              return (
+                <ProForm.Item name="mulspecList" trigger="onValuesChange">
+                  <EditableProTable<BAS.mulspecListItem>
+                    bordered
+                    headerTitle={
+                      <Space align="start">
+                        <Tooltip key="1" title="根据规格和计量单位自动生成商品组合">
+                          <Button
+                            type="primary"
+                            onClick={async () => {
+                              await generateMulspecList(
+                                isMulSpec,
+                                unitList,
+                                selectedValueList,
+                                spuName,
+                              );
+                            }}
+                          >
+                            重新生成组合
+                          </Button>
+                        </Tooltip>
+                        <Tooltip key="2" title="根据基准价格批量设置">
+                          <Button
+                            onClick={() => {
+                              const mulspecList: BAS.Spu['mulspecList'] = formRef.current?.getFieldValue(
+                                'mulspecList',
+                              );
+                              const basePrice: BAS.Spu['basePrice'] =
+                                formRef.current?.getFieldValue('basePrice') || 0;
+                              if (mulspecList) {
+                                try {
+                                  formRef.current?.setFieldsValue({
+                                    mulspecList: mulspecList.map((mul) => ({
+                                      ...mul,
+                                      priceList: mul.priceList.map((price) => ({
+                                        ...price,
+                                        unitPrices: price.unitPrices?.map((unit) => {
+                                          return {
+                                            ...unit,
+                                            price:
+                                              (basePrice * (unit.rate || 0) * price.discount) / 100,
+                                          };
+                                        }),
+                                      })),
+                                    })),
+                                  });
+                                  message.success('批量设置价格成功');
+                                } catch (e) {
+                                  message.warn(e);
+                                }
+                              } else {
+                                message.warn('生成商品组合后再批量设置价格');
+                              }
+                            }}
+                          >
+                            批量设置价格
+                          </Button>
+                        </Tooltip>
+                      </Space>
+                    }
+                    actionRef={mulspecListTableRef}
+                    scroll={{ x: 2000 }}
+                    rowKey="autoId"
+                    recordCreatorProps={false}
+                    columns={prodColumns}
+                    editable={{
+                      type: 'multiple',
+                      actionRender: (row, config, defaultDom) => [defaultDom.save],
+                    }}
+                  />
+                </ProForm.Item>
+              );
+            }}
+          </ProFormDependency>
+          <ProForm.Group title="商品图片">
+            <ProFormUploadDragger
+              width="lg"
+              name="albumList"
+              action={`${BASE_URL}/sys/upload/upload?type=prodImage`}
+              fieldProps={{
+                listType: 'picture-card',
+              }}
+            />
+          </ProForm.Group>
+        </ProForm>
+      }
+    />
   );
 };
 

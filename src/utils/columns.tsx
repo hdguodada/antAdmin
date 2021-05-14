@@ -37,13 +37,14 @@ export const checkStatusValueEnum = new Map([
 /**
  * 审核状态
  */
-export const checkStatus = <T extends unknown>(search: undefined | false): ProColumns<T> => {
+export const checkStatusColumns = <T extends unknown>(search: undefined | false): ProColumns<T> => {
   return {
     title: '审核状态',
     dataIndex: 'checkStatus',
     valueType: 'select',
     valueEnum: checkStatusValueEnum,
     search,
+    index: 105,
   };
 };
 
@@ -111,7 +112,7 @@ export const memoColumns = <T extends unknown>(): ProColumns<T> => ({
   title: '备注',
   dataIndex: 'memo',
   search: false,
-  editable: false,
+  index: 103,
 });
 
 export enum StatusEnum {
@@ -129,11 +130,13 @@ export const crtNameColumns = <T extends unknown>(): ProColumns<T> => ({
   title: '制单人',
   dataIndex: 'crtName',
   search: false,
+  index: 100,
 });
 export const checkName = <T extends unknown>(): ProColumns<T> => ({
   title: '审核人',
   dataIndex: 'checkName',
   search: false,
+  index: 101,
 });
 
 export const indexColumns: ProColumns = {
@@ -354,6 +357,14 @@ export const srcOrderColumns = <T extends unknown>({
   };
 };
 
+export const srcOrderSearch = <T extends unknown>({ title = '源订单号' } = {}): ProColumns<T> => {
+  return {
+    title,
+    dataIndex: 'srcOrder',
+    hideInTable: true,
+  };
+};
+
 export const totalAmountColumns = <T extends unknown>({
   title = '购货金额',
   hideInTable = false,
@@ -363,6 +374,17 @@ export const totalAmountColumns = <T extends unknown>({
     dataIndex: 'totalAmount',
     search: false,
     valueType: 'money',
+    hideInTable,
+  };
+};
+
+export const billDescColumns = <T extends unknown>({
+  title = '整单备注',
+  hideInTable = true,
+} = {}): ProColumns<T> => {
+  return {
+    title,
+    dataIndex: 'billDesc',
     hideInTable,
   };
 };
@@ -676,7 +698,7 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
         )}
 
         <ProForm.Item label="商品" name="skuIdList">
-          <SkuSelect type="single" />
+          <SkuSelect />
         </ProForm.Item>
         <ProFormSelect label="仓库" width="md" name="storeCd" options={options} />
         <UserSelect label="制单人" name="crtId" />
@@ -819,6 +841,7 @@ export const keywordColumns = <T extends unknown>({ placeholder = '' }): ProColu
     dataIndex: 'keyword',
     title: '快速查找',
     hideInTable: true,
+    order: 1,
     fieldProps: {
       placeholder,
     },
@@ -954,7 +977,7 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
       [BussType.采购订单, BussType.销售退货订单].indexOf(bussType) < 0,
       [BussType.采购订单, BussType.采购退货订单].indexOf(bussType) > -1 ? undefined : false,
     ),
-    checkStatus(getOrderType(OrderType.购销货).indexOf(bussType) > -1 ? undefined : false),
+    checkStatusColumns(getOrderType(OrderType.购销货).indexOf(bussType) > -1 ? undefined : false),
     crtNameColumns(),
     checkName(),
     memoColumns(),

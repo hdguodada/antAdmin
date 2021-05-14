@@ -1,0 +1,60 @@
+{
+  "add": {
+    "billId": "",
+    "date": "2021-05-14",
+    "billNo": "ZJZZD383712",
+    "accounts": [
+      {
+        "autoId": 133149,
+        "payAccountId": "1379977661601812480",
+        "recAccountId": "1382160912613380096",
+        "amount": 500,
+        "settlement": 1,
+        "settlementNo": "555"
+      }
+    ]
+  },
+  "list": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "rows|5": [
+        {
+          "bussType": 56,
+          "memo": "",
+          "billDate": "2021-05-13",
+          "crtName": "郭靖",
+          "checkName": "郭靖",
+          "totalAmount": 600,
+          "accounts": [
+            {
+              "autoId": "@id",
+              "recAccountName": "@cname",
+              "recAccountId": "@id", // 收款账户
+              "settlement": "@id",
+              "settlementNo": "string",
+              "amount": 500,
+              "payAccountName": "@cname",
+              "payAccountId": "@id",
+              "remark": ""
+            },
+            {
+              "autoId": "@id",
+              "recAccountName": "@cname",
+              "recAccountId": "@id", // 收款账户
+              "settlement": "@id",
+              "settlementNo": "string",
+              "amount": 500,
+              "payAccountName": "@cname",
+              "payAccountId": "@id",
+              "remark": ""
+            }
+          ],
+          "billId": "@id",
+          "checkStatus": 1,
+          "billNo": "@id"
+        }
+      ]
+    }
+  }
+}

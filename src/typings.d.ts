@@ -21,6 +21,8 @@ type GAFieldsObject = {
   nonInteraction?: boolean;
 };
 
+type K = string | number;
+
 type MyResponse<T> = {
   code: 0;
   data: T;
@@ -36,6 +38,21 @@ type RowResponse<T> = {
     pageNumber: number;
     columns?: string[];
     summary?: Record<string, number>;
+  };
+  msg: string;
+};
+
+type ReportsResponse<T> = {
+  code: 0;
+  data: {
+    rows: {
+      rows: T[];
+      summary: Record<string, number>;
+    };
+    total: number;
+    pageSize: number;
+    pageNumber: number;
+    columns?: string[];
   };
   msg: string;
 };

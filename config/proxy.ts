@@ -24,6 +24,11 @@ export default {
       changeOrigin: true,
       pathRewrite: { ['^' + '/funds']: '' },
     },
+    '/xsdj': {
+      target: 'https://www.hengdianworld.xyz/mock/20',
+      changeOrigin: true,
+      pathRewrite: { ['^' + '/xsdj']: '' },
+    },
   },
   test: {
     '/dev': {

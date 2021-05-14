@@ -5,7 +5,7 @@ import { delSupplier, querySuppliers } from '@/services/Bas';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
   baseSearch,
-  checkStatus,
+  checkStatusColumns,
   indexColumns,
   keywordColumns,
   stateColumns,
@@ -15,23 +15,21 @@ import { history } from 'umi';
 import BatchDel from '@/components/DelPopconfirm';
 import { useState } from 'react';
 import AddSuppForm from './addForm';
-import { Badge, Button, message, Radio } from 'antd';
+import { Button, message } from 'antd';
 import { check } from '@/services';
 import { mapModId } from '@/utils/utils';
 import GlobalWrapper from '@/components/GlobalWrapper';
-import { LightFilter, ProFormDatePicker } from '@ant-design/pro-form';
-import Checkbox from 'antd/lib/checkbox/Checkbox';
 
 export const Supplier: React.FC<{
   select: boolean;
-  onChange?: (value: BAS.Supplier) => void;
+  onChange?: (value: BAS.Supplier[]) => void;
+  multiple?: boolean;
   selectParams?: { state: number; checkStatus: number };
-}> = ({ select, onChange, selectParams }) => {
+}> = ({ select, onChange, selectParams, multiple }) => {
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
   const [modalFormInit, setModalFormInit] = useState<BAS.Supplier>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
-  const [initParams, setInitParams] = useState(selectParams || { state: 1 });
   const columns: ProColumns<BAS.Supplier>[] = [
     keywordColumns({
       placeholder: '按供应商编号,供应商名称,等查询',
@@ -91,13 +89,14 @@ export const Supplier: React.FC<{
       search: false,
       hideInTable: select,
     },
-    checkStatus(undefined),
+    checkStatusColumns(undefined),
     stateColumns,
   ];
   columns.push({
     title: '操作',
     key: 'action',
     valueType: 'option',
+    fixed: 'right',
     width: 120,
     render: (_, record) => {
       return !select
@@ -115,7 +114,7 @@ export const Supplier: React.FC<{
             <a
               key="editable"
               onClick={async () => {
-                onChange?.(record);
+                onChange?.([record]);
               }}
             >
               选择
@@ -157,8 +156,21 @@ export const Supplier: React.FC<{
             total: response.data.total,
           };
         }}
-        rowSelection={select ? false : {}}
+        rowSelection={select && !multiple ? false : {}}
         tableAlertOptionRender={({ selectedRowKeys, selectedRows }) => {
+          if (select && multiple) {
+            return tableAlertOptionRenderDom([
+              <Button
+                type="dashed"
+                key="select"
+                onClick={() => {
+                  onChange?.(selectedRows);
+                }}
+              >
+                选中并关闭
+              </Button>,
+            ]);
+          }
           return tableAlertOptionRenderDom([
             <BatchDel
               key="del"

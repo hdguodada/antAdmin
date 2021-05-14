@@ -6,12 +6,13 @@ import ProTable from '@ant-design/pro-table';
 import { Button, Table, Typography } from 'antd';
 import moment from 'moment';
 import React from 'react';
-import { SkuSelect, SupplierSelect } from '../components';
-import { useRequest } from 'umi';
+import { BussTypeComponentUrl, SkuSelect, SupplierSelect } from '../components';
+import { useModel, useRequest, history } from 'umi';
 
-const { Text } = Typography;
+const { Text, Link } = Typography;
 
 export default function PurcOrderTrack() {
+  const { suppTypeEnum } = useModel('suppType', (model) => ({ suppTypeEnum: model.valueEnum }));
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
     {
       title: '单据日期',
@@ -32,7 +33,7 @@ export default function PurcOrderTrack() {
       title: '商品名称',
       dataIndex: 'skuId',
       key: 'skuId',
-      renderFormItem: () => <SkuSelect type="single" />,
+      renderFormItem: () => <SkuSelect type="input" multiple />,
       render: (_, record) => <div>{record.skuName}</div>,
     },
     {
@@ -46,13 +47,30 @@ export default function PurcOrderTrack() {
       title: '采购订单编号',
       dataIndex: 'billNo',
       key: 'billNo',
+      render: (_, record) => (
+        <Link
+          onClick={() => {
+            history.push(`${BussTypeComponentUrl.采购订单}/${record.billId}`);
+          }}
+        >
+          {_}
+        </Link>
+      ),
+    },
+    {
+      title: '供应商类别',
+      dataIndex: 'suppTypeId',
+      key: 'suppTypeId',
+      hideInTable: true,
+      valueType: 'select',
+      valueEnum: suppTypeEnum,
     },
     {
       title: '供应商',
       dataIndex: 'suppId',
       key: 'suppId',
       render: (_, record) => <div>{record.suppName}</div>,
-      renderFormItem: () => <SupplierSelect />,
+      renderFormItem: () => <SupplierSelect multiple />,
     },
     {
       title: '仓库',
@@ -115,6 +133,24 @@ export default function PurcOrderTrack() {
         [3, { text: '已入库', status: 'Success' }],
       ]),
     },
+    {
+      dataIndex: 'orderByBillNo',
+      valueType: 'radio',
+      valueEnum: new Map([
+        [1, '按单据排列'],
+        [0, '按商品排列'],
+      ]),
+      initialValue: 1,
+      hideInTable: true,
+    },
+    {
+      title: '含未审核',
+      dataIndex: 'includeUnchecked',
+      valueType: 'switch',
+      initialValue: true,
+      hideInTable: true,
+      colSize: 0.5,
+    },
     memoColumns(),
   ];
   const { run, data } = useRequest(
@@ -148,17 +184,17 @@ export default function PurcOrderTrack() {
             合计
           </Table.Summary.Cell>
           <Table.Summary.Cell index={2}>
-            <Text type="danger">{data?.summary?.qty}</Text>
+            <Text type="danger">¥{data?.summary?.qty}</Text>
           </Table.Summary.Cell>
           <Table.Summary.Cell index={3}></Table.Summary.Cell>
           <Table.Summary.Cell index={4}>
-            <Text type="danger">{data?.summary?.amount}</Text>
+            <Text type="danger">¥{data?.summary?.amount}</Text>
           </Table.Summary.Cell>
           <Table.Summary.Cell index={5}>
-            <Text type="danger">{data?.summary?.unQty}</Text>
+            <Text type="danger">¥{data?.summary?.unQty}</Text>
           </Table.Summary.Cell>
           <Table.Summary.Cell index={6}>
-            <Text type="danger"> {data?.summary?.unAmount}</Text>
+            <Text type="danger"> ¥{data?.summary?.unAmount}</Text>
           </Table.Summary.Cell>
           <Table.Summary.Cell index={7} colSpan={4}></Table.Summary.Cell>
         </Table.Summary.Row>
