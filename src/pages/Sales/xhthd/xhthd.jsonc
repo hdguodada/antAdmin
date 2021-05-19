@@ -1,0 +1,62 @@
+{
+  "add": {
+    "billId": "",
+    "custId": 1,
+    "date": "2021-05-17",
+    "billNo": "XHT2021051700005",
+    "depId": 1,
+    "operId": 1,
+    "entries": [
+      {
+        "spuId": 720,
+        "skuId": 73,
+        "skuName": "农夫山泉矿泉水 矿泉水规格:330ml",
+        "spuName": "农夫山泉矿泉水",
+        "cateName": "矿泉水",
+        "skuCode": "PRB2021051200444",
+        "spuCode": "20210428_1744",
+        "isSerNum": false,
+        "isWarranty": false,
+        "storeCd": "CK202008270001",
+        "storeName": "仓库1",
+        "currentQty": 300,
+        "realQty": 0,
+        "baseUnitName": "瓶",
+        "baseUnitId": 19,
+        "outDefaultLocationUnitId": 19,
+        "inDefaultLocationUnitId": 19,
+        "inLocationUnitId": 19,
+        "inLocationUnitRate": 1,
+        "unitList": [
+          { "rate": 12, "unitId": 6, "unitName": "盒" },
+          { "rate": 24, "unitId": 8, "unitName": "箱" },
+          { "rate": 1, "unitId": 19, "unitName": "瓶" }
+        ],
+        "autoId": 679380,
+        "unitId": 19,
+        "rate": 1,
+        "discountRate": 5,
+        "taxRate": 5,
+        "outStoreCd": "CK202008270001",
+        "deduction": 1.25,
+        "basQty": 5,
+        "beforeDisAmount": 25,
+        "amount": 23.75,
+        "taxPrice": 5.25,
+        "tax": 1.19,
+        "taxAmount": 24.94,
+        "qty": 5,
+        "price": 5
+      }
+    ],
+    "disRate": "5",
+    "disAmount": 1.25,
+    "amount": 23.69,
+    "arrears": 0,
+    "rpAmount": 23.69,
+    "addressId": 17,
+    "totalQty": 5,
+    "totalAmount": 24.94,
+    "dev": "xsdj"
+  }
+}

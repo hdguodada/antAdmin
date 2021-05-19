@@ -75,25 +75,37 @@
     icon: 'MoneyCollectOutlined',
     routes: [
       {
-        name: 'Xhdd',
-        path: 'Xhdd',
+        name: 'xhdd',
+        path: 'xhdd',
         component: './Sales/xhdd',
       },
       {
-        name: 'Xhdd',
-        path: 'Xhdd/:id',
+        name: 'xhdd',
+        path: 'xhdd/:id',
         component: './Sales/xhdd/detail',
         hideInMenu: true,
       },
       {
-        name: 'Xhd',
-        path: 'Xhd',
+        name: 'xhd',
+        path: 'xhd',
         component: './Sales/xhd',
       },
       {
-        name: 'Xhthd',
-        path: 'Xhthd',
-        component: './Sales/Xhthd',
+        name: 'xhd',
+        path: 'xhd/:id',
+        component: './Sales/Xhd/detail',
+        hideInMenu: true,
+      },
+      {
+        name: 'xhthd',
+        path: 'xhthd',
+        component: './Sales/xhthd',
+      },
+      {
+        name: 'xhthd',
+        path: 'xhthd/:id',
+        component: './Sales/xhthd/detail',
+        hideInMenu: true,
       },
       {
         name: 'Reports',

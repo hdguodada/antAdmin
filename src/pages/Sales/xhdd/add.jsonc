@@ -1,0 +1,141 @@
+{
+  "billId": "",
+  "custId": 1,
+  "date": "2021-05-18",
+  "deliveryDate": "2021-05-18",
+  "billNo": "XHDD050132",
+  "depId": 1,
+  "operId": 1,
+  "entries": [
+    {
+      "spuId": 720,
+      "skuId": 73,
+      "skuName": "农夫山泉矿泉水 矿泉水规格:330ml",
+      "spuName": "农夫山泉矿泉水",
+      "cateName": "矿泉水",
+      "skuCode": "PRB2021051200444",
+      "spuCode": "20210428_1744",
+      "isSerNum": false,
+      "isWarranty": false,
+      "storeCd": "CK202008270001",
+      "storeName": "仓库1",
+      "currentQty": 94,
+      "realQty": 0,
+      "baseUnitName": "瓶",
+      "baseUnitId": 19,
+      "outDefaultLocationUnitId": 19,
+      "inDefaultLocationUnitId": 19,
+      "inLocationUnitId": 19,
+      "inLocationUnitRate": 1,
+      "unitList": [
+        { "rate": 12, "unitId": 6, "unitName": "盒" },
+        { "rate": 24, "unitId": 8, "unitName": "箱" },
+        { "rate": 1, "unitId": 19, "unitName": "瓶" }
+      ],
+      "priceList": [
+        {
+          "discount": 100,
+          "levelId": 90001,
+          "levelName": "零售价",
+          "unitPrices": [
+            { "price": 24, "unitId": 6, "unitName": "盒", "rate": 12 },
+            { "price": 48, "unitId": 8, "unitName": "箱", "rate": 24 },
+            { "price": 2, "unitId": 19, "unitName": "瓶", "rate": 1 }
+          ]
+        },
+        {
+          "discount": 90,
+          "levelId": 90002,
+          "levelName": "批发价",
+          "unitPrices": [
+            { "price": 21.6, "unitId": 6, "unitName": "盒", "rate": 12 },
+            { "price": 43.2, "unitId": 8, "unitName": "箱", "rate": 24 },
+            { "price": 1.8, "unitId": 19, "unitName": "瓶", "rate": 1 }
+          ]
+        },
+        {
+          "discount": 80,
+          "levelId": 90003,
+          "levelName": "预计采购价",
+          "unitPrices": [
+            { "price": 19.2, "unitId": 6, "unitName": "盒", "rate": 12 },
+            { "price": 38.4, "unitId": 8, "unitName": "箱", "rate": 24 },
+            { "price": 1.6, "unitId": 19, "unitName": "瓶", "rate": 1 }
+          ]
+        },
+        {
+          "discount": 100,
+          "levelId": 1,
+          "levelName": "普通客户",
+          "unitPrices": [
+            { "price": 24, "unitId": 6, "unitName": "盒", "rate": 12 },
+            { "price": 48, "unitId": 8, "unitName": "箱", "rate": 24 },
+            { "price": 2, "unitId": 19, "unitName": "瓶", "rate": 1 }
+          ]
+        },
+        {
+          "discount": 60,
+          "levelId": 2,
+          "levelName": "总代理",
+          "unitPrices": [
+            { "price": 14.4, "unitId": 6, "unitName": "盒", "rate": 12 },
+            { "price": 28.8, "unitId": 8, "unitName": "箱", "rate": 24 },
+            { "price": 1.2, "unitId": 19, "unitName": "瓶", "rate": 1 }
+          ]
+        },
+        {
+          "discount": 80,
+          "levelId": 4,
+          "levelName": "地市代理",
+          "unitPrices": [
+            { "price": 19.2, "unitId": 6, "unitName": "盒", "rate": 12 },
+            { "price": 38.4, "unitId": 8, "unitName": "箱", "rate": 24 },
+            { "price": 1.6, "unitId": 19, "unitName": "瓶", "rate": 1 }
+          ]
+        },
+        {
+          "discount": 90,
+          "levelId": 55,
+          "levelName": "乡镇代理",
+          "unitPrices": [
+            { "price": 21.6, "unitId": 6, "unitName": "盒", "rate": 12 },
+            { "price": 43.2, "unitId": 8, "unitName": "箱", "rate": 24 },
+            { "price": 1.8, "unitId": 19, "unitName": "瓶", "rate": 1 }
+          ]
+        },
+        {
+          "discount": 70,
+          "levelId": 3,
+          "levelName": "省级代理",
+          "unitPrices": [
+            { "price": 16.8, "unitId": 6, "unitName": "盒", "rate": 12 },
+            { "price": 33.6, "unitId": 8, "unitName": "箱", "rate": 24 },
+            { "price": 1.4, "unitId": 19, "unitName": "瓶", "rate": 1 }
+          ]
+        }
+      ],
+      "autoId": 391858,
+      "unitId": 19,
+      "rate": 1,
+      "discountRate": 0,
+      "taxRate": 0,
+      "outStoreCd": "CK202008270001",
+      "deduction": 0,
+      "basQty": 1,
+      "beforeDisAmount": 1,
+      "amount": 1,
+      "taxPrice": 1,
+      "tax": 0,
+      "taxAmount": 1,
+      "qty": 1,
+      "price": 1
+    }
+  ],
+  "bussType": 20,
+  "disRate": 0,
+  "disAmount": 0,
+  "amount": 1,
+  "addressId": 17,
+  "totalQty": 1,
+  "totalAmount": 1
+}

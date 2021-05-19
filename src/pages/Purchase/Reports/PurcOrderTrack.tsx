@@ -1,12 +1,18 @@
 import { purchaseOrderListByGhdd } from '@/services/Purchase';
-import { memoColumns, spuCodeColumns } from '@/utils/columns';
+import {
+  dateRangeColumns,
+  memoColumns,
+  spuCodeColumns,
+  suppColumns,
+  suppTypeColumns,
+} from '@/utils/columns';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Button, Table, Typography } from 'antd';
 import moment from 'moment';
 import React from 'react';
-import { BussTypeComponentUrl, SkuSelect, SupplierSelect } from '../components';
+import { BussTypeComponentUrl, SkuSelect } from '../components';
 import { useModel, useRequest, history } from 'umi';
 
 const { Text, Link } = Typography;
@@ -14,20 +20,7 @@ const { Text, Link } = Typography;
 export default function PurcOrderTrack() {
   const { suppTypeEnum } = useModel('suppType', (model) => ({ suppTypeEnum: model.valueEnum }));
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
-    {
-      title: '单据日期',
-      dataIndex: 'dateStr',
-      key: 'dataStr',
-      valueType: 'dateRange',
-      initialValue: [moment().startOf('month'), moment()],
-      render: (_, record) => <div>{record.dateStr}</div>,
-      search: {
-        transform: (value) => ({
-          beginDate: value[0],
-          endDate: value[1],
-        }),
-      },
-    },
+    dateRangeColumns(),
     spuCodeColumns,
     {
       title: '商品名称',
@@ -57,21 +50,8 @@ export default function PurcOrderTrack() {
         </Link>
       ),
     },
-    {
-      title: '供应商类别',
-      dataIndex: 'suppTypeId',
-      key: 'suppTypeId',
-      hideInTable: true,
-      valueType: 'select',
-      valueEnum: suppTypeEnum,
-    },
-    {
-      title: '供应商',
-      dataIndex: 'suppId',
-      key: 'suppId',
-      render: (_, record) => <div>{record.suppName}</div>,
-      renderFormItem: () => <SupplierSelect multiple />,
-    },
+    suppTypeColumns(suppTypeEnum),
+    suppColumns(),
     {
       title: '仓库',
       dataIndex: 'storeName',
@@ -203,12 +183,6 @@ export default function PurcOrderTrack() {
       scroll={{ x: 2000 }}
       pagination={{
         pageSize: 10,
-      }}
-      postData={(values) => {
-        return values.map((item) => ({
-          ...item,
-          autoId: +(Math.random() * 1000000).toFixed(0),
-        }));
       }}
       search={{
         collapseRender: (collapsed) =>

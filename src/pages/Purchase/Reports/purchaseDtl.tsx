@@ -5,6 +5,7 @@ import {
   spuCodeColumns,
   srcOrderColumns,
   srcOrderSearch,
+  suppColumns,
   unitIdColumns,
 } from '@/utils/columns';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -14,7 +15,7 @@ import { Button, Table, Typography } from 'antd';
 import moment from 'moment';
 import React from 'react';
 import { useModel, useRequest } from 'umi';
-import { SupplierSelect, SkuSelect, BussType, BussTypeComponentUrl } from '../components';
+import { SkuSelect, BussTypeComponentUrl, BussTypeEnum } from '../components';
 
 const { Text } = Typography;
 export default () => {
@@ -42,17 +43,10 @@ export default () => {
       title: '业务类别',
       dataIndex: 'bussType',
       valueType: 'select',
-      valueEnum: BussType,
+      valueEnum: BussTypeEnum,
       search: false,
     },
-    {
-      title: '供应商',
-      dataIndex: 'suppId',
-      hideInTable: true,
-      valueType: 'select',
-      renderFormItem: () => <SupplierSelect multiple />,
-      render: (_, record) => <div>{record.suppName}</div>,
-    },
+    suppColumns(),
     spuCodeColumns,
     {
       title: '商品名称',

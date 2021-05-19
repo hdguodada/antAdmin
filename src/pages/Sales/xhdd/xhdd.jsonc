@@ -7,6 +7,7 @@
     "billNo": "XHDD050064",
     "depId": 1,
     "operId": 23,
+    "addressId": 1,
     "entries": [
       {
         "spuId": 720,

@@ -1,6 +1,7 @@
 declare namespace PUR {
   export type PurchaseOrder = {
     billId?: K;
+    contactName?: string;
     dev?: string;
     dateStr: string;
     deliveryDateStr: string | number;
@@ -8,6 +9,7 @@ declare namespace PUR {
     srcGhdBillNo?: K[]; // 关联购货单
     srcThdBillNo?: K[]; // 关联购货订单
     srcGhddBillNo?: K[]; // 关联退货单
+    date?: string;
     cateName?: string;
     cateId?: K;
     spec?: string;
@@ -17,6 +19,10 @@ declare namespace PUR {
     skuId?: K;
     skuName?: string;
     storeName: string;
+    operId?: K;
+    operName?: string;
+    custId?: K;
+    custName?: string;
     storeCd: K;
     unitId?: K; // 采购明细表中的入库单位
     unitName?: string;
@@ -51,6 +57,7 @@ declare namespace PUR {
     srcDtlId?: K;
     autoId: K;
     spuId?: K;
+    skuCode?: K;
     spuName?: string;
     cateName?: string;
     spuCode?: K;
@@ -123,7 +130,6 @@ declare namespace PUR {
     checkStatus?: number; // 是否审核
   };
   export type Purchase = base & {
-    dev?: string;
     srcGhdBillNo?: { billId: K; billNo: K }[]; // 关联购货单
     srcThdBillNo?: { billId: K; billNo: K }[]; // 关联购货订单
     srcGhddBillNo?: { billId: K; billNo: K }[]; // 关联退货单
@@ -147,5 +153,13 @@ declare namespace PUR {
       totalTax: number;
       totalTaxAmount: number;
     };
+    items?: {
+      skuName: string;
+      qty: number;
+      unitName: string;
+      inStoreName: string;
+      outStoreName: string;
+      memo: string;
+    }[];
   } & DefaultField;
 }

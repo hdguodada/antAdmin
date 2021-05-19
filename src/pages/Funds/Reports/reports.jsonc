@@ -1,0 +1,102 @@
+{
+  "AccountsPayableDetail": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "summary": {
+        "balance": 11252,
+        "expenditure": 0,
+        "income": 11252
+      },
+      "rows|5": [
+        {
+          "autoId": "@id",
+          "dateStr": "@date",
+          "balance": "@natural(50, 100)",
+          "billId": "@id",
+          "billNo": "@id",
+          "bussType": "@id",
+          "contactName": "800008 供应商(示例)",
+          "date": "@date",
+          "memo": "",
+          "expenditure": "@natural(50, 100)",
+          "income": "@natural(50, 100)",
+          "suppId": "@id"
+        }
+      ]
+    }
+  },
+  "FundBalance": {
+    "code": 200,
+    "msg": "success",
+    "data": {
+      "summary": {
+        "balance": -2800,
+        "expenditure": 3000,
+        "income": 200
+      },
+      "rows | 5": [
+        {
+          "billId": "@id",
+          "billNo": "@id",
+          "custId": "@id",
+          "custName": "@cname",
+          "date": "@date",
+          "memo": "@cname",
+          "operName": "@cname",
+          "operId": "@id",
+          "expenditure": "@natural(50, 100)", // 增加预收款
+          "income": "@natural(50, 100)", // 增加应收款
+          "balance": "@natural(50, 100)", // 应收款余额
+          "bussType": "@id" // 业务类型
+        }
+      ],
+      "params": {
+        "serviceType": 2,
+        "salesFilter": "",
+        "endDate": "2021-05-19",
+        "type": -10,
+        "t_bs_user": "T_BS_USER",
+        "beginDate": "2021-05-06",
+        "t_bs_inventory": "T_BS_INVENTORY",
+        "dbid": 796196089548649,
+        "supplier": " T_BS_CONTACT ",
+        "startTime": "2021-05-06",
+        "keyword": null,
+        "numberFilter": [],
+        "categoryId": null,
+        "table": " T_BS_INVLOCATION ",
+        "customer": " T_BS_CONTACT "
+      }
+    }
+  },
+  "CustomerBalance": {
+    "code": 0,
+    "msg": "success",
+    "data": {
+      "summary": {
+        "totalAmount": "@natural(50, 100)", // 销售金额
+        "disAmount": "@natural(50,100)", // 优惠金额
+        "postfee": "@natural(50,100)", // 客户承担费用
+        "amount": "@natural(50,100)", // 应收金额
+        "rpAmount": "@natural(50,100)", // 手机收款金额
+        "inAmount": "@natural(50,100)" // 应收款余额
+      },
+      "rows|5": [
+        {
+          "date": "@date", // 单据日期
+          "billId": "@id",
+          "billNo": "@id",
+          "bussType": "@id",
+          "totalAmount": "@natural(50,100)", // 销售金额
+          "disAmount": "@natural(50,100)", // 优惠金额
+          "postfee": "@natural(50,100)", // 客户承担费用
+          "amount": "@natural(50,100)", // 应收金额
+          "rpAmount": "@natural(50,100)", // 实际收款金额
+          "inAmount": "@natural(50,100)", // 应收款余额
+          "memo": "备注"
+        }
+      ]
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import { request } from 'umi';
 import { mapModId } from '@/utils/utils';
-import { AdvancedSearchFormField } from '@/utils/columns';
+import type { AdvancedSearchFormField } from '@/utils/columns';
 
 /**
  * 新增购货订单
@@ -132,10 +132,7 @@ export async function queryPurchaseInfo(
 export async function queryPurchaseUnStockIn(
   id: React.Key,
   headers = { modId: mapModId.purchaseGhdd },
-  url:
-    | '/bis/purcOrder/infoUnStockIn'
-    | '/bis/purchase/infoReturn'
-    | '/bis/purcOrder/infoReturnable',
+  url: string,
 ): Promise<InfoResponse<PUR.Purchase>> {
   return request(url, { method: 'GET', params: { id }, headers });
 }

@@ -1,19 +1,8 @@
 /* eslint-disable no-console */
 import React from 'react';
-import { addPurchase, queryPurchaseInfo, updPurchase } from '@/services/Purchase';
-import { BussType, NewOrderForm, StockType } from '@/pages/Purchase/components';
+import { BussType, StockType } from '@/pages/Purchase/components';
+import { XhForm } from '../components';
 
 export default () => {
-  const url = '/bas/sales/xhdd';
-  return (
-    <NewOrderForm
-      queryInfo={queryPurchaseInfo}
-      bussType={BussType.销售单}
-      add={addPurchase}
-      upd={updPurchase}
-      url={url}
-      componentUrl={url}
-      stockType={StockType.出库}
-    />
-  );
+  return <XhForm bussType={BussType.销售单} stockType={StockType.出库} dev="xsdj" />;
 };

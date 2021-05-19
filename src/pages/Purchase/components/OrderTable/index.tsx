@@ -12,6 +12,8 @@ import moment from 'moment';
 import { BussType } from '..';
 import Style from '@/global.less';
 import { delPurchase } from '@/services/Purchase';
+import { PageContainer } from '@ant-design/pro-layout';
+import { transProTableParamsToMyRequest } from '@/utils/utils';
 
 export type OrderTableProps<T> = {
   url: string; // 接口地址
@@ -40,95 +42,102 @@ export default function OrderTable<T extends Record<string, unknown>>(props: Ord
     AdvancedSearchFormField | undefined
   >(initSearch);
   return (
-    <ProTable<T, AdvancedSearchFormField>
-      rowKey="billId"
-      rowSelection={{}}
-      options={false}
-      rowClassName={(record) => {
-        if (record.bussType === BussType.采购退货订单) {
-          return Style['error-color'];
-        }
-        return '';
-      }}
-      scroll={{ x: 1500 }}
-      params={advancedSearchFormValues}
-      actionRef={actionRef}
-      search={AdvancedSearch({
-        url: `${componentUrl || url}/new`,
-        jsxList: [
-          <AdvancedSearchForm
-            key="AdvancedSearchForm"
-            value={advancedSearchFormValues}
-            onChange={(value) => {
-              setAdvancedSearchFormValues(value);
-            }}
-            bussType={bussType}
-          />,
-        ],
-        other: {
-          defaultCollapsed: false,
-        },
-        myReset: () => {
-          setAdvancedSearchFormValues(undefined);
-        },
-      })}
-      onRow={(record) => {
-        return {
-          onDoubleClick: () => {
-            history.push(`${url}/${record.billId}`);
-          },
-        };
-      }}
-      tableAlertOptionRender={({ selectedRowKeys }) => {
-        return (
-          <Space size={16}>
-            <CheckButton url={checkUrl} selectedRowKeys={selectedRowKeys} actionRef={actionRef} />
-            {openCloseFn && (
-              <OpenButton
-                selectedRowKeys={selectedRowKeys}
-                fn={openCloseFn}
-                actionRef={actionRef}
-              />
-            )}
+    <PageContainer
+      title={false}
+      content={
+        <ProTable<T, AdvancedSearchFormField>
+          rowKey="billId"
+          rowSelection={{}}
+          options={false}
+          rowClassName={(record) => {
+            if (record.bussType === BussType.采购退货订单) {
+              return Style['error-color'];
+            }
+            return '';
+          }}
+          scroll={{ x: 1500 }}
+          params={advancedSearchFormValues}
+          actionRef={actionRef}
+          search={AdvancedSearch({
+            url: `${componentUrl || url}/new`,
+            jsxList: [
+              <AdvancedSearchForm
+                key="AdvancedSearchForm"
+                value={advancedSearchFormValues}
+                onChange={(value) => {
+                  setAdvancedSearchFormValues(value);
+                }}
+                bussType={bussType}
+              />,
+            ],
+            other: {
+              defaultCollapsed: false,
+            },
+            myReset: () => {
+              setAdvancedSearchFormValues(undefined);
+            },
+          })}
+          onRow={(record) => {
+            return {
+              onDoubleClick: () => {
+                history.push(`${url}/${record.billId}`);
+              },
+            };
+          }}
+          tableAlertOptionRender={({ selectedRowKeys }) => {
+            return (
+              <Space size={16}>
+                <CheckButton
+                  url={checkUrl}
+                  selectedRowKeys={selectedRowKeys}
+                  actionRef={actionRef}
+                />
+                {openCloseFn && (
+                  <OpenButton
+                    selectedRowKeys={selectedRowKeys}
+                    fn={openCloseFn}
+                    actionRef={actionRef}
+                  />
+                )}
 
-            <Button
-              danger
-              onClick={async () => {
-                const res = await delPurchase(selectedRowKeys, `${url}/del`);
-                showSysInfo(res);
-                actionRef.current?.reload();
-              }}
-            >
-              批量删除
-            </Button>
-          </Space>
-        );
-      }}
-      beforeSearchSubmit={(params) => {
-        return {
-          ...params,
-          beginDate: params.date?.[0] ?? moment().startOf('month').format('YYYY-MM-DD'),
-          endDate: params.date?.[1] ?? moment().format('YYYY-MM-DD'),
-          status: params.billStatus ?? [],
-        };
-      }}
-      columns={columns}
-      request={async (params) => {
-        const response = await queryList(
-          {
-            ...params,
-            pageNumber: params.current,
-            queryFilter: params,
-            dev,
-          },
-          `${url}/list`,
-        );
-        return {
-          data: response.data.rows,
-          success: response.code === 0,
-          total: response.data.total,
-        };
-      }}
+                <Button
+                  danger
+                  onClick={async () => {
+                    const res = await delPurchase(selectedRowKeys, `${url}/del`);
+                    showSysInfo(res);
+                    actionRef.current?.reload();
+                  }}
+                >
+                  批量删除
+                </Button>
+              </Space>
+            );
+          }}
+          beforeSearchSubmit={(params) => {
+            return {
+              ...params,
+              beginDate: params.date?.[0] ?? moment().startOf('month').format('YYYY-MM-DD'),
+              endDate: params.date?.[1] ?? moment().format('YYYY-MM-DD'),
+              status: params.billStatus ?? [],
+            };
+          }}
+          columns={columns}
+          request={async (params) => {
+            const response = await queryList(
+              transProTableParamsToMyRequest({
+                ...params,
+                dev,
+              }),
+              `${url}/list`,
+            );
+            return {
+              data: response.data.rows,
+              success: response.code === 0,
+              total: response.data.total,
+            };
+          }}
+        />
+      }
     />
   );
 }

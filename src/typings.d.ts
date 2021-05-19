@@ -107,7 +107,7 @@ type DefaultField = {
   updId?: string | number; // 修改人Id
   updName?: string; // 修改人
   updDate?: string; // 修改日期
-  dev?: boolean;
+  dev?: string;
 };
 
 type Window = {

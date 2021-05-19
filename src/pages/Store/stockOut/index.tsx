@@ -1,19 +1,15 @@
 import React from 'react';
-import { delPurchase, queryPurchase } from '@/services/Purchase';
-import OrderTable from '@/pages/Purchase/components/OrderTable';
-import { BussType, BussTypeApiUrl, BussTypeComponentUrl } from '@/pages/Purchase/components';
+import { BussType } from '@/pages/Purchase/components';
+import { StoreTable } from '../components';
+import GlobalWrapper from '@/components/GlobalWrapper';
 
 export default () => {
-  const url = BussTypeApiUrl.其他出库单;
-  const componentUrl = BussTypeComponentUrl.其他出库单;
   return (
-    <OrderTable<PUR.Purchase>
-      url={url}
-      checkUrl={'/bis/stockOut/check'}
-      del={delPurchase}
-      queryList={queryPurchase}
-      componentUrl={componentUrl}
-      bussType={BussType.其他出库单}
-    />
+    <GlobalWrapper type="list">
+      <StoreTable
+        initSearch={{ bussType: [BussType.其他出库单, BussType.盘亏] }}
+        bussType={BussType.其他出库单}
+      />
+    </GlobalWrapper>
   );
 };

@@ -6,9 +6,8 @@ import { PlusOutlined } from '@ant-design/icons';
 import DepForm from '@/pages/Sys/dep/form';
 import { useState } from 'react';
 import { patternMsg } from './validator';
-import { queryUsers } from '@/services/Sys';
 import type { NamePath } from 'antd/lib/form/interface';
-import { useRequest } from '@@/plugin-request/request';
+import { useRequest } from 'umi';
 import UserForm from '@/pages/Sys/user/form';
 
 export const StateForm = (
@@ -63,8 +62,7 @@ export const DepSelect = (props: {
                   <>
                     <Divider style={{ margin: '4px 0' }} />
                     <Button
-                      style={{ margin: '4px 0' }}
-                      type="ghost"
+                      type="text"
                       block
                       onClick={() => {
                         setModalVisit(true);
@@ -100,7 +98,7 @@ type UserSelectProps = {
 export const UserSelect = ({ name, label, disabled, showNew }: UserSelectProps) => {
   const { options, queryUsers } = useModel('user', (model) => ({
     options: model.options,
-    queryUsers: model.queryUsers,
+    queryUsers: model.query,
   }));
   const [modalVisit, setModalVisit] = useState(false);
 
@@ -119,13 +117,14 @@ export const UserSelect = ({ name, label, disabled, showNew }: UserSelectProps) 
                   <>
                     <Divider style={{ margin: '4px 0' }} />
                     <Button
+                      type="text"
                       block
-                      type="primary"
                       onClick={() => {
                         setModalVisit(true);
                       }}
                     >
                       <PlusOutlined />
+                      新建职员
                     </Button>
                   </>
                 )}

@@ -1,25 +1,12 @@
 import React from 'react';
-import { addPurchase, queryPurchaseInfo, updPurchase } from '@/services/Purchase';
-import {
-  BussType,
-  BussTypeApiUrl,
-  BussTypeComponentUrl,
-  NewOrderForm,
-  StockType,
-} from '@/pages/Purchase/components';
+import { BussType } from '@/pages/Purchase/components';
+import { StoreForm } from '../components';
+import GlobalWrapper from '@/components/GlobalWrapper';
 
 export default () => {
-  const url = BussTypeApiUrl.调拨单;
-  const componentUrl = BussTypeComponentUrl.调拨单;
   return (
-    <NewOrderForm
-      queryInfo={queryPurchaseInfo}
-      bussType={BussType.调拨单}
-      add={addPurchase}
-      upd={updPurchase}
-      url={url}
-      componentUrl={componentUrl}
-      stockType={StockType.出库}
-    />
+    <GlobalWrapper type="descriptions">
+      <StoreForm bussType={BussType.调拨单} />
+    </GlobalWrapper>
   );
 };

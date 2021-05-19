@@ -19,7 +19,7 @@ import {
   billNoColumns,
 } from '@/utils/columns';
 import moment from 'moment';
-import { BussType } from '@/pages/Purchase/components';
+import { BussType, BussTypeEnum } from '@/pages/Purchase/components';
 
 export const InBalance: React.FC = () => {
   const { valueEnum } = useModel('store', (model) => ({ valueEnum: model.valueEnum }));
@@ -157,7 +157,7 @@ export const DeliverDetail: React.FC = () => {
       dataIndex: 'bussType',
       title: '业务类别',
       search: false,
-      valueEnum: BussType,
+      valueEnum: BussTypeEnum,
     },
     {
       dataIndex: 'buName',
@@ -365,7 +365,7 @@ export const SerNumDetail: React.FC = () => {
       dataIndex: 'contactName',
       search: false,
     },
-    billNoColumns(() => {}),
+    billNoColumns(),
     {
       dataIndex: 'status',
       title: '状态',

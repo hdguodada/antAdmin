@@ -1,11 +1,11 @@
 import { purcAndPay } from '@/services/Purchase';
+import { dateRangeColumns, suppColumns, suppTypeColumns } from '@/utils/columns';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Table, Typography } from 'antd';
-import moment from 'moment';
 import React from 'react';
 import { useModel, useRequest } from 'umi';
-import { BussType, SupplierSelect } from '../components';
+import { BussTypeEnum } from '../components';
 
 const { Text } = Typography;
 
@@ -13,48 +13,16 @@ export default () => {
   const { suppEnum } = useModel('suppType', (model) => ({ suppEnum: model.valueEnum }));
 
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
-    {
-      title: '供应商类别',
-      dataIndex: 'suppTypeId',
-      valueType: 'select',
-      valueEnum: suppEnum,
-      render: (_, record) => <div>{record.suppTypeName}</div>,
-    },
-    {
-      title: '供应商',
-      dataIndex: 'suppId',
-      valueType: 'select',
-      hideInTable: true,
-      renderFormItem: () => <SupplierSelect multiple />,
-      render: (_, record) => <div>{record.cateName}</div>,
-    },
-    {
-      title: '供应商',
-      dataIndex: 'suppName',
-      search: false,
-      index: 1,
-    },
+    suppTypeColumns(suppEnum),
+    suppColumns(),
     {
       title: '业务类别',
       dataIndex: 'bussType',
-      valueEnum: BussType,
+      valueEnum: BussTypeEnum,
       valueType: 'select',
       search: false,
     },
-    {
-      title: '单据日期',
-      dataIndex: 'dateStr',
-      key: 'dataStr',
-      valueType: 'dateRange',
-      initialValue: [moment().startOf('month'), moment()],
-      render: (_, record) => <div>{record.dateStr}</div>,
-      search: {
-        transform: (value) => ({
-          beginDate: value[0],
-          endDate: value[1],
-        }),
-      },
-    },
+    dateRangeColumns(),
     {
       title: '采购金额',
       search: false,

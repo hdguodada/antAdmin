@@ -1,12 +1,12 @@
 import { purcSumBySupp } from '@/services/Purchase';
-import { memoColumns, spuCodeColumns } from '@/utils/columns';
+import { memoColumns, spuCodeColumns, suppColumns, suppTypeColumns } from '@/utils/columns';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Table, Typography } from 'antd';
 import moment from 'moment';
 import React from 'react';
 import { useModel, useRequest } from 'umi';
-import { SupplierSelect, SkuSelect } from '../components';
+import { SkuSelect } from '../components';
 
 const { Text } = Typography;
 
@@ -29,21 +29,8 @@ export default () => {
         }),
       },
     },
-    {
-      title: '供应商类别',
-      dataIndex: 'suppTypeId',
-      valueType: 'select',
-      valueEnum: suppEnum,
-      render: (_, record) => <div>{record.suppTypeName}</div>,
-    },
-    {
-      title: '供应商',
-      dataIndex: 'suppId',
-      valueType: 'select',
-      hideInTable: true,
-      renderFormItem: () => <SupplierSelect multiple />,
-      render: (_, record) => <div>{record.cateName}</div>,
-    },
+    suppTypeColumns(suppEnum),
+    suppColumns(),
     spuCodeColumns,
     {
       title: '商品',

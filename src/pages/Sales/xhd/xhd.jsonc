@@ -1,0 +1,119 @@
+{
+  "add": {
+    "billId": "",
+    "custId": 1,
+    "date": "2021-05-17",
+    "billNo": "XHD050013",
+    "depId": 1, // 部门id
+    "operId": 1, // 销售员
+    "entries": [
+      {
+        // 非序列号商品
+        "spuId": 720,
+        "skuId": 73,
+        "skuName": "农夫山泉矿泉水 矿泉水规格:330ml",
+        "spuName": "农夫山泉矿泉水",
+        "cateName": "矿泉水",
+        "skuCode": "PRB2021051200444",
+        "spuCode": "20210428_1744",
+        "isSerNum": false,
+        "isWarranty": false,
+        "storeCd": "CK202008270001",
+        "storeName": "仓库1",
+        "currentQty": 300,
+        "realQty": 0,
+        "baseUnitName": "瓶",
+        "baseUnitId": 19,
+        "outDefaultLocationUnitId": 19,
+        "inDefaultLocationUnitId": 19,
+        "inLocationUnitId": 19,
+        "inLocationUnitRate": 1,
+        "unitList": [
+          { "rate": 12, "unitId": 6, "unitName": "盒" },
+          { "rate": 24, "unitId": 8, "unitName": "箱" },
+          { "rate": 1, "unitId": 19, "unitName": "瓶" }
+        ],
+        "autoId": 451826,
+        "unitId": 19, // 入库单位
+        "rate": 1,
+        "discountRate": 5, // 分单折扣率
+        "taxRate": 10, // 税率
+        "outStoreCd": "CK202008270001",
+        "deduction": 12500, // 折扣额
+        "basQty": 500,
+        "beforeDisAmount": 250000, // 优惠前金额
+        "amount": 237500, // 优惠后金额
+        "taxPrice": 550, // 含税单价
+        "tax": 23750, // 税额
+        "taxAmount": 261250, // 价税合计
+        "qty": 500, // 数量
+        "price": 500, // 单价
+        "memo": "分单备注"
+      },
+      {
+        // 序列号商品
+        "spuId": 720,
+        "skuId": 73,
+        "skuName": "农夫山泉矿泉水 矿泉水规格:330ml",
+        "spuName": "农夫山泉矿泉水",
+        "cateName": "矿泉水",
+        "skuCode": "PRB2021051200444",
+        "spuCode": "20210428_1744",
+        "isSerNum": false,
+        "isWarranty": false,
+        "storeCd": "CK202008270001",
+        "storeName": "仓库1",
+        "currentQty": 300,
+        "realQty": 0,
+        "baseUnitName": "瓶",
+        "baseUnitId": 19,
+        "outDefaultLocationUnitId": 19,
+        "inDefaultLocationUnitId": 19,
+        "inLocationUnitId": 19,
+        "inLocationUnitRate": 1,
+        "unitList": [
+          { "rate": 12, "unitId": 6, "unitName": "盒" },
+          { "rate": 24, "unitId": 8, "unitName": "箱" },
+          { "rate": 1, "unitId": 19, "unitName": "瓶" }
+        ],
+        "autoId": 451826,
+        "unitId": 19, // 入库单位
+        "rate": 1,
+        "discountRate": 5, // 分单折扣率
+        "taxRate": 10, // 税率
+        "outStoreCd": "CK202008270001",
+        "deduction": 12500, // 折扣额
+        "basQty": 500,
+        "beforeDisAmount": 250000, // 优惠前金额
+        "amount": 237500, // 优惠后金额
+        "taxPrice": 550, // 含税单价
+        "tax": 23750, // 税额
+        "taxAmount": 261250, // 价税合计
+        "qty": 5, // 数量
+        "serNumList|5": [
+          // 出库序列号
+          {
+            "autoId": "@id",
+            "serId": "@id",
+            "serNum": "@id",
+            "desc": "@cname"
+          }
+        ],
+        "price": 500, // 单价
+        "memo": "分单备注"
+      }
+    ],
+    "disRate": "5", // 整单折扣
+    "disAmount": 13062.5, // 收款优惠
+    "amount": 248187.5, //优惠后金额
+    "customerFree": 100, // 客户承担费用
+    "arrears": 238287.5, // 当前欠款
+    "totalArrears": null, // 客户总欠款
+    "rpAmount": 10000, // 本次收款
+    "accountId": "1382160912613380096", // 收款账户
+    "addressId": 17, // 客户地址id
+    "totalQty": 500, // 单据总数
+    "totalAmount": 261250, // 单据总额
+    "dev": "xsdj"
+  }
+}

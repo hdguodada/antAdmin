@@ -395,7 +395,7 @@ export function FindUnHxListColumns(select = true): ProColumns<FUND.Entries>[] {
       dataIndex: 'bussType',
       title: '业务类别',
       valueType: 'select',
-      valueEnum: BussType,
+      valueEnum: BussTypeEnum,
       search: false,
       editable: false,
     },

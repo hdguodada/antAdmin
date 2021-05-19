@@ -8,16 +8,17 @@ import ProTable from '@ant-design/pro-table';
 import Modal from 'antd/lib/modal/Modal';
 import type { FormInstance } from 'antd';
 import { Button, Input, message, Select, Space } from 'antd';
-import { DashOutlined, SearchOutlined } from '@ant-design/icons';
+import { ClearOutlined, DashOutlined, SearchOutlined } from '@ant-design/icons';
 import {
   currentQtyColumns,
   indexColumns,
   keywordColumns,
   memoColumns,
   qtyColumns,
+  skuCodeColumns,
   skuIdColumns,
-  spuCodeColumns,
   storeCdColumns,
+  tableAlertOptionRenderDom,
 } from '@/utils/columns';
 import { getCode } from '@/services/Sys';
 import { calPrice } from '@/utils/utils';
@@ -42,7 +43,6 @@ import { SN } from '@/pages/Store/serNum/serNumDetail';
 import { queryPurchaseUnStockIn } from '@/services/Purchase';
 import { InputNumber } from 'antd';
 import { getCurrentStock, getSkuStock } from '@/services/Store';
-import CustomerSelect from '@/pages/Bas/customer/customerSelect';
 import ProCard from '@ant-design/pro-card';
 import GlobalWrapper from '@/components/GlobalWrapper';
 
@@ -116,18 +116,20 @@ export const SupplierSelect: React.FC<{
 };
 
 export const SkuSelect: React.FC<{
-  value?: PUR.Entries[];
-  onChange?: (value: PUR.Entries[] | PUR.Entries | React.Key | React.Key[]) => void;
-  setEditableKeys?: (value: React.Key[]) => void;
+  value?: PUR.Entries[] | K[];
+  onChange?: (value: PUR.Entries[] | PUR.Entries | React.Key | React.Key[] | undefined) => void;
   disabled?: boolean;
   type?: 'button' | 'input';
   multiple?: boolean;
   labelInValue?: boolean;
-}> = ({ value, onChange, setEditableKeys, disabled, type = 'button', multiple, labelInValue }) => {
-  const formRef = useRef<FormInstance>();
+}> = ({ value, onChange, disabled, type = 'button', multiple, labelInValue }) => {
   const [visible, setVisible] = useState<boolean>(false);
-  const [selectedEntries, setSelectedEntries] = useState<PUR.Entries[]>();
-  const [inputValue, setInputValue] = useState<string>();
+  const [inputValue, setInputValue] = useState<string | undefined>(() => {
+    if (labelInValue) {
+      return (value as PUR.Entries[])?.map((i) => i.skuCode).join(', ');
+    }
+    return value?.join(', ');
+  });
   const handleOk = (recordList: PUR.Entries[]) => {
     const v =
       recordList?.map((item) => ({
@@ -142,17 +144,15 @@ export const SkuSelect: React.FC<{
     if (labelInValue) {
       if (multiple) {
         onChange?.(v);
-        setEditableKeys?.(v.map((i) => i.autoId));
       } else {
         onChange?.(v[0]);
       }
     } else if (multiple) {
       onChange?.(v.map((item) => item.skuId));
-      setEditableKeys?.(v.map((i) => i.autoId));
     } else {
       onChange?.(v[0].skuId);
     }
-    setInputValue(v.map((i) => i.skuName).join(', '));
+    setInputValue(v.map((i) => i.skuCode).join(', '));
     setVisible(false);
   };
   const columns: ProColumns<PUR.Entries>[] = [
@@ -160,15 +160,16 @@ export const SkuSelect: React.FC<{
       placeholder: '请输入商品名称或编码',
     }),
     indexColumns,
-    spuCodeColumns,
-    {
-      dataIndex: 'cateName',
-      title: '商品类别',
-      search: false,
-    },
     {
       dataIndex: 'skuName',
       title: '商品名称',
+      search: false,
+      fixed: 'left',
+    },
+    skuCodeColumns,
+    {
+      dataIndex: 'cateName',
+      title: '商品类别',
       search: false,
     },
     currentQtyColumns(),
@@ -188,12 +189,12 @@ export const SkuSelect: React.FC<{
       key: 'action',
       valueType: 'option',
       width: 120,
+      hideInTable: multiple,
       render: (_, record) => {
         return [
           <a
             key="editable"
             onClick={async () => {
-              setSelectedEntries([record]);
               handleOk([record]);
             }}
           >
@@ -224,9 +225,10 @@ export const SkuSelect: React.FC<{
             setVisible(true);
           }}
           suffix={
-            <DashOutlined
+            <ClearOutlined
               onClick={() => {
-                setVisible(true);
+                setInputValue(undefined);
+                handleOk([]);
               }}
             />
           }
@@ -240,54 +242,37 @@ export const SkuSelect: React.FC<{
         onCancel={async () => {
           setVisible(false);
         }}
-        footer={
-          multiple
-            ? [
-                <Button
-                  type={'primary'}
-                  key="back"
-                  onClick={() => {
-                    handleOk(selectedEntries || []);
-                  }}
-                >
-                  选中并关闭
-                </Button>,
-                <Button
-                  key="submit"
-                  onClick={() => {
-                    setVisible(false);
-                  }}
-                >
-                  关闭
-                </Button>,
-              ]
-            : null
-        }
+        footer={false}
       >
         <ProTable<PUR.Entries>
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 500 }}
           onRow={(record) => {
             return {
               onDoubleClick: () => {
-                setSelectedEntries([record]);
-                formRef.current?.submit();
+                handleOk([record]);
               },
             };
           }}
-          rowSelection={
-            multiple
-              ? {
-                  onChange: (a, b) => {
-                    setSelectedEntries(b);
-                  },
-                }
-              : false
-          }
-          rowKey={'skuId'}
+          scroll={{ x: 900, y: 350 }}
+          rowSelection={multiple ? {} : false}
+          rowKey="skuId"
           options={false}
           columns={columns}
           params={{
             state: 1,
+          }}
+          tableAlertOptionRender={({ selectedRows }) => {
+            return tableAlertOptionRenderDom([
+              <Button
+                type="dashed"
+                key="select"
+                onClick={() => {
+                  handleOk(selectedRows);
+                }}
+              >
+                选中并关闭
+              </Button>,
+            ]);
           }}
           request={async (params) => {
             const response = await querySkuList({
@@ -328,6 +313,13 @@ export enum BussType {
   其他支出单 = 55,
   资金转账单 = 56,
 }
+
+export const BussTypeEnum = new Map(
+  Object.entries(BussType)
+    .filter((i) => !Number.isNaN(+i[0]))
+    .map((j) => [+j[0], j[1]]),
+);
+
 export enum StockType {
   入库 = 'In',
   出库 = 'Out',
@@ -353,7 +345,7 @@ export enum BussTypeApiUrl {
   采购退货单 = '/bis/purcReturn',
   其他入库单 = '/bis/stockIn',
   其他出库单 = '/bis/stockOut',
-  调拨单 = '/bas/stock/stockChange',
+  调拨单 = '/bis/stockTrans',
   其他收入单 = '/funds/ori',
   其他支出单 = '/funds/ori',
   收款单 = '/funds/receipt',
@@ -362,6 +354,7 @@ export enum BussTypeApiUrl {
   资金转账单 = '/funds/fundTf',
   销售订单 = '/sales/xhdd',
   销售单 = '/sales/xhd',
+  销售退货单 = '/sales/thd',
 }
 
 export enum BussTypeComponentUrl {
@@ -380,6 +373,7 @@ export enum BussTypeComponentUrl {
   资金转账单 = '/funds/fundTf',
   销售订单 = '/sales/xhdd',
   销售单 = '/sales/xhd',
+  销售退货单 = '/sales/xhthd',
 }
 
 export function getOrderType(orderType: OrderType) {
@@ -578,7 +572,7 @@ export const StoreSelectChangeCurrentQty: React.FC<{
   const { storeOptions } = useModel('store', (model) => ({
     storeOptions: model.options,
   }));
-  const { run } = useRequest(
+  const { run, loading } = useRequest(
     async (skuId, storeCd) => {
       const res = await getCurrentStock({
         skuId,
@@ -598,6 +592,7 @@ export const StoreSelectChangeCurrentQty: React.FC<{
       <SkuStock skuId={entries[index].skuId} skuName={entries[index].skuName} />
       <Select
         options={storeOptions}
+        loading={loading}
         style={{ width: '216px' }}
         value={value}
         onChange={async (e) => {
@@ -616,7 +611,7 @@ export const StoreSelectChangeCurrentQty: React.FC<{
   );
 };
 
-export type NewOrderFormProps = {
+export type PurchaseFormProps = {
   queryInfo: (
     id: React.Key,
     url: string,
@@ -703,6 +698,18 @@ export const GenerateButton: React.FC<{
     url = `${BussTypeComponentUrl.采购退货单}/new?srcGhdBillId=`;
     children = '生成退货单';
   }
+  if (bussType === BussType.销售订单) {
+    url = `${BussTypeComponentUrl.销售单}/new?srcXhddBillId=`;
+    children = '生成销货单';
+  }
+  if (bussType === BussType.销售退货订单) {
+    url = `${BussTypeComponentUrl.销售退货单}/new?srcXhddBillId=`;
+    children = '生成退货单';
+  }
+  if (bussType === BussType.销售单) {
+    url = `${BussTypeComponentUrl.销售退货单}/new?srcXhdBillId=`;
+    children = '生成退货单';
+  }
   return (
     <Button
       key="generate"
@@ -717,25 +724,23 @@ export const GenerateButton: React.FC<{
     />
   );
 };
-export const NewOrderForm = (props: NewOrderFormProps) => {
-  const {
-    queryInfo,
-    bussType,
-    add,
-    upd,
-    dev,
-    url = '',
-    componentUrl = '',
-    stockType = StockType.入库,
-  } = props;
+
+export type PurchaseEntriesProps = {
+  value?: any;
+  onChange?: (value: any) => void;
+  bussType: BussType;
+  checked: boolean;
+  formRef: any;
+};
+export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
+  bussType,
+  checked,
+  formRef,
+  value,
+  onChange,
+}) => {
   const actionRef = useRef<ActionType>();
-  const formRef = useRef<FormInstance>();
-  const initialValues = generateInitValuesFromBussType(bussType, url, componentUrl);
-  const { id } = useParams<{ id: string }>();
-  const location = useLocation();
   const [editableKeys, setEditableKeys] = useState<React.Key[]>();
-  const [checked, setChecked] = useState<boolean>(false);
-  const [isInfo, setIsInfo] = useState<boolean>(false);
   const columns: ProColumns<PUR.Entries>[] = [
     indexColumns,
     {
@@ -797,7 +802,16 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
           entries[index as number].isSerNum
         ) {
           return (
-            <SN entries={entries} index={index as number} formRef={formRef} stockType={stockType} />
+            <SN
+              entries={entries}
+              index={index as number}
+              formRef={formRef}
+              stockType={
+                [BussType.采购单, BussType.采购订单].indexOf(bussType) > -1
+                  ? StockType.入库
+                  : StockType.出库
+              }
+            />
           );
         }
         return <InputNumber min={0} style={{ width: 104 }} />;
@@ -819,43 +833,6 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
           ''
         );
       },
-      hideInTable: bussType === BussType.调拨单,
-    },
-    {
-      title: () => (
-        <div>
-          <span className="error-color">*</span>调出仓库
-        </div>
-      ),
-      dataIndex: 'outStoreCd',
-      render: (_, record) => <div>{record.outStoreName}</div>,
-      renderFormItem: ({ index }) => {
-        const entries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
-        return index !== undefined ? (
-          <StoreSelectChangeCurrentQty entries={entries} index={index} formRef={formRef} />
-        ) : (
-          ''
-        );
-      },
-      hideInTable: bussType !== BussType.调拨单,
-    },
-    {
-      title: () => (
-        <div>
-          <span className="error-color">*</span>调入仓库
-        </div>
-      ),
-      dataIndex: 'inStoreCd',
-      render: (_, record) => <div>{record.inStoreName}</div>,
-      renderFormItem: ({ index }) => {
-        const entries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
-        return index !== undefined ? (
-          <StoreSelectChangeCurrentQty entries={entries} index={index} formRef={formRef} />
-        ) : (
-          ''
-        );
-      },
-      hideInTable: bussType !== BussType.调拨单,
     },
 
     {
@@ -863,14 +840,12 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
       dataIndex: 'basUnitId',
       width: 120,
       editable: false,
-      hideInTable: [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1,
       render: (_, record) => <div>{record.baseUnitName}</div>,
     },
     {
       title: '基本数量',
       dataIndex: 'basQty',
       editable: false,
-      hideInTable: [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1,
     },
     {
       title: () => (
@@ -881,14 +856,12 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
       ),
       dataIndex: 'price',
       valueType: 'money',
-      hideInTable: bussType === BussType.调拨单,
     },
     {
       title: '含税单价',
       dataIndex: 'taxPrice',
       editable: false,
       valueType: 'money',
-      hideInTable: [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1,
     },
     {
       title: () => (
@@ -898,40 +871,34 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
       ),
       dataIndex: 'discountRate',
       valueType: 'percent',
-      hideInTable: [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1,
     },
     {
       title: '折扣额',
       dataIndex: 'deduction',
       valueType: 'money',
       editable: false,
-      hideInTable: [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1,
     },
     {
-      title: stockType === 'In' ? '优惠前金额' : '折后金额',
+      title: '优惠前金额',
       dataIndex: 'beforeDisAmount',
       valueType: 'money',
       editable: false,
-      hideInTable: [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1,
     },
     {
       title: calAmountTitle(bussType),
       dataIndex: 'amount',
       valueType: 'money',
       editable: false,
-      hideInTable: bussType === BussType.调拨单,
     },
     {
       title: '税率',
       dataIndex: 'taxRate',
       valueType: 'percent',
-      hideInTable: [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1,
     },
     {
       title: '税额',
       dataIndex: 'tax',
       valueType: 'money',
-      hideInTable: [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1,
       editable: false,
     },
     {
@@ -939,7 +906,6 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
       dataIndex: 'taxAmount',
       valueType: 'money',
       editable: false,
-      hideInTable: [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1,
     },
     memoColumns(),
     {
@@ -947,33 +913,56 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
       dataIndex: 'srcGhddBillNo',
       render: (_, record) => <a>{record.srcGhddBillNo?.[0]?.billNo}</a>,
       editable: false,
-      hideInTable:
-        [
-          BussType.采购订单,
-          BussType.其他入库单,
-          BussType.盘盈,
-          BussType.其他出库单,
-          BussType.盘亏,
-          BussType.调拨单,
-        ].indexOf(bussType) > -1,
+      hideInTable: [BussType.采购订单].indexOf(bussType) > -1,
     },
     {
       title: '原购货单号',
       dataIndex: 'srcGhdBillNo',
       render: (_, record) => <a>{record.srcGhdBillNo?.[0]?.billNo}</a>,
       editable: false,
-      hideInTable:
-        [
-          BussType.采购单,
-          BussType.采购订单,
-          BussType.其他入库单,
-          BussType.盘盈,
-          BussType.其他出库单,
-          BussType.盘亏,
-          BussType.调拨单,
-        ].indexOf(bussType) > -1,
+      hideInTable: [BussType.采购单, BussType.采购订单].indexOf(bussType) > -1,
     },
   ];
+  useEffect(() => {
+    if (value && !checked) {
+      setEditableKeys(value.map((item: any) => item.autoId) || []);
+    }
+  }, [value, checked]);
+  return (
+    <EditableProTable<PUR.Entries>
+      rowKey="autoId"
+      bordered
+      actionRef={actionRef}
+      scroll={
+        [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1
+          ? undefined
+          : { x: 3000 }
+      }
+      recordCreatorProps={false}
+      columns={columns}
+      editable={{
+        type: 'multiple',
+        editableKeys,
+        onChange: setEditableKeys,
+        actionRender: (row, config, defaultDom) => [defaultDom.delete],
+        onValuesChange: (record, recordList) => {
+          onChange?.(recordList);
+        },
+      }}
+      value={value}
+    />
+  );
+};
+
+export const PurchaseForm = (props: PurchaseFormProps) => {
+  const { queryInfo, bussType, add, upd, dev, url = '', componentUrl = '' } = props;
+  const formRef = useRef<FormInstance>();
+  const initialValues = generateInitValuesFromBussType(bussType, url, componentUrl);
+  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const [checked, setChecked] = useState<boolean>(false);
+  const [isInfo, setIsInfo] = useState<boolean>(false);
+
   const getSuppAccountPayableSum = async (suppId: React.Key) => {
     const supp = (await querySuppliersInfo(suppId)).data;
     formRef.current?.setFieldsValue({
@@ -1021,7 +1010,6 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
               ],
               srcDtlId: i.dtlId,
             }));
-            setEditableKeys(entries?.map((i) => i.autoId));
             res = {
               ...res,
               ...srcGhdd,
@@ -1047,7 +1035,6 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
               ],
               srcDtlId: i.dtlId,
             }));
-            setEditableKeys(entries?.map((i) => i.autoId));
             res = {
               ...res,
               ...srcGHD,
@@ -1068,9 +1055,6 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
         ...en,
         autoId: +(Math.random() * 1000000).toFixed(0),
       }));
-      if (info.checkStatus !== 2) {
-        setEditableKeys(entries?.map((i) => i.autoId));
-      }
       return {
         data: {
           ...info,
@@ -1202,17 +1186,6 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
                   )}
                 </ProFormDependency>
               )}
-              {[BussType.其他出库单, ...getOrderType(OrderType.销货)].indexOf(bussType) > -1 && (
-                <ProFormDependency name={['contactName']}>
-                  {({ contactName }) => {
-                    return (
-                      <ProForm.Item name="custId" label="客户" rules={patternMsg.text('客户')}>
-                        <CustomerSelect custName={contactName} disabled={checked} />
-                      </ProForm.Item>
-                    );
-                  }}
-                </ProFormDependency>
-              )}
               <ProFormDatePicker width="md" name="date" label="单据日期" disabled={checked} />
               {bussType === BussType.采购订单 && (
                 <ProFormDatePicker
@@ -1244,34 +1217,12 @@ export const NewOrderForm = (props: NewOrderFormProps) => {
             </ProForm.Group>
             <ProForm.Group>
               <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
-                <SkuSelect
-                  setEditableKeys={setEditableKeys}
-                  disabled={checked}
-                  multiple
-                  labelInValue
-                />
+                <SkuSelect disabled={checked} multiple labelInValue />
               </ProForm.Item>
               <BussTypeFormField bussType={bussType} disabled={checked} />
             </ProForm.Group>
-            <ProForm.Item name="entries" trigger="onValuesChange">
-              <EditableProTable<PUR.Entries>
-                rowKey="autoId"
-                bordered
-                actionRef={actionRef}
-                scroll={
-                  [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1
-                    ? undefined
-                    : { x: 3000 }
-                }
-                recordCreatorProps={false}
-                columns={columns}
-                editable={{
-                  type: 'multiple',
-                  editableKeys,
-                  onChange: setEditableKeys,
-                  actionRender: (row, config, defaultDom) => [defaultDom.delete],
-                }}
-              />
+            <ProForm.Item name="entries">
+              <PurchaseEntries formRef={formRef} checked={checked} bussType={bussType} />
             </ProForm.Item>
             <ProFormTextArea name="memo" label="备注" disabled={checked} />
             <ProFormDependency name={['totalQty', 'totalAmount']}>

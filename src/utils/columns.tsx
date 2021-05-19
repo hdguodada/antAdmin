@@ -16,6 +16,8 @@ import ProForm, {
   ProFormText,
 } from '@ant-design/pro-form';
 import type { StockType } from '@/pages/Purchase/components';
+import { BussTypeEnum } from '@/pages/Purchase/components';
+import { BussTypeComponentUrl } from '@/pages/Purchase/components';
 import {
   BussType,
   getOrderType,
@@ -45,6 +47,7 @@ export const checkStatusColumns = <T extends unknown>(search: undefined | false)
     valueEnum: checkStatusValueEnum,
     search,
     index: 105,
+    order: -1,
   };
 };
 
@@ -102,10 +105,11 @@ export const billStatusColumns = <T extends unknown>(
 export const skuIdColumns: ProColumns = {
   title: '商品',
   dataIndex: 'skuId',
-  render: (_, record) => <div>{record.skuName || record.spuName}</div>,
+  render: (_, record) => <div>{record.skuName}</div>,
   search: false,
   editable: false,
   copyable: true,
+  fixed: 'left',
 };
 
 export const memoColumns = <T extends unknown>(): ProColumns<T> => ({
@@ -191,6 +195,13 @@ export const spuCodeColumns: ProColumns = {
   search: false,
 };
 
+export const skuCodeColumns: ProColumns = {
+  title: '商品条码',
+  dataIndex: 'skuCode',
+  search: false,
+  width: 100,
+};
+
 export const dateColumns = <T extends unknown>({
   title = '创建日期',
   dataIndex = 'crtDate',
@@ -217,14 +228,42 @@ export const qtyColumns = <T extends unknown>({
   };
 };
 
-export const suppColumns = <T extends unknown>({
-  title = '供应商',
-  dataIndex = 'suppId',
-} = {}): ProColumns<T> => {
+export function customerColumns({
+  title = '客户',
+  dataIndex = 'custId',
+  hideInTable = false,
+  search = true,
+} = {}): ProColumns {
   return {
     title,
     dataIndex,
-    search: false,
+    hideInTable,
+    search: search ? undefined : false,
+    render: (_, record) => (
+      <Button
+        type="link"
+        onClick={() => {
+          history.push(`/bas/supplier/${(record as any).custId}`);
+        }}
+      >
+        {record.custName || record.contactName || '-'}
+      </Button>
+    ),
+    renderFormItem: () => <SupplierSelect multiple />,
+  };
+}
+
+export function suppColumns({
+  title = '供应商',
+  dataIndex = 'suppId',
+  hideInTable = false,
+  search = true,
+} = {}): ProColumns {
+  return {
+    title,
+    dataIndex,
+    hideInTable,
+    search: search ? undefined : false,
     render: (_, record) => (
       <Button
         type="link"
@@ -235,28 +274,35 @@ export const suppColumns = <T extends unknown>({
         {(record as any).suppName}
       </Button>
     ),
+    renderFormItem: () => <SupplierSelect multiple />,
   };
-};
-export const customerColumns = <T extends unknown>({
-  title = '客户',
-  dataIndex = 'custId',
-} = {}): ProColumns<T> => {
+}
+
+export function suppTypeColumns(suppEnum: Map<React.Key, string> | undefined): ProColumns {
+  return {
+    title: '供应商类别',
+    dataIndex: 'suppTypeId',
+    valueType: 'select',
+    valueEnum: suppEnum,
+    render: (_, record) => <div>{record.suppTypeName}</div>,
+  };
+}
+
+export function dateRangeColumns({ title = '单据日期', dataIndex = 'dateStr' } = {}): ProColumns {
   return {
     title,
     dataIndex,
-    search: false,
-    render: (_, record) => (
-      <Button
-        type="link"
-        onClick={() => {
-          history.push(`/bas/customer/${(record as any).custId}`);
-        }}
-      >
-        {(record as any).custName}
-      </Button>
-    ),
+    valueType: 'dateRange',
+    initialValue: [moment().startOf('month'), moment()],
+    render: (_, record) => <div>{record[dataIndex]}</div>,
+    search: {
+      transform: (value) => ({
+        beginDate: value[0],
+        endDate: value[1],
+      }),
+    },
   };
-};
+}
 
 export const currentQtyColumns = <T extends unknown>({
   title = '可用库存',
@@ -289,7 +335,7 @@ export const stateColumns: ProColumns = {
   ]),
 };
 
-export const billNoColumns = <T extends unknown>(fn?: (record?: T) => void): ProColumns<T> => {
+export function billNoColumns(): ProColumns {
   return {
     title: '订单编号',
     dataIndex: 'billNo',
@@ -297,7 +343,7 @@ export const billNoColumns = <T extends unknown>(fn?: (record?: T) => void): Pro
     render: (_, record) => (
       <Button
         onClick={() => {
-          fn?.(record);
+          history.push(`${BussTypeComponentUrl[BussType[record.bussType]]}/${record.billId}`);
         }}
         type="link"
       >
@@ -305,7 +351,17 @@ export const billNoColumns = <T extends unknown>(fn?: (record?: T) => void): Pro
       </Button>
     ),
   };
-};
+}
+
+export function bussTypeColumns(): ProColumns {
+  return {
+    title: '业务类型',
+    dataIndex: 'bussType',
+    valueEnum: BussTypeEnum,
+    valueType: 'select',
+    search: false,
+  };
+}
 
 export const srcOrderColumns = <T extends unknown>({
   title,
@@ -556,19 +612,23 @@ export const baseSearch = ({
         >
           {resetText}
         </Button>,
-        <Button
-          key="new"
-          type="primary"
-          onClick={() => {
-            fn?.();
-            if (url) {
-              history.push(url);
-            }
-          }}
-        >
-          <PlusOutlined />
-          新建
-        </Button>,
+        <div key="new">
+          {(fn || url) && (
+            <Button
+              key="new"
+              type="primary"
+              onClick={() => {
+                fn?.();
+                if (url) {
+                  history.push(url);
+                }
+              }}
+            >
+              <PlusOutlined />
+              新建
+            </Button>
+          )}
+        </div>,
       ];
       return jsxList ? base.concat(jsxList) : base;
     },
@@ -596,8 +656,8 @@ export type AdvancedSearchFormField = Partial<{
   date: [string, string];
   deliveryDate: [string, string];
   billStatus: any[];
-  suppIdMid: Partial<BAS.Supplier>;
-  custIdMid: Partial<BAS.Customer>;
+  suppIdMid: Partial<BAS.Supplier>[];
+  custIdMid: Partial<BAS.Customer>[];
   contactName: string;
 }>;
 type AdvancedSearchFormProps = {
@@ -612,7 +672,10 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
   return (
     <ModalForm<AdvancedSearchFormField>
       trigger={<Button type="dashed">高级搜索</Button>}
-      initialValues={value}
+      initialValues={{
+        date: [moment().startOf('month').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+        ...value,
+      }}
       formRef={formRef}
       onValuesChange={(values: AdvancedSearchFormField) => {
         if (values.date) {
@@ -629,19 +692,20 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
         }
         if (values.skuIdList) {
           formRef.current?.setFieldsValue({
-            skuId: values.skuIdList[0].skuId,
+            skuId: values.skuIdList.map((i) => i.skuId),
+            skuName: values.skuIdList.map((i) => i.skuCode).join(', '),
           });
         }
         if (values.suppIdMid) {
           formRef.current?.setFieldsValue({
-            suppId: values.suppIdMid.suppId,
-            contactName: values.suppIdMid.contactName,
+            suppId: values.suppIdMid.map((i) => i.suppId),
+            suppName: values.suppIdMid.map((i) => i.suppCd).join(', '),
           });
         }
         if (values.custIdMid) {
           formRef.current?.setFieldsValue({
-            custId: values.custIdMid.custId,
-            contactName: values.custIdMid.contactName,
+            custId: values.custIdMid.map((i) => i.custId),
+            custName: values.custIdMid.map((i) => i.custCd).join(', '),
           });
         }
       }}
@@ -656,15 +720,7 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
       <ProFormText name="suppName" hidden />
       <ProFormText name="skuId" hidden />
       <ProForm.Group>
-        <ProFormDateRangePicker
-          initialValue={[
-            moment().startOf('month').format('YYYY-MM-DD'),
-            moment().format('YYYY-MM-DD'),
-          ]}
-          width="md"
-          label="单据日期"
-          name="date"
-        />
+        <ProFormDateRangePicker width="md" label="单据日期" name="date" />
         <ProFormText label="分录备注" width="md" name="entryDesc" />
         {getOrderType(OrderType.其他出入库).indexOf(bussType) < 0 && (
           <ProFormSelect
@@ -677,10 +733,10 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
         )}
         {getOrderType(OrderType.购货).concat(getOrderType(OrderType.其他入库)).indexOf(bussType) >
           -1 && (
-          <ProFormDependency name={['contactName']}>
-            {({ contactName }) => (
-              <ProForm.Item label="供应商" name="suppIdMid">
-                <SupplierSelect labelInValue suppName={contactName} />
+          <ProFormDependency name={['suppName']}>
+            {({ suppName }) => (
+              <ProForm.Item label="供应商" name="suppIdMid" style={{ width: '328px' }}>
+                <SupplierSelect labelInValue suppName={suppName} multiple />
               </ProForm.Item>
             )}
           </ProFormDependency>
@@ -688,19 +744,45 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
 
         {getOrderType(OrderType.销货).concat(getOrderType(OrderType.其他出库)).indexOf(bussType) >
           -1 && (
-          <ProFormDependency name={['contactName']}>
-            {({ contactName }) => (
-              <ProForm.Item label="客户" name="custIdMid">
-                <CustomerSelect labelInValue custName={contactName} />
+          <ProFormDependency name={['custName']}>
+            {({ custName }) => (
+              <ProForm.Item label="客户" name="custIdMid" style={{ width: '328px' }}>
+                <CustomerSelect labelInValue custName={custName} multiple />
               </ProForm.Item>
             )}
           </ProFormDependency>
         )}
 
-        <ProForm.Item label="商品" name="skuIdList">
-          <SkuSelect />
+        <ProForm.Item label="商品" name="skuIdList" style={{ width: '328px' }}>
+          <SkuSelect type="input" multiple labelInValue />
         </ProForm.Item>
-        <ProFormSelect label="仓库" width="md" name="storeCd" options={options} />
+        {bussType === BussType.调拨单 ? (
+          <>
+            <ProFormSelect
+              label="调入仓库"
+              width="md"
+              name="storeCd"
+              options={options}
+              fieldProps={{ mode: 'multiple' }}
+            />
+            <ProFormSelect
+              label="调出仓库"
+              width="md"
+              name="storeCd"
+              options={options}
+              fieldProps={{ mode: 'multiple' }}
+            />
+          </>
+        ) : (
+          <ProFormSelect
+            label="仓库"
+            width="md"
+            name="storeCd"
+            options={options}
+            fieldProps={{ mode: 'multiple' }}
+          />
+        )}
+
         <UserSelect label="制单人" name="crtId" />
         <UserSelect label="最后修改人" name="updId" />
         <UserSelect label="审核人" name="checkId" />
@@ -870,9 +952,7 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
         <DatePicker.RangePicker defaultValue={[moment().startOf('month'), moment()]} />
       ),
     },
-    billNoColumns((record) => {
-      history.push(`${componentUrl}/${record?.billId}`);
-    }),
+    billNoColumns(),
   ];
   return base.concat([
     {
@@ -887,7 +967,7 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
       title: '业务类别',
       search: false,
       valueType: 'select',
-      valueEnum: BussType,
+      valueEnum: BussTypeEnum,
       hideInTable: [BussType.采购单, BussType.采购退货单, BussType.调拨单].indexOf(bussType) > -1,
     },
     {

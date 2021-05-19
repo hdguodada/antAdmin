@@ -1,0 +1,43 @@
+{
+  "xhdd": {
+    "data": {
+      "rows|5": [
+        {
+          "date": "@date",
+          "baseQty": 1,
+          "memo": null,
+          "spec": "MacBook Air",
+          "price": 6288,
+          "address": "dadad|13505892586|dadadad",
+          "skuName": "示例(笔记本)",
+          "deliveryDate": "2021-05-14",
+          "billNo": "XHDD20210514001",
+          "amount": "6,288.00",
+          "storeName": "默认仓库",
+          "unAmount": "6,288.00",
+          "inDate": null,
+          "spuCode": "SL001635",
+          "contactName": "888888 零售客户",
+          "unitName": "件",
+          "unitId": "@id",
+          "deleted": 0,
+          "custId": "@id",
+          "billId": "@id",
+          "qty": "1",
+          "taxPrice": 6288,
+          "fdesc": null,
+          "unQty": "1",
+          "status": "未出库"
+        }
+      ],
+      "summary": {
+        "amount": "12,576.00",
+        "unAmount": "12,576.00",
+        "qty": "2",
+        "unQty": "2"
+      }
+    },
+    "msg": "success",
+    "status": 200
+  }
+}

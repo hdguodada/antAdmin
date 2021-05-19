@@ -4,13 +4,13 @@ import {
   BussType,
   BussTypeApiUrl,
   BussTypeComponentUrl,
-  NewOrderForm,
+  PurchaseForm,
   StockType,
 } from '../components';
 
 export default () => {
   return (
-    <NewOrderForm
+    <PurchaseForm
       queryInfo={queryPurchaseInfo}
       bussType={BussType.采购退货单}
       url={BussTypeApiUrl.采购退货单}

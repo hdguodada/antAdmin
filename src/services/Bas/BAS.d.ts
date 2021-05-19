@@ -276,7 +276,7 @@ declare namespace BAS {
     discount: number; // 折扣率
   } & DefaultField;
   export type CustAddress = {
-    custId: K:
+    custId: K;
     addressId: K;
     linkman: K;
     mobile: K;

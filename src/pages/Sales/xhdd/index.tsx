@@ -6,7 +6,7 @@ import GlobalWrapper from '@/components/GlobalWrapper';
 export default () => {
   return (
     <GlobalWrapper type="list">
-      <XhTable openCloseFn={() => {}} dev={'xsdj'} bussType={BussType.销售订单} />
+      <XhTable openCloseFn={() => {}} bussType={BussType.销售订单} />
     </GlobalWrapper>
   );
 };

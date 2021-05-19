@@ -9,15 +9,20 @@ import {
   baseSearch,
   indexColumns,
   keywordColumns,
+  memoColumns,
   stateColumns,
   tableAlertOptionRenderDom,
 } from '@/utils/columns';
 import BatchDel from '@/components/DelPopconfirm';
+import { Button } from 'antd';
+import { copyFilterObjWithWhiteList } from '@/utils/utils';
 
 export const CustomerTable: React.FC<{
-  select?: { state: number };
-  onChange?: (value: BAS.Customer) => void;
-}> = ({ select, onChange }) => {
+  selectParams?: { state: number };
+  select?: boolean;
+  onChange?: (value: BAS.Customer[]) => void;
+  multiple?: boolean;
+}> = ({ selectParams, onChange, multiple, select }) => {
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
   const columns: ProColumns<BAS.Customer>[] = [
@@ -48,14 +53,9 @@ export const CustomerTable: React.FC<{
       search: false,
       ellipsis: true,
       copyable: true,
+      fixed: 'left',
     },
-    {
-      key: 'memo',
-      dataIndex: 'memo',
-      title: '备注',
-      search: false,
-      hideInTable: !!select,
-    },
+    memoColumns(),
     stateColumns,
   ];
   columns.push({
@@ -63,9 +63,20 @@ export const CustomerTable: React.FC<{
     key: 'action',
     valueType: 'option',
     width: 120,
+    fixed: 'right',
     render: (_, entity) => {
-      return !select
+      return select && !multiple
         ? [
+            <a
+              key="editable"
+              onClick={async () => {
+                onChange?.([copyFilterObjWithWhiteList(entity, ['custCd', 'custId'])]);
+              }}
+            >
+              选择
+            </a>,
+          ]
+        : [
             <a
               key="editable"
               onClick={() => {
@@ -73,16 +84,6 @@ export const CustomerTable: React.FC<{
               }}
             >
               视图
-            </a>,
-          ]
-        : [
-            <a
-              key="editable"
-              onClick={async () => {
-                onChange?.(entity);
-              }}
-            >
-              选择
             </a>,
           ];
     },
@@ -103,18 +104,33 @@ export const CustomerTable: React.FC<{
           },
         })}
         columns={columns}
-        params={select}
+        params={selectParams}
         rowSelection={{}}
-        tableAlertOptionRender={({ selectedRowKeys }) => {
-          return tableAlertOptionRenderDom([
-            <BatchDel
-              key="del"
-              onConfirm={async () => {
-                await delCustomer(selectedRowKeys);
-                actionRef.current?.reload();
-              }}
-            />,
-          ]);
+        tableAlertOptionRender={({ selectedRowKeys, selectedRows }) => {
+          return select
+            ? tableAlertOptionRenderDom([
+                <Button
+                  type="dashed"
+                  danger
+                  key="select"
+                  onClick={() => {
+                    onChange?.(
+                      selectedRows.map((i) => copyFilterObjWithWhiteList(i, ['custCd', 'custId'])),
+                    );
+                  }}
+                >
+                  选中并关闭
+                </Button>,
+              ])
+            : tableAlertOptionRenderDom([
+                <BatchDel
+                  key="del"
+                  onConfirm={async () => {
+                    await delCustomer(selectedRowKeys);
+                    actionRef.current?.reload();
+                  }}
+                />,
+              ]);
         }}
         request={async (params) => {
           const response = await queryCustomers({

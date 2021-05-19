@@ -11,6 +11,7 @@ export default () => {
   return (
     <GlobalWrapper type="descriptions">
       <PageContainer
+        title={false}
         tabList={[
           {
             tab: '采购订单追踪表',

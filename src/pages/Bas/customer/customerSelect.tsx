@@ -4,12 +4,13 @@ import { Input, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 const CustomerSelect: React.FC<{
-  value?: React.Key;
+  value?: BAS.Customer[] | BAS.Customer | K[] | K;
   custName?: string;
   disabled?: boolean;
-  onChange?: (value: React.Key | BAS.Customer) => void;
+  onChange?: (value: BAS.Customer[] | BAS.Customer | K[] | K) => void;
+  multiple?: boolean;
   labelInValue?: boolean;
-}> = ({ value, onChange, disabled, custName, labelInValue }) => {
+}> = ({ value, onChange, disabled, custName, labelInValue, multiple }) => {
   const [visible, setVisible] = useState<boolean>(false);
   const handleOk = () => {
     setVisible(false);
@@ -17,19 +18,37 @@ const CustomerSelect: React.FC<{
   const handleCancel = () => {
     setVisible(false);
   };
-  const [inputValue, setInputValue] = useState<string>(() => {
-    if (value && custName) {
+  const [inputValue, setInputValue] = useState<string | undefined>(() => {
+    if (custName) {
       return custName;
     }
-    return '';
-  });
-  const handleChange = (ttt: BAS.Customer) => {
-    if (labelInValue) {
-      onChange?.(ttt);
-    } else {
-      onChange?.(ttt.custId);
+    if (value) {
+      if (labelInValue) {
+        if (multiple) {
+          return (value as BAS.Customer[])?.map((i) => i.custCd).join(',');
+        }
+        return (value as BAS.Customer).custCd;
+      }
+      if (multiple) {
+        return (value as K[])?.join(',');
+      }
+      return value?.toString();
     }
-    setInputValue(ttt.custName);
+    return undefined;
+  });
+  const handleChange = (ttt: BAS.Customer[]) => {
+    if (labelInValue) {
+      if (multiple) {
+        onChange?.(ttt);
+      } else {
+        onChange?.(ttt[0]);
+      }
+    } else if (multiple) {
+      onChange?.(ttt.map((i) => i.custId));
+    } else {
+      onChange?.(ttt[0].custId);
+    }
+    setInputValue(ttt.map((i) => i.custCd).join(','));
     handleCancel();
   };
   useEffect(() => {
@@ -39,7 +58,7 @@ const CustomerSelect: React.FC<{
     <>
       <Input
         value={inputValue}
-        style={{ width: '328px' }}
+        style={{ width: '100%' }}
         onClick={() => {
           setVisible(true);
         }}
@@ -53,11 +72,13 @@ const CustomerSelect: React.FC<{
           />
         }
       />
-      <Modal visible={visible} width={1000} onOk={handleOk} onCancel={handleCancel}>
+      <Modal visible={visible} width={1000} onOk={handleOk} onCancel={handleCancel} footer={false}>
         <CustomerTable
-          select={{
+          selectParams={{
             state: 1,
           }}
+          select
+          multiple={multiple}
           onChange={handleChange}
         />
       </Modal>

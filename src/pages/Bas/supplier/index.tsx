@@ -98,6 +98,7 @@ export const Supplier: React.FC<{
     valueType: 'option',
     fixed: 'right',
     width: 120,
+    hideInTable: multiple,
     render: (_, record) => {
       return !select
         ? [
