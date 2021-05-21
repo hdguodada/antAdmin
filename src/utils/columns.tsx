@@ -1,5 +1,5 @@
 import { DownOutlined, EditFilled, PlusOutlined } from '@ant-design/icons';
-import type { ProColumns } from '@ant-design/pro-table';
+import type { ProColumns, ProColumnType } from '@ant-design/pro-table';
 import type { FormInstance } from 'antd';
 import { Button, DatePicker, Dropdown, Menu, Space, Tooltip } from 'antd';
 import React, { useRef } from 'react';
@@ -110,6 +110,7 @@ export const skuIdColumns: ProColumns = {
   editable: false,
   copyable: true,
   fixed: 'left',
+  width: 250,
 };
 
 export const memoColumns = <T extends unknown>(): ProColumns<T> => ({
@@ -117,6 +118,14 @@ export const memoColumns = <T extends unknown>(): ProColumns<T> => ({
   dataIndex: 'memo',
   search: false,
   index: 103,
+  width: 200,
+});
+
+export const fixWdithColumns = <T extends unknown>(): ProColumns<T> => ({
+  index: 10000,
+  editable: false,
+  search: false,
+  fixed: 'right',
 });
 
 export enum StatusEnum {
@@ -165,6 +174,7 @@ export const unitIdColumns: ProColumns = {
   render: (_, record) => <div>{record.unitName}</div>,
   search: false,
   editable: false,
+  width: 75,
 };
 
 export const baseUnitIdColumns: ProColumns = {
@@ -193,6 +203,8 @@ export const spuCodeColumns: ProColumns = {
   title: '商品编号',
   dataIndex: 'spuCode',
   search: false,
+  editable: false,
+  width: 150,
 };
 
 export const skuCodeColumns: ProColumns = {
@@ -200,6 +212,7 @@ export const skuCodeColumns: ProColumns = {
   dataIndex: 'skuCode',
   search: false,
   width: 100,
+  editable: false,
 };
 
 export const dateColumns = <T extends unknown>({
@@ -218,6 +231,7 @@ export const qtyColumns = <T extends unknown>({
   title = '数量',
   dataIndex = 'totalQty',
   hideInTable = false,
+  rest = {},
 } = {}): ProColumns<T> => {
   return {
     title,
@@ -225,6 +239,8 @@ export const qtyColumns = <T extends unknown>({
     search: false,
     valueType: 'digit',
     hideInTable,
+    width: 100,
+    ...rest,
   };
 };
 
@@ -323,6 +339,7 @@ export const storeCdColumns: ProColumns = {
   dataIndex: 'storeCd',
   editable: false,
   render: (_, record) => <div>{record.storeName}</div>,
+  width: 100,
 };
 export const stateColumns: ProColumns = {
   title: '状态',
@@ -363,22 +380,14 @@ export function bussTypeColumns(): ProColumns {
   };
 }
 
-export const srcOrderColumns = <T extends unknown>({
-  title,
-  dataIndex,
-  url,
-  hideInTable,
-}: {
-  title: string;
-  dataIndex: string;
-  url: string;
-  hideInTable: boolean;
-}): ProColumns<T> => {
+export const srcOrderColumns = <T extends unknown>(
+  props: ProColumnType<T>,
+  dataIndex: K,
+  url: string,
+): ProColumns<T> => {
   return {
-    title,
     dataIndex,
-    search: false,
-    hideInTable,
+    ...props,
     render: (_, record) => {
       if (record && record[dataIndex] && record[dataIndex].length > 0) {
         const menu = (
@@ -524,7 +533,7 @@ export const isDeafultColumns = <T extends unknown>(): ProColumns<T> => {
 export const optionColumns = <T extends unknown>({
   modify,
   del,
-  width = 65,
+  width = 105,
   fixed = 'right',
   jsxList = [],
 }: {
@@ -1013,24 +1022,31 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
         [BussType.其他入库单, BussType.调拨单, ...getOrderType(OrderType.购货)].indexOf(bussType) >
         -1,
     },
-    srcOrderColumns({
-      title: '关联购货单号',
-      dataIndex: 'srcGhdBillNo',
-      url: '/bis/purchase',
-      hideInTable: [BussType.采购订单, BussType.采购退货单].indexOf(bussType) < 0,
-    }),
-    srcOrderColumns({
-      title: '关联购货退货单号',
-      dataIndex: 'srcThdBillNo',
-      url: '/bis/Thd',
-      hideInTable: bussType !== BussType.采购单,
-    }),
-    srcOrderColumns({
-      title: '关联购货订单号',
-      dataIndex: 'srcGhddBillNo',
-      url: '/bis/purcOrder',
-      hideInTable: [BussType.采购单, BussType.采购退货单].indexOf(bussType) < 0,
-    }),
+    srcOrderColumns(
+      {
+        title: '关联购货单号',
+        hideInTable: [BussType.采购订单, BussType.采购退货单].indexOf(bussType) < 0,
+      },
+      'srcGhdBillNo',
+      BussTypeComponentUrl.采购单,
+    ),
+    srcOrderColumns(
+      {
+        title: '关联购货退货单号',
+        hideInTable: bussType !== BussType.采购单,
+      },
+      'srcThdBillNo',
+      BussTypeComponentUrl.采购退货单,
+    ),
+    srcOrderColumns(
+      {
+        title: '关联购货订单号',
+        dataIndex: 'srcGhddBillNo',
+        hideInTable: [BussType.采购单, BussType.采购退货单].indexOf(bussType) < 0,
+      },
+      'srcGhddBillNo',
+      BussTypeComponentUrl.采购订单,
+    ),
     qtyColumns({
       title: '原购货数量',
       dataIndex: 'srcQty',

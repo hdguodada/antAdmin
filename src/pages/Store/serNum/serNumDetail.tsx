@@ -29,12 +29,16 @@ import { useRequest } from '@@/plugin-request/request';
 export const SNTransfer: React.FC<{
   value?: number;
   onChange?: (value?: number) => void;
+  storeCd: K;
+  skuId: K;
   isSerNum: 0 | 1;
-}> = ({ value, onChange, isSerNum }) => {
+  formRef: any;
+  entries: STORE.invOiEntries[];
+}> = ({ value, onChange, isSerNum, storeCd, skuId, formRef, entries }) => {
   const [inputValue, setInputValue] = useState<number | undefined>(value);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>();
-
+  const [newSerNum, setNewSerNum] = useState<string[]>();
   const onTransferChange = (nextTargetKeys: string[]) => {
     setTargetKeys(nextTargetKeys);
   };
@@ -44,19 +48,17 @@ export const SNTransfer: React.FC<{
   const { data, run } = useRequest(
     async () => {
       if (isSerNum) {
-        const mockData = [];
-        // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < 20; i++) {
-          mockData.push({
-            key: i.toString(),
-            title: `content${i + 1}`,
-            description: `description of content${i + 1}`,
-          });
-        }
+        const res = await serNumFindList({
+          queryFilter: {
+            storeCd,
+            skuId,
+          },
+        });
+
         return {
-          data: mockData.map((item) => ({
-            key: item.key.toString(),
-            title: item.title,
+          data: res.data.rows.map((item) => ({
+            key: item.serNum,
+            title: item.serNum,
           })),
           success: true,
         };
@@ -67,9 +69,6 @@ export const SNTransfer: React.FC<{
     },
     {
       manual: true,
-      onSuccess: (values) => {
-        console.log(values);
-      },
     },
   );
   useEffect(() => {
@@ -101,15 +100,27 @@ export const SNTransfer: React.FC<{
         />
       }
     >
-      <Transfer
-        dataSource={data}
-        titles={['Source', 'Target']}
-        selectedKeys={selectedKeys}
-        targetKeys={targetKeys}
-        onChange={onTransferChange}
-        onSelectChange={onSelectChange}
-        render={(item) => item.title}
-      />
+      <ProCard split="vertical" ghost>
+        <ProCard>
+          <Transfer
+            dataSource={data}
+            titles={['系统在库序列号', '实际在库序列号']}
+            selectedKeys={selectedKeys}
+            targetKeys={targetKeys}
+            onChange={onTransferChange}
+            onSelectChange={onSelectChange}
+            render={(item) => item.title}
+          />
+        </ProCard>
+        <ProCard>
+          <Input.TextArea
+            placeholder="请在此处输入未在系统的序列号，用逗号或者空格分开"
+            autoSize={{
+              minRows: 20,
+            }}
+          />
+        </ProCard>
+      </ProCard>
     </ModalForm>
   ) : (
     <InputNumber
@@ -118,6 +129,8 @@ export const SNTransfer: React.FC<{
         setInputValue(e);
         onChange?.(e);
       }}
+      autoFocus
+      style={{ width: '100%' }}
     />
   );
 };
@@ -135,9 +148,9 @@ export const SNTransfer: React.FC<{
 export const SNSelect: React.FC<{
   value?: STORE.SN[];
   onChange?: (value: STORE.SN[]) => void;
-  skuId: React.Key;
-  storeCd: React.Key;
-  skuName: React.Key;
+  skuId: K;
+  storeCd: K;
+  skuName: K;
   visible: boolean;
   setVisible: (visible: boolean) => void;
   handleOk: () => void;
@@ -225,7 +238,7 @@ export const SN: React.FC<{
   const [visible, setVisible] = useState<boolean>(false);
   const [recordListS, setRecordList] = useState<STORE.SN[]>();
   const [initValues, setInitValues] = useState<STORE.SN[]>();
-  const [editKeys, setEditKeys] = useState<React.Key[]>();
+  const [editKeys, setEditKeys] = useState<K[]>();
   const { serNumList, skuName } = entries[index];
   const inFormRef = useRef<FormInstance>();
   const handleOk = () => {

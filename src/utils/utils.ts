@@ -221,3 +221,7 @@ export const filterRoutes = (sysRoutes: any[], apiRoutes: any[]) => {
   });
   return res;
 };
+
+export function useQuery(search: string) {
+  return new URLSearchParams(search);
+}

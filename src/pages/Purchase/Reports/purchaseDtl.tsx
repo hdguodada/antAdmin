@@ -112,12 +112,14 @@ export default () => {
       dataIndex: 'taxAmount',
       valueType: 'money',
     },
-    srcOrderColumns({
-      title: '源购货订单号',
-      dataIndex: 'srcGhddBillNo',
-      url: BussTypeComponentUrl.采购订单,
-      hideInTable: false,
-    }),
+    srcOrderColumns(
+      {
+        title: '源购货订单号',
+        hideInTable: false,
+      },
+      'srcGhddBillNo',
+      BussTypeComponentUrl.采购订单,
+    ),
     billDescColumns(),
     srcOrderSearch(),
     memoColumns(),

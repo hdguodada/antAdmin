@@ -4,18 +4,20 @@
   "data": {
     "rows|10": [
       {
-        "storeName": "@cname",
-        "unitName": "个",
-        "skuName": "@cname",
-        "code": "SL001768",
-        "storeCd": "@id",
-        "skuId": "@id",
-        "qty": "@number",
-        "cateName": "@cname",
-        "unitId": "@id",
-        "spuName": "@cname",
-        "cateId": "@id",
-        "isSerNum": 0 // 盘点的都是非序列管理的商品
+        "cateId": 33,
+        "cateName": "矿泉水",
+        "checkInventoryQty": null,
+        "dtlId": null,
+        "isSerNum": 0,
+        "memmo": "农夫山泉矿泉水",
+        "qty": 12,
+        "skuId": 75,
+        "skuName": "农夫山泉矿泉水 矿泉水规格:1500ml",
+        "spuCode": "20210428_1744",
+        "storeCd": "CK202008270001",
+        "storeName": "仓库1",
+        "unitId": 19,
+        "unitName": "瓶"
       }
     ]
   },

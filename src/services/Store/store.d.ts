@@ -5,39 +5,53 @@ declare namespace STORE {
     memo?: string;
     date?: string;
     storeName?: string;
-    bussType?: React.Key;
+    bussType?: K;
     skuName?: string;
-    skuId?: React.Key;
-    storeCd?: React.Key;
+    skuId?: K;
+    storeCd?: K;
     status?: number;
   };
   export type invOiParams = {
     date?: string;
-    storeCd?: React.Key;
-    cateId?: React.Key;
+    storeCd?: K;
+    cateId?: K;
     skuName?: string;
-    showZero?: boolean;
-    isSerNum: boolean;
+    showZero?: number;
+    isSerNum: number;
   };
-  export type invOiResponse = {
-    billId: React.Key;
-    storeName: string;
-    unitName: string;
-    skuName: string;
-    code: React.Key;
-    storeCd: React.Key;
-    skuId: React.Key;
-    qty: number;
+  export type invOiEntries = {
+    cateId: K;
     cateName: string;
-    unitId: React.Key;
-    spuName: string;
-    cateId: React.Key;
-    isSerNum: boolean; // 盘点的都是非序列管理的商品
-    checkInventory?: number; //  盘点库存
-    change?: number;
+    checkInventoryQty?: any;
+    dtlId?: any;
+    isSerNum: number;
+    memmo: string;
+    qty: number;
+    skuId: K;
+    skuName: string;
+    spuCode: string;
+    storeCd: string;
+    storeName: string;
+    unitId: K;
+    unitName: string;
+    autoId: K;
+    unitList: PUR.Entries['unitList'];
+    inventoryResult: any;
   };
-  export type invOiPdForm = {
-    isSerNum: boolean;
-    entries: invOiResponse[];
+  export type invOiForm = {
+    billId: K;
+    billNo: K;
+    pdDate: string;
+    date: string;
+    pdDateStr: string;
+    storeName: string;
+    skuName: string;
+    cateId: K;
+    isDelete: number;
+    showZero: number;
+    storeCd: string;
+    isSerNum: 0 | 1;
+    entries: invOiEntries[];
+    pdResult: { billId: K; billNo: string }[];
   };
 }

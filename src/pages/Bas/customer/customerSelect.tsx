@@ -1,17 +1,18 @@
 import { CustomerTable } from './index';
-import { DashOutlined } from '@ant-design/icons';
+import { ClearOutlined } from '@ant-design/icons';
 import { Input, Modal } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const CustomerSelect: React.FC<{
   value?: BAS.Customer[] | BAS.Customer | K[] | K;
   custName?: string;
   disabled?: boolean;
-  onChange?: (value: BAS.Customer[] | BAS.Customer | K[] | K) => void;
+  onChange?: (value: BAS.Customer[] | BAS.Customer | K[] | K | undefined) => void;
   multiple?: boolean;
   labelInValue?: boolean;
 }> = ({ value, onChange, disabled, custName, labelInValue, multiple }) => {
   const [visible, setVisible] = useState<boolean>(false);
+  const customerTableRef = useRef();
   const handleOk = () => {
     setVisible(false);
   };
@@ -36,19 +37,19 @@ const CustomerSelect: React.FC<{
     }
     return undefined;
   });
-  const handleChange = (ttt: BAS.Customer[]) => {
+  const handleChange = (ttt?: BAS.Customer[]) => {
     if (labelInValue) {
       if (multiple) {
         onChange?.(ttt);
       } else {
-        onChange?.(ttt[0]);
+        onChange?.(ttt?.[0]);
       }
     } else if (multiple) {
-      onChange?.(ttt.map((i) => i.custId));
+      onChange?.(ttt?.map((i) => i.custId));
     } else {
-      onChange?.(ttt[0].custId);
+      onChange?.(ttt?.[0].custId);
     }
-    setInputValue(ttt.map((i) => i.custCd).join(','));
+    setInputValue(ttt?.map((i) => i.custCd).join(','));
     handleCancel();
   };
   useEffect(() => {
@@ -65,9 +66,10 @@ const CustomerSelect: React.FC<{
         placeholder={'(空)'}
         disabled={disabled}
         suffix={
-          <DashOutlined
+          <ClearOutlined
             onClick={() => {
-              setVisible(true);
+              setInputValue(undefined);
+              handleChange(undefined);
             }}
           />
         }
@@ -77,6 +79,7 @@ const CustomerSelect: React.FC<{
           selectParams={{
             state: 1,
           }}
+          ref={customerTableRef}
           select
           multiple={multiple}
           onChange={handleChange}

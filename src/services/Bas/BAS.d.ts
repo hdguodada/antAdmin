@@ -278,11 +278,11 @@ declare namespace BAS {
   export type CustAddress = {
     custId: K;
     addressId: K;
-    linkman: K;
-    mobile: K;
+    linkman: string;
+    mobile: string;
     regioncd: string;
-    address: K;
-    fullAddress: k;
+    address: string;
+    fullAddress: string;
     isDefault: boolean;
     regioncdMid: K[];
   } & DefaultField;

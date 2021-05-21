@@ -1,4 +1,4 @@
-import ProForm, { ProFormRadio, ProFormSelect } from '@ant-design/pro-form';
+import ProForm, { ProFormCheckbox, ProFormRadio, ProFormSelect } from '@ant-design/pro-form';
 import React from 'react';
 import { Button, Divider, TreeSelect } from 'antd';
 import { useModel } from 'umi';
@@ -9,6 +9,8 @@ import { patternMsg } from './validator';
 import type { NamePath } from 'antd/lib/form/interface';
 import { useRequest } from 'umi';
 import UserForm from '@/pages/Sys/user/form';
+import { ProFormCheckboxProps } from '@ant-design/pro-form/lib/components/Checkbox';
+import Checkbox from 'antd/lib/checkbox/Checkbox';
 
 export const StateForm = (
   <ProFormRadio.Group
@@ -143,27 +145,11 @@ export const UserSelect = ({ name, label, disabled, showNew }: UserSelectProps) 
 };
 
 export const AccountSelect = ({ name, label, disabled }: UserSelectProps) => {
-  const { query } = useModel('account', (model) => ({
-    query: model.query,
+  const { accountEnum, defaultValue } = useModel('account', (model) => ({
+    accountEnum: model.valueEnum,
+    defaultValue: model.defaultValue,
   }));
-  const [defaultValue, setDefaultValue] = useState<React.Key>();
-  const { data, loading } = useRequest(async () => {
-    const res = (await query()).data.rows;
-    const options = res.map((item) => {
-      if (item.isDeafult === 1) {
-        setDefaultValue(item.accountId);
-      }
-      return {
-        label: item.accountName,
-        value: item.accountId,
-      };
-    });
-    return {
-      data: options,
-      success: true,
-    };
-  });
-  return !loading ? (
+  return (
     <ProFormSelect
       width="md"
       showSearch
@@ -175,10 +161,8 @@ export const AccountSelect = ({ name, label, disabled }: UserSelectProps) => {
       name={name}
       rules={patternMsg.select('')}
       label={label}
-      options={data}
+      valueEnum={accountEnum}
     />
-  ) : (
-    <div />
   );
 };
 
@@ -201,6 +185,20 @@ export const ProductTypeTreeSelect: React.FC<{
       allowClear
       treeDefaultExpandAll
       treeData={treeDataSimpleMode}
+    />
+  );
+};
+
+export const ProFormCheckBoxZeroAndOne: React.FC<{
+  value?: number;
+  onChange?: (value: number) => void;
+}> = ({ value, onChange }) => {
+  return (
+    <Checkbox
+      onChange={(e) => {
+        onChange?.(e.target.checked ? 1 : 0);
+      }}
+      checked={value === 1}
     />
   );
 };

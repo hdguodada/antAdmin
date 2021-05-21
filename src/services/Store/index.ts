@@ -1,5 +1,6 @@
 import { request } from 'umi';
 import { mapModId } from '@/utils/utils';
+import { BussTypeApiUrl } from '@/pages/Purchase/components';
 
 export * from './serNum';
 
@@ -37,23 +38,48 @@ export async function getSkuStock(
 }
 
 export async function queryToPd(
-  params: STORE.invOiParams,
-): Promise<RowResponse<STORE.invOiResponse>> {
-  return request('/bas/inventory/queryToPd', {
-    params,
+  data?: Partial<STORE.invOiForm>,
+  url = '/bis/stockInventory/queryToPd',
+): Promise<InfoResponse<STORE.invOiForm>> {
+  return request(url, {
+    data,
+    method: 'POST',
+    headers: { modId: mapModId.store },
+  });
+}
+
+export async function stockInventoryInfo(id: K): Promise<InfoResponse<STORE.invOiForm>> {
+  return request('/bis/stockInventory/info', {
+    params: { id },
     method: 'GET',
-    data: { dev: 'bas' },
+    headers: { modId: mapModId.store },
+  });
+}
+
+export async function stockInventoryAdd(
+  data: Partial<STORE.invOiForm>,
+): Promise<InfoResponse<STORE.invOiForm>> {
+  return request('/bis/stockInventory/add', {
+    data,
+    method: 'POST',
     headers: { modId: mapModId.store },
   });
 }
 
 export async function queryPdRecordList(
-  params: STORE.invOiParams,
-): Promise<RowResponse<STORE.invOiResponse>> {
-  return request('/bas/inventory/queryPdRecordList', {
-    params,
-    method: 'GET',
-    data: { dev: 'bas' },
+  data: STORE.invOiParams,
+): Promise<RowResponse<STORE.invOiForm>> {
+  return request(`${BussTypeApiUrl.盘点}/list`, {
+    data,
+    method: 'POST',
+    headers: { modId: mapModId.store },
+  });
+}
+
+export async function delPdRecordList(data: K[]): Promise<RowResponse<STORE.invOiForm>> {
+  return request(`${BussTypeApiUrl.盘点}/del`, {
+    data,
+    method: 'POST',
     headers: { modId: mapModId.store },
   });
 }

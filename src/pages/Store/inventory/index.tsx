@@ -2,38 +2,53 @@ import React, { useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { baseSearch, indexColumns, optionColumns, srcOrderColumns } from '@/utils/columns';
-import type { FormInstance } from 'antd';
+import {
+  baseSearch,
+  fixWdithColumns,
+  indexColumns,
+  optionColumns,
+  srcOrderColumns,
+  storeCdColumns,
+} from '@/utils/columns';
+import { Dropdown, FormInstance, Menu } from 'antd';
 import { TreeSelect } from 'antd';
-import { queryPdRecordList } from '@/services/Store';
+import { delPdRecordList, queryPdRecordList } from '@/services/Store';
 import { DatePicker } from 'antd';
 import moment from 'moment';
 import GlobalWrapper from '@/components/GlobalWrapper';
 import { history, useModel } from 'umi';
 import { BussTypeComponentUrl } from '@/pages/Purchase/components';
+import { DownOutlined } from '@ant-design/icons';
 
 export const InventoryTable: React.FC = () => {
-  const { options } = useModel('store', (model) => ({ options: model.options }));
   const { treeDataSimpleMode } = useModel('productType', (model) => ({
     treeDataSimpleMode: model.treeDataSimpleMode,
   }));
-  const columns: ProColumns<STORE.invOiResponse>[] = [
+  const { storeEnum } = useModel('store', (model) => ({ storeEnum: model.valueEnum }));
+  const columns: ProColumns<STORE.invOiForm>[] = [
     indexColumns,
     {
       dataIndex: 'pdDate',
-      valueType: 'date',
       title: '盘点时间',
-      renderFormItem: () => (
-        <DatePicker.RangePicker defaultValue={[moment().startOf('month'), moment()]} />
-      ),
+      valueType: 'dateRange',
+      initialValue: [moment().startOf('month'), moment()],
+      render: (_, record) => <div>{record.pdDateStr}</div>,
+      search: {
+        transform: (value) => ({
+          beginDate: value[0],
+          endDate: value[1],
+        }),
+      },
+      width: 105,
     },
     {
-      dataIndex: 'storeCd',
       title: '仓库',
-      hideInTable: true,
-      request: async () => {
-        return options;
-      },
+      dataIndex: 'storeCd',
+      editable: false,
+      render: (_, record) => <div>{record.storeName}</div>,
+      width: 105,
+      valueEnum: storeEnum,
+      valueType: 'select',
     },
     {
       dataIndex: 'cateId',
@@ -54,29 +69,66 @@ export const InventoryTable: React.FC = () => {
       dataIndex: 'billNo',
       title: '盘点编号',
       search: false,
+      width: 105,
     },
+
     {
-      dataIndex: 'locationName',
-      title: '盘点仓库',
-      search: false,
-    },
-    srcOrderColumns({
       title: '盘点结果',
-      dataIndex: 'pdResult',
-      url: '',
       hideInTable: false,
-    }),
+      width: 255,
+      dataIndex: 'pdResult',
+      render: (_, record) => {
+        if (record && record.pdResult && record.pdResult.length > 0) {
+          const menu = (
+            <Menu>
+              {record.pdResult.map((item) => (
+                <Menu.Item key={item.billId}>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => {
+                      if (item.billNo.startsWith('盘盈')) {
+                        history.push(`${BussTypeComponentUrl.其他入库单}/${item.billId}`);
+                      }
+                      if (item.billNo.startsWith('盘亏')) {
+                        history.push(`${BussTypeComponentUrl.其他出库单}/${item.billId}`);
+                      }
+                      return false;
+                    }}
+                  >
+                    {item.billNo}
+                  </a>
+                </Menu.Item>
+              ))}
+            </Menu>
+          );
+          return (
+            <Dropdown overlay={menu}>
+              <div>
+                {record.pdResult[0].billNo}
+                <DownOutlined />
+              </div>
+            </Dropdown>
+          );
+        }
+        return '-';
+      },
+    },
+
     optionColumns({
       modify: async ({ record }) => {
         history.push(`${BussTypeComponentUrl.盘点}/${record.billId}`);
       },
-      del: async () => {},
+      del: async ({ record }) => {
+        await delPdRecordList([record.billId]);
+      },
     }),
+    fixWdithColumns(),
   ];
   const formRef = useRef<FormInstance<STORE.invOiParams>>();
 
   return (
-    <ProTable<STORE.invOiResponse, STORE.invOiParams>
+    <ProTable<STORE.invOiForm, STORE.invOiParams>
       columns={columns}
       rowKey="billId"
       formRef={formRef}
@@ -99,7 +151,7 @@ export const InventoryTable: React.FC = () => {
 const Inventory: React.FC = () => {
   return (
     <GlobalWrapper type={'list'}>
-      <PageContainer content={<InventoryTable />} />
+      <PageContainer title={false} content={<InventoryTable />} />
     </GlobalWrapper>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { delCustomer, queryCustomers } from '@/services/Bas';
@@ -17,13 +17,20 @@ import BatchDel from '@/components/DelPopconfirm';
 import { Button } from 'antd';
 import { copyFilterObjWithWhiteList } from '@/utils/utils';
 
-export const CustomerTable: React.FC<{
+type CustomerTableProps = {
   selectParams?: { state: number };
   select?: boolean;
   onChange?: (value: BAS.Customer[]) => void;
   multiple?: boolean;
-}> = ({ selectParams, onChange, multiple, select }) => {
+};
+export const CustomerTable = forwardRef((props: CustomerTableProps, ref) => {
+  const { selectParams, onChange, multiple, select } = props;
   const actionRef = useRef<ActionType>();
+  useImperativeHandle(ref, () => ({
+    clearSelected: () => {
+      actionRef.current?.clearSelected?.();
+    },
+  }));
   const [modalVisit, setModalVisit] = useState(false);
   const columns: ProColumns<BAS.Customer>[] = [
     indexColumns,
@@ -70,7 +77,9 @@ export const CustomerTable: React.FC<{
             <a
               key="editable"
               onClick={async () => {
-                onChange?.([copyFilterObjWithWhiteList(entity, ['custCd', 'custId'])]);
+                onChange?.([
+                  copyFilterObjWithWhiteList(entity, ['custCd', 'custId', 'accountPayableSum']),
+                ]);
               }}
             >
               选择
@@ -115,7 +124,9 @@ export const CustomerTable: React.FC<{
                   key="select"
                   onClick={() => {
                     onChange?.(
-                      selectedRows.map((i) => copyFilterObjWithWhiteList(i, ['custCd', 'custId'])),
+                      selectedRows.map((i) =>
+                        copyFilterObjWithWhiteList(i, ['custCd', 'custId', 'accountPayableSum']),
+                      ),
                     );
                   }}
                 >
@@ -147,7 +158,7 @@ export const CustomerTable: React.FC<{
       />
     </>
   );
-};
+});
 
 export default () => {
   return <PageContainer content={<CustomerTable />} />;

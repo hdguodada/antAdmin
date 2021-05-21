@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { delSupplier, querySuppliers } from '@/services/Bas';
@@ -20,13 +20,21 @@ import { check } from '@/services';
 import { mapModId } from '@/utils/utils';
 import GlobalWrapper from '@/components/GlobalWrapper';
 
-export const Supplier: React.FC<{
+export type SupplierProps = {
   select: boolean;
+  value?: any;
   onChange?: (value: BAS.Supplier[]) => void;
   multiple?: boolean;
   selectParams?: { state: number; checkStatus: number };
-}> = ({ select, onChange, selectParams, multiple }) => {
+};
+export const Supplier = forwardRef((props: SupplierProps, ref) => {
   const actionRef = useRef<ActionType>();
+  const { select, onChange, selectParams, multiple, value } = props;
+  useImperativeHandle(ref, () => ({
+    clearSelected: () => {
+      actionRef.current?.clearSelected?.();
+    },
+  }));
   const [modalVisit, setModalVisit] = useState(false);
   const [modalFormInit, setModalFormInit] = useState<BAS.Supplier>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
@@ -123,6 +131,11 @@ export const Supplier: React.FC<{
           ];
     },
   });
+  useEffect(() => {
+    if (!value) {
+      actionRef.current?.clearSelected?.();
+    }
+  }, [value]);
   return (
     <>
       <AddSuppForm
@@ -163,6 +176,7 @@ export const Supplier: React.FC<{
             return tableAlertOptionRenderDom([
               <Button
                 type="dashed"
+                danger
                 key="select"
                 onClick={() => {
                   onChange?.(selectedRows);
@@ -226,7 +240,7 @@ export const Supplier: React.FC<{
       />
     </>
   );
-};
+});
 
 export default () => {
   return (

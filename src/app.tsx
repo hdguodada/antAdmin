@@ -96,9 +96,11 @@ export async function getInitialState(): Promise<{
 
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
-    breadcrumbRender: false,
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
+    waterMarkProps: {
+      content: initialState?.currentUser?.name,
+    },
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;
@@ -107,10 +109,12 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         history.push('/user/login');
       }
     },
+    menuHeaderRender: false,
     menuDataRender: (menuData) => menuData,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     ...initialState?.settings,
+    breadcrumbRender: false,
   };
 };
 

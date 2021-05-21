@@ -67,20 +67,20 @@ declare namespace PUR {
     code?: K;
     skuImageUrl?: string;
     spec?: string;
-    skuId: K;
-    skuName: string;
-    unitId: K;
-    unitList: BAS.Unit[];
-    storeCd: K;
-    storeName: string;
-    unitName: string;
+    skuId?: K;
+    skuName?: string;
+    unitId?: K;
+    unitList?: BAS.Unit[];
+    storeCd?: K;
+    storeName?: string;
+    unitName?: string;
     baseUnitId?: K;
     baseUnitName?: string;
-    inLocationUnitId: K;
-    inLocationUnitRate: number;
+    inLocationUnitId?: K;
+    inLocationUnitRate?: number;
     inDefaultLocationUnitId?: K;
     outDefaultLocationUnitId?: K;
-    isSerNum: boolean;
+    isSerNum?: boolean;
     qty?: number; // 数量
     price?: number; // 单价
     discountRate?: number; // 折扣
@@ -88,7 +88,7 @@ declare namespace PUR {
     beforeDisAmount?: number; // 优惠前金额
     amount?: number; // 优惠后金额
     description?: string;
-    serNumList: SN[]; // 序列号管理
+    serNumList?: SN[]; // 序列号管理
     basQty?: number; // 基本数量
     taxPrice?: number; // 含税单价
     taxRate?: number; // 税率

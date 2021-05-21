@@ -22,7 +22,6 @@ import {
   checkStatusColumns,
   crtNameColumns,
   currentQtyColumns,
-  hxStateCodeColumns,
   indexColumns,
   keywordColumns,
   memoColumns,
@@ -141,7 +140,7 @@ export const XhTableColumns = ({
     },
     {
       title: '客户',
-      dataIndex: 'contactName',
+      dataIndex: 'custName',
       search: false,
     },
     totalAmountColumns({
@@ -548,7 +547,6 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
 export type XhFormProps = {
   bussType: BussType; // 业务类型
   dev?: string; // 是否开发
-  stockType?: StockType; // In 是入库单 Out 出库单
 };
 export const XhForm = (props: XhFormProps) => {
   const { bussType, dev } = props;
@@ -642,6 +640,9 @@ export const XhForm = (props: XhFormProps) => {
           dev,
         })
       ).data;
+      setAddressOptions(
+        await (await queryCustomerAddress({ queryFilter: { custId: info.custId } })).data.rows,
+      );
       setChecked(info.checkStatus === 2);
       const entries = info.entries?.map((en) => ({
         ...en,
@@ -745,33 +746,40 @@ export const XhForm = (props: XhFormProps) => {
             return false;
           }}
           onValuesChange={async (values) => {
+            if (values.cust) {
+              const { cust } = values;
+              setAddressOptions(
+                await (await queryCustomerAddress({ queryFilter: { custId: cust.custId } })).data
+                  .rows,
+              );
+              formRef.current?.setFieldsValue({
+                addressId: undefined,
+                custId: cust.custId,
+                accountPayableSum: cust.accountPayableSum,
+              });
+            }
             if ([BussType.销售单, BussType.销售退货单].indexOf(bussType) > -1) {
               calPrice(values, formRef, true);
               return;
             }
             calPrice(values, formRef);
-            if (values.custId) {
-              setAddressOptions(
-                await (await queryCustomerAddress({ queryFilter: { custId: values.custId } })).data
-                  .rows,
-              );
-            }
           }}
           formRef={formRef}
           submitter={false}
         >
           <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
+          <ProFormText hidden width="md" name="custId" label="客户Id" disabled />
           <ProForm.Group>
-            <ProFormDependency name={['contactName']}>
-              {({ contactName }) => {
+            <ProFormDependency name={['custName']}>
+              {({ custName }) => {
                 return (
                   <ProForm.Item
-                    name="custId"
+                    name="cust"
                     label="客户"
                     rules={patternMsg.text('客户')}
                     style={{ width: '328px' }}
                   >
-                    <CustomerSelect custName={contactName} disabled={checked} />
+                    <CustomerSelect custName={custName} disabled={checked} labelInValue />
                   </ProForm.Item>
                 );
               }}
@@ -783,7 +791,10 @@ export const XhForm = (props: XhFormProps) => {
                     width="md"
                     name="addressId"
                     label="客户地址"
-                    options={addressOptions.map((i) => ({ label: i.address, value: i.addressId }))}
+                    options={addressOptions.map((i) => ({
+                      label: i.linkman + i.mobile + i.fullAddress,
+                      value: i.addressId,
+                    }))}
                   />
                 ) : (
                   ''
@@ -812,7 +823,7 @@ export const XhForm = (props: XhFormProps) => {
           </ProForm.Group>
           <ProForm.Group>
             <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
-              <SkuSelect disabled={checked} multiple labelInValue />
+              <SkuSelect disabled={checked} multiple labelInValue accumulate />
             </ProForm.Item>
             {
               // 只有在销售订单时展示业务类型,销货或者退货
@@ -876,6 +887,7 @@ export const XhForm = (props: XhFormProps) => {
                 <>
                   <ProFormDigit width="sm" name="customerFree" label="客户承担费用" />
                   <ProFormDigit width="sm" name="arrears" label="本次欠款" disabled />
+                  <ProFormDigit width="sm" name="accountPayableSum" label="客户欠款" disabled />
                   <ProFormDigit width="sm" name="totalArrears" label="总欠款" disabled />
                   <AccountSelect name="accountId" label="结算账户" />
                   <ProFormDigit width="sm" name="rpAmount" label="本次收款" />

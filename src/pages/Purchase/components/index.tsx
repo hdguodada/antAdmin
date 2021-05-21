@@ -8,7 +8,7 @@ import ProTable from '@ant-design/pro-table';
 import Modal from 'antd/lib/modal/Modal';
 import type { FormInstance } from 'antd';
 import { Button, Input, message, Select, Space } from 'antd';
-import { ClearOutlined, DashOutlined, SearchOutlined } from '@ant-design/icons';
+import { ClearOutlined, SearchOutlined } from '@ant-design/icons';
 import {
   currentQtyColumns,
   indexColumns,
@@ -54,33 +54,34 @@ export const SupplierSelect: React.FC<{
   value?: React.Key;
   suppName?: string;
   disabled?: boolean;
-  onChange?: (value: React.Key | React.Key[] | BAS.Supplier | BAS.Supplier[]) => void;
+  onChange?: (value: React.Key | React.Key[] | BAS.Supplier | BAS.Supplier[] | undefined) => void;
   labelInValue?: boolean;
   multiple?: boolean;
 }> = ({ value, onChange, disabled, suppName, labelInValue, multiple }) => {
+  const suppRef = useRef<ActionType>();
   const [visible, setVisible] = useState<boolean>(false);
   const handleCancel = () => {
     setVisible(false);
   };
-  const [inputValue, setInputValue] = useState<string>(() => {
+  const [inputValue, setInputValue] = useState<string | undefined>(() => {
     if (value && suppName) {
       return suppName;
     }
     return '';
   });
-  const handleChange = (supplier: BAS.Supplier[]) => {
+  const handleChange = (supplier?: BAS.Supplier[]) => {
     if (labelInValue) {
       if (multiple) {
         onChange?.(supplier);
       } else {
-        onChange?.(supplier[0]);
+        onChange?.(supplier?.[0]);
       }
     } else if (multiple) {
-      onChange?.(supplier.map((item) => item.suppId));
+      onChange?.(supplier?.map((item) => item.suppId));
     } else {
-      onChange?.(supplier[0].suppId);
+      onChange?.(supplier?.[0].suppId);
     }
-    setInputValue(supplier.map((item) => item.suppName).join(','));
+    setInputValue(supplier?.map((item) => item.suppName).join(','));
     handleCancel();
   };
   useEffect(() => {
@@ -96,9 +97,11 @@ export const SupplierSelect: React.FC<{
         style={{ width: '100%' }}
         disabled={disabled}
         suffix={
-          <DashOutlined
+          <ClearOutlined
             onClick={() => {
-              setVisible(true);
+              setInputValue(undefined);
+              handleChange(undefined);
+              suppRef.current?.clearSelected?.();
             }}
           />
         }
@@ -107,6 +110,8 @@ export const SupplierSelect: React.FC<{
         <Supplier
           select={true}
           onChange={handleChange}
+          value={value}
+          ref={suppRef}
           selectParams={{ checkStatus: 2, state: 1 }}
           multiple={multiple}
         />
@@ -122,8 +127,10 @@ export const SkuSelect: React.FC<{
   type?: 'button' | 'input';
   multiple?: boolean;
   labelInValue?: boolean;
-}> = ({ value, onChange, disabled, type = 'button', multiple, labelInValue }) => {
+  accumulate?: boolean;
+}> = ({ value, onChange, disabled, type = 'button', multiple, labelInValue, accumulate }) => {
   const [visible, setVisible] = useState<boolean>(false);
+  const actionRef = useRef<ActionType>();
   const [inputValue, setInputValue] = useState<string | undefined>(() => {
     if (labelInValue) {
       return (value as PUR.Entries[])?.map((i) => i.skuCode).join(', ');
@@ -143,7 +150,11 @@ export const SkuSelect: React.FC<{
       })) || [];
     if (labelInValue) {
       if (multiple) {
-        onChange?.(v);
+        if (accumulate) {
+          onChange?.(v.concat((value as any) || []));
+        } else {
+          onChange?.(v);
+        }
       } else {
         onChange?.(v[0]);
       }
@@ -228,6 +239,7 @@ export const SkuSelect: React.FC<{
             <ClearOutlined
               onClick={() => {
                 setInputValue(undefined);
+                actionRef.current?.clearSelected?.();
                 handleOk([]);
               }}
             />
@@ -253,6 +265,7 @@ export const SkuSelect: React.FC<{
               },
             };
           }}
+          actionRef={actionRef}
           scroll={{ x: 900, y: 350 }}
           rowSelection={multiple ? {} : false}
           rowKey="skuId"
@@ -312,6 +325,7 @@ export enum BussType {
   其他收入单 = 54,
   其他支出单 = 55,
   资金转账单 = 56,
+  盘点 = 100,
 }
 
 export const BussTypeEnum = new Map(
@@ -355,6 +369,7 @@ export enum BussTypeApiUrl {
   销售订单 = '/sales/xhdd',
   销售单 = '/sales/xhd',
   销售退货单 = '/sales/thd',
+  盘点 = '/bis/stockInventory',
 }
 
 export enum BussTypeComponentUrl {
@@ -1217,7 +1232,7 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
             </ProForm.Group>
             <ProForm.Group>
               <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
-                <SkuSelect disabled={checked} multiple labelInValue />
+                <SkuSelect disabled={checked} multiple labelInValue accumulate />
               </ProForm.Item>
               <BussTypeFormField bussType={bussType} disabled={checked} />
             </ProForm.Group>
