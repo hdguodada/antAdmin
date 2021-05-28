@@ -36,15 +36,25 @@ export async function serNumFindList(data: QueryRequest<STORE.SN>): Promise<RowR
  * @returns
  */
 export async function storeReports(
-  params: QueryRequest<PUR.PurchaseOrder>,
+  data: QueryRequest<PUR.PurchaseOrder>,
   headers = { modId: mapModId.store },
   url = '',
 ): Promise<RowResponse<PUR.PurchaseOrder>> {
   return request(url, {
-    params,
     headers,
-    data: {
-      dev: 'bas',
-    },
+    data,
+    method: 'POST',
+  });
+}
+
+export async function storeRowResponseReports(
+  data: QueryRequest<PUR.PurchaseOrder>,
+  headers = { modId: mapModId.store },
+  url = '',
+): Promise<ReportsResponse<PUR.PurchaseOrder>> {
+  return request(url, {
+    headers,
+    data,
+    method: 'POST',
   });
 }

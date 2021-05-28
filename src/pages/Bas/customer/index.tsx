@@ -161,5 +161,5 @@ export const CustomerTable = forwardRef((props: CustomerTableProps, ref) => {
 });
 
 export default () => {
-  return <PageContainer content={<CustomerTable />} />;
+  return <PageContainer title={false} content={<CustomerTable />} />;
 };

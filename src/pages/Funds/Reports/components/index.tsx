@@ -1,14 +1,16 @@
-import { baseSearch } from '@/utils/columns';
-import type { ProColumns } from '@ant-design/pro-table';
+import type { ProTableProps } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
+import type { FormInstance } from 'antd';
+import React, { useRef } from 'react';
 import { useRequest } from 'umi';
 import type { FundsReportItem } from '../index';
 
-const FundReportTable: React.FC<{
-  columns: ProColumns<FundsReportItem>[];
-  url: string;
-}> = ({ columns, url }) => {
-  const { run, error } = useRequest<RowResponse<FundsReportItem>>(
+const FundReportTable: React.FC<
+  {
+    url: string;
+  } & ProTableProps<FundsReportItem, any>
+> = ({ url, ...rest }) => {
+  const { run, data } = useRequest<RowResponse<FundsReportItem>>(
     (params: any) => ({
       url,
       data: {
@@ -18,19 +20,16 @@ const FundReportTable: React.FC<{
     }),
     { manual: true },
   );
+  const formRef = useRef<FormInstance>();
   return (
-    <ProTable<FundsReportItem>
+    <ProTable
       rowKey="autoId"
       options={false}
+      formRef={formRef}
       pagination={false}
-      request={async (params) => {
-        return {
-          data: await (await run({ queryFilter: params })).rows,
-          success: !error,
-        };
-      }}
-      columns={columns}
-      search={baseSearch({})}
+      dataSource={data?.rows}
+      onSubmit={(params) => run(params)}
+      {...rest}
     />
   );
 };

@@ -7,7 +7,7 @@ import { FundsTable } from '../components';
 export default () => {
   return (
     <GlobalWrapper type="list">
-      <PageContainer content={<FundsTable bussType={BussType.收款单} />} />
+      <PageContainer title={false} content={<FundsTable bussType={BussType.收款单} />} />
     </GlobalWrapper>
   );
 };

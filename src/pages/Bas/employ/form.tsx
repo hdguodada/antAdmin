@@ -54,7 +54,9 @@ const EmpLoyForm: React.FC<FormProps> = (props) => {
       <ProForm.Group>
         <ProFormText width="md" name="empCd" label="员工编号" rules={patternMsg.text('')} />
         <ProFormText width="md" name="empName" label="员工名称" rules={patternMsg.text('')} />
-        <DepSelect showNew={true} name={'depId'} label={'所属部门'} />
+        <ProForm.Item name={'depId'} label={'所属部门'}>
+          <DepSelect showNew={true} />
+        </ProForm.Item>
         <ProFormText width="md" name="idcard" label="身份证" />
         <ProFormDatePicker width="md" name="birthday" label="出生日期" />
         <ProFormText width="md" name="sex" label="性别" />

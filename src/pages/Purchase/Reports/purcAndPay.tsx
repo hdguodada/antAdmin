@@ -94,31 +94,33 @@ export default () => {
       request={async (params) => {
         return run(params);
       }}
-      summary={() => (
-        <Table.Summary.Row>
-          <Table.Summary.Cell index={0} colSpan={4}>
-            合计
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={2}>
-            <Text type="danger">¥{data?.summary?.totalAmount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={3}>
-            <Text type="danger">¥{data?.summary?.reducedAmount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={4}>
-            <Text type="danger">¥{data?.summary?.amount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={5}>
-            <Text type="danger">¥{data?.summary?.payedAmount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={6}>
-            <Text type="danger">¥{data?.summary?.payableAmount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={7}>
-            <Text type="danger">{data?.summary?.backRateStr}</Text>
-          </Table.Summary.Cell>
-        </Table.Summary.Row>
-      )}
+      summary={() =>
+        !(data?.summary instanceof Array) && (
+          <Table.Summary.Row>
+            <Table.Summary.Cell index={0} colSpan={4}>
+              合计
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={2}>
+              <Text type="danger">¥{data?.summary?.totalAmount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={3}>
+              <Text type="danger">¥{data?.summary?.reducedAmount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={4}>
+              <Text type="danger">¥{data?.summary?.amount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={5}>
+              <Text type="danger">¥{data?.summary?.payedAmount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={6}>
+              <Text type="danger">¥{data?.summary?.payableAmount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={7}>
+              <Text type="danger">{data?.summary?.backRateStr}</Text>
+            </Table.Summary.Cell>
+          </Table.Summary.Row>
+        )
+      }
     />
   );
 };

@@ -1,5 +1,5 @@
 import type { FormInstance } from 'antd';
-import { Button, InputNumber, message, Select, Space } from 'antd';
+import { Button, message, Select, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRequest, history, useModel } from 'umi';
 import {
@@ -10,6 +10,7 @@ import {
   updPurchase,
 } from '@/services/Purchase';
 import type { AdvancedSearchFormField } from '@/utils/columns';
+import { bussTypeColumns, dateRangeColumns } from '@/utils/columns';
 import {
   AdvancedSearch,
   AdvancedSearchForm,
@@ -29,7 +30,6 @@ import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import {
-  BussTypeEnum,
   calAmountTitle,
   calPriceTitle,
   CheckAudit,
@@ -74,26 +74,13 @@ export const StoreTableColumns = ({
   const base: ProColumns<PUR.Purchase>[] = [
     keywordColumns({ placeholder: '请输入编号或者客户名称查询' }),
     indexColumns,
-    {
-      title: '单据日期',
+    dateRangeColumns({
       dataIndex: 'date',
-      valueType: 'dateRange',
-      hideInTable: true,
-      initialValue: [moment().startOf('month'), moment()],
-      search: {
-        transform: (value) => ({
-          beginDate: value[0],
-          endDate: value[1],
-        }),
-      },
-    },
-    {
-      dataIndex: 'date',
-      title: '单据日期',
-      valueType: 'date',
-      search: false,
-    },
-    billNoColumns(),
+    }),
+    billNoColumns({
+      fixed: 'left',
+      bussType,
+    }),
     crtNameColumns(),
     checkName(),
     memoColumns(),
@@ -109,7 +96,9 @@ export const StoreTableColumns = ({
         showSysInfo(res);
       },
     }),
-    checkStatusColumns(false),
+    checkStatusColumns({
+      search: false,
+    }),
   ];
   return bussType === BussType.调拨单
     ? base.concat([
@@ -139,17 +128,12 @@ export const StoreTableColumns = ({
         },
       ])
     : base.concat([
-        {
-          dataIndex: 'bussType',
-          title: '业务类别',
-          search: false,
-          valueType: 'select',
-          valueEnum: BussTypeEnum,
-        },
+        bussTypeColumns(),
         {
           title: () => (bussType === BussType.其他入库单 ? '供应商' : '客户'),
           dataIndex: 'contactName',
           search: false,
+          width: 155,
         },
         totalAmountColumns({
           title: '金额',
@@ -186,7 +170,8 @@ export function StoreTable(props: StoreTableProps) {
             }
             return '';
           }}
-          scroll={{ x: 1500 }}
+          bordered
+          scroll={{ x: 2500 }}
           params={advancedSearchFormValues}
           actionRef={actionRef}
           search={AdvancedSearch({
@@ -201,7 +186,7 @@ export function StoreTable(props: StoreTableProps) {
                 bussType={bussType}
               />,
             ],
-            other: {
+            searchConfig: {
               defaultCollapsed: false,
             },
             myReset: () => {
@@ -317,7 +302,7 @@ export const StoreForm = (props: StoreFormProps) => {
         </Button>,
       ],
     },
-    skuIdColumns,
+    skuIdColumns({ search: false, editable: false }),
     {
       title: () => (
         <div>
@@ -366,22 +351,32 @@ export const StoreForm = (props: StoreFormProps) => {
       ),
       dataIndex: 'qty',
       valueType: 'digit',
-      renderFormItem: ({ index }) => {
-        const entries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
-        if (
-          getOrderType(OrderType.订单).indexOf(bussType) < 0 &&
-          entries[index as number].isSerNum
-        ) {
-          return (
-            <SN
-              entries={entries}
-              index={index as number}
-              formRef={formRef}
-              stockType={bussType === BussType.其他入库单 ? StockType.入库 : StockType.出库}
-            />
-          );
-        }
-        return <InputNumber min={0} style={{ width: 104 }} />;
+      editable: false,
+      width: 255,
+      render: (_, record) => {
+        return (
+          <SN
+            sku={record}
+            disabled={checked || (record.currentQty || 0) <= 0}
+            initValue={{
+              qty: record.qty || 0,
+              serNumList: record.serNumList || [],
+            }}
+            onChange={(v) => {
+              const oldEntries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
+              const newEntries: PUR.Entries[] = oldEntries.map((en) => {
+                return record.skuId === en.skuId
+                  ? { ...en, qty: v.qty, serNumList: v.serNumList }
+                  : en;
+              });
+              formRef.current?.setFieldsValue({
+                entries: newEntries,
+              });
+              calPrice({ entries: newEntries }, formRef);
+            }}
+            stockType={bussType === BussType.其他入库单 ? StockType.入库 : StockType.出库}
+          />
+        );
       },
     },
     {
@@ -455,14 +450,11 @@ export const StoreForm = (props: StoreFormProps) => {
           const pageBussType = bussType === BussType.其他入库单 ? BussType.盘盈 : BussType.盘亏;
           let entries: PUR.Entries[];
           if (inventoryInfo.isSerNum) {
-            entries = [];
-          } else {
             entries = inventoryInfo.entries
               .filter((i) => {
-                // 如果是盘盈 取正值部分,否则取
                 return pageBussType === BussType.盘盈
-                  ? i.inventoryResult > 0
-                  : i.inventoryResult < 0;
+                  ? i.inventoryResult.newSerNum?.length
+                  : i.inventoryResult.delSerNum?.length;
               })
               .map((item) => ({
                 skuId: item.skuId,
@@ -470,7 +462,36 @@ export const StoreForm = (props: StoreFormProps) => {
                 unitId: item.unitId,
                 unitName: item.unitName,
                 currentQty: item.qty,
-                qty: Math.abs(item.inventoryResult),
+                qty: Math.abs(
+                  pageBussType === BussType.盘盈
+                    ? item.inventoryResult.newSerNum?.length || 0
+                    : item.inventoryResult.delSerNum?.length || 0,
+                ),
+                storeCd: item.storeCd,
+                autoId: item.autoId,
+                inventoryId: inventoryInfo.billId,
+                unitList: [{ unitId: item.unitId, rate: 1, unitName: item.unitName, autoId: 123 }],
+                isSerNum: true,
+                serNumList:
+                  pageBussType === BussType.盘盈
+                    ? item.inventoryResult.newSerNum
+                    : item.inventoryResult.delSerNum,
+              }));
+          } else {
+            entries = inventoryInfo.entries
+              .filter((i) => {
+                // 如果是盘盈 取正值部分,否则取
+                return pageBussType === BussType.盘盈
+                  ? (i.inventoryResult.length || 0) > 0
+                  : (i.inventoryResult.length || 0) < 0;
+              })
+              .map((item) => ({
+                skuId: item.skuId,
+                skuName: item.skuName,
+                unitId: item.unitId,
+                unitName: item.unitName,
+                currentQty: item.qty,
+                qty: Math.abs(item.inventoryResult.length || 0),
                 storeCd: item.storeCd,
                 autoId: item.autoId,
                 inventoryId: inventoryInfo.billId,
@@ -478,6 +499,7 @@ export const StoreForm = (props: StoreFormProps) => {
               }));
           }
           setEditableKeys(entries.map((i) => i.autoId));
+          console.log('inventoryInfo', entries);
           return {
             data: {
               ...res,
@@ -528,7 +550,7 @@ export const StoreForm = (props: StoreFormProps) => {
         onFinish={async (values) => {
           // 新增或修改时,对序列号商品进行基本单位判断.购货订单无需序列号
           const ttt = values?.entries?.filter((item) => {
-            if (item.isSerNum) {
+            if (item.isSerNum && !inventoryInfo) {
               if (item.unitId !== item.baseUnitId) {
                 message.error(`商品${item.skuName}录入序列号时，请选择基本计量单位！`);
                 return true;
@@ -640,7 +662,18 @@ export const StoreForm = (props: StoreFormProps) => {
         </ProForm.Group>
         <ProForm.Group>
           <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
-            <SkuSelect disabled={checked} multiple labelInValue accumulate />
+            <SkuSelect
+              disabled={checked}
+              multiple
+              labelInValue
+              accumulate
+              onChange={(v) => {
+                setEditableKeys((v as PUR.Entries[]).map((i) => i.autoId));
+                formRef.current?.setFieldsValue({
+                  entries: v,
+                });
+              }}
+            />
           </ProForm.Item>
           {
             // 其他入库单 盘盈 ,其他入库
@@ -697,11 +730,6 @@ export const StoreForm = (props: StoreFormProps) => {
             }
             recordCreatorProps={false}
             columns={columns}
-            onRow={(r) => ({
-              onClick: () => {
-                setEditableKeys([r.autoId]);
-              },
-            })}
             editable={{
               type: 'multiple',
               editableKeys,

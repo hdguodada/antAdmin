@@ -2,6 +2,7 @@
   {
     path: '/',
     redirect: '/desktop',
+    layout: false,
   },
   // 用户登录
   {
@@ -33,7 +34,7 @@
     routes: [
       {
         name: 'purcOrder',
-        path: 'purcOrder',
+        path: '/bis/purcOrder',
         component: './Purchase/Ghdd',
       },
       {
@@ -251,11 +252,6 @@
         path: 'supplier/:id',
         component: './Bas/supplier/form',
         hideInMenu: true,
-      },
-      {
-        name: 'employ',
-        path: 'employ',
-        component: './Bas/employ',
       },
       {
         name: 'store',

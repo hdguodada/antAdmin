@@ -1,24 +1,19 @@
 import React, { useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import type { ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import {
-  baseSearch,
-  fixWdithColumns,
-  indexColumns,
-  optionColumns,
-  srcOrderColumns,
-  storeCdColumns,
-} from '@/utils/columns';
-import { Dropdown, FormInstance, Menu } from 'antd';
+import { baseSearch, fixWdithColumns, indexColumns, optionColumns } from '@/utils/columns';
+import type { FormInstance } from 'antd';
+import { Button, Dropdown, Menu, Space } from 'antd';
 import { TreeSelect } from 'antd';
 import { delPdRecordList, queryPdRecordList } from '@/services/Store';
-import { DatePicker } from 'antd';
 import moment from 'moment';
 import GlobalWrapper from '@/components/GlobalWrapper';
 import { history, useModel } from 'umi';
 import { BussTypeComponentUrl } from '@/pages/Purchase/components';
 import { DownOutlined } from '@ant-design/icons';
+import { showSysInfo } from '@/components/SysInfo';
+import { delPurchase } from '@/services/Purchase';
 
 export const InventoryTable: React.FC = () => {
   const { treeDataSimpleMode } = useModel('productType', (model) => ({
@@ -126,13 +121,32 @@ export const InventoryTable: React.FC = () => {
     fixWdithColumns(),
   ];
   const formRef = useRef<FormInstance<STORE.invOiParams>>();
+  const actionRef = useRef<ActionType>();
 
   return (
     <ProTable<STORE.invOiForm, STORE.invOiParams>
       columns={columns}
       rowKey="billId"
       formRef={formRef}
+      actionRef={actionRef}
       options={false}
+      rowSelection={{}}
+      tableAlertOptionRender={({ selectedRowKeys }) => {
+        return (
+          <Space size={16}>
+            <Button
+              danger
+              onClick={async () => {
+                const res = await delPurchase(selectedRowKeys, `/bis/stockInventory/del`);
+                showSysInfo(res);
+                actionRef.current?.reload();
+              }}
+            >
+              批量删除
+            </Button>
+          </Space>
+        );
+      }}
       pagination={{ pageSize: 10 }}
       request={async (params) => {
         const res = await queryPdRecordList(params);

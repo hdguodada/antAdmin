@@ -1,18 +1,20 @@
-import React, { useRef, useState } from 'react';
-import type { ActionType, ProColumns } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
-import { useModel } from 'umi';
-import { Tag } from 'antd';
 import { delProductType, queryProductTypesInfo } from '@/services/Bas';
-import ProductTypeForm from './form';
 import { optionColumns, refreshAndNew } from '@/utils/columns';
-import Style from '@/global.less';
+import type { ActionType, ProColumns, ProTableProps } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
+import { Tag } from 'antd';
+import React, { useRef, useState } from 'react';
+import { useModel } from 'umi';
+import ProductTypeForm from './form';
+import styles from './index.less';
 
-export const ProdcutTypeTable: React.FC<{
+type ProductTypeTableProps = {
   inSpuPage?: boolean;
   cateId?: K;
-  onChange?: (id: K) => void;
-}> = ({ inSpuPage, cateId, onChange }) => {
+  setcateId?: any;
+} & ProTableProps<BAS.ProductType, any>;
+export default function ProdcutTypeTable(props: ProductTypeTableProps) {
+  const { inSpuPage, cateId, setcateId, ...rest } = props;
   const { tree, queryProductType } = useModel('productType', (model) => ({
     queryProductType: model.query,
     tree: model.tree,
@@ -26,7 +28,6 @@ export const ProdcutTypeTable: React.FC<{
       title: '商品类别',
       dataIndex: 'cateId',
       search: false,
-      fixed: 'left',
       render: (_, record) => <div>{record.cateName}</div>,
     },
     {
@@ -61,7 +62,7 @@ export const ProdcutTypeTable: React.FC<{
           queryProductType();
         });
       },
-      fixed: 'right',
+      hideInTable: inSpuPage,
     }),
   ];
   return (
@@ -85,23 +86,21 @@ export const ProdcutTypeTable: React.FC<{
         onRow={(record) => {
           return {
             onClick: () => {
-              if (record.cateId) {
-                onChange?.(record.cateId);
+              if (record.cateId && record.isLeaf) {
+                setcateId?.(record.cateId);
               }
             },
           };
         }}
         rowKey="cateId"
         rowClassName={(record) => {
-          return record.cateId === cateId ? Style.myLink : '';
+          return record.cateId === cateId ? styles['split-row-select-active'] : '';
         }}
         actionRef={actionRef}
         options={false}
+        dataSource={tree[0].children}
         columns={columns}
-        postData={(v) => v[0].children}
-        request={async (params) => {
-          return queryProductType(params);
-        }}
+        {...rest}
       />
       <ProductTypeForm
         action={formAction}
@@ -112,7 +111,4 @@ export const ProdcutTypeTable: React.FC<{
       />
     </>
   );
-};
-export default () => {
-  return <ProdcutTypeTable />;
-};
+}

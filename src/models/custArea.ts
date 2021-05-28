@@ -1,26 +1,20 @@
 import { useState, useCallback } from 'react';
-import { queryCustArea as query, queryCustAreaTree as queryTree } from '@/services/Bas';
+import { queryCustAreaTree as queryTree } from '@/services/Bas';
+import { transformTreeData } from '@/utils/utils';
+import type { DataNode } from 'antd/lib/tree';
 
 export default () => {
-  const [list, setList] = useState<BAS.CustArea[]>([]);
   const [tree, setTreeList] = useState<BAS.CustArea[]>([]);
-  const [treeDataSimpleMode, setTreeDataSimpleMode] = useState<TreeData>([]);
-  const queryCustArea = useCallback(async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
-    const response = await query(data, headers);
-    setList(response.data.rows);
-    setTreeDataSimpleMode(
-      response.data.rows.map((i) => ({
-        id: i.areaId,
-        value: i.areaId,
-        title: i.areaName,
-        pId: i.pareaId,
-      })),
-    );
-    return response;
-  }, []);
+  const [treeDataSimpleMode, setTreeDataSimpleMode] = useState<DataNode[]>([]);
+  const [leafCanClickTreeData, setLeafCanClickTreeData] = useState<DataNode[]>();
+
   const queryCustAreaTree = useCallback(
     async (data = { pageNumer: -1 }, headers = { modId: '92' }) => {
       const response = await queryTree(data, headers);
+      setTreeDataSimpleMode(transformTreeData(response.data.rows));
+      setLeafCanClickTreeData(
+        transformTreeData(response.data.rows, 'attrList', undefined, undefined, undefined, true),
+      );
       setTreeList(response.data.rows);
       return response;
     },
@@ -28,10 +22,9 @@ export default () => {
   );
 
   return {
-    list,
-    queryCustArea,
     treeDataSimpleMode,
     queryCustAreaTree,
+    leafCanClickTreeData,
     tree,
   };
 };

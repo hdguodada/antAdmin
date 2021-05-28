@@ -17,13 +17,13 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
 import type { FormInstance } from 'antd';
-import { Upload, Tooltip, Space, message, Button, Select, Input, TreeSelect, Image } from 'antd';
+import { Upload, Tooltip, Space, message, Button, Select, Input, Image } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { useModel, useParams, useRequest, history, useLocation } from 'umi';
 import Style from '@/global.less';
 import GlobalWrapper from '@/components/GlobalWrapper';
 import { optionColumns } from '@/utils/columns';
-import { RefTreeSelectProps } from 'antd/lib/tree-select';
+import { ProductBrandSelect, ProductTypeTreeSelect, StoreSelect } from '@/utils/form';
 
 const { Option } = Select;
 
@@ -164,9 +164,7 @@ export const ProductDetail = () => {
   const isNew = id === 'new';
   const mulspecListTableRef = useRef<ActionType>();
   // 全局模块的加载 Start
-  const { treeDataSimpleMode } = useModel('productType', (model) => ({
-    treeDataSimpleMode: model.treeDataSimpleMode,
-  }));
+
   const { unitOptions } = useModel('unit', (model) => ({
     unitOptions: model.options,
   }));
@@ -407,7 +405,7 @@ export const ProductDetail = () => {
           ...initialValues,
           mulspecList,
           spuCode,
-          cateId: +(location as any).query.cateId,
+          cateId: cateId > 0 ? cateId : undefined,
           selectedValueList,
         },
       };
@@ -640,7 +638,8 @@ export const ProductDetail = () => {
               label="商品名称"
               rules={patternMsg.text('商品名称')}
             />
-            <ProFormSelect
+            <ProductBrandSelect
+              showNew
               width="md"
               name="brandId"
               label="品牌"
@@ -653,22 +652,21 @@ export const ProductDetail = () => {
               style={{ width: '328px' }}
               rules={patternMsg.select('商品类别')}
             >
-              <TreeSelect
-                showSearch
-                allowClear
-                treeDefaultExpandAll
-                treeData={treeDataSimpleMode}
-                treeNodeFilterProp="title"
-                onSelect={async (_, option) => {
-                  if (!option.attrList.length) {
-                    message.warn('此类别下没有属性');
-                  }
-                  setSpecListEditableKeys(
-                    (option.attrList as BAS.Attr[]).map((item) => item.attrId as React.Key),
-                  );
-                  formRef.current?.setFieldsValue({
-                    selectedValueList: option.attrList,
-                  });
+              <ProductTypeTreeSelect
+                isLeaf
+                showNew
+                fieldProps={{
+                  onSelect: async (_, option) => {
+                    if (!option.attrList.length) {
+                      message.warn('此类别下没有属性');
+                    }
+                    setSpecListEditableKeys(
+                      (option.attrList as BAS.Attr[]).map((item) => item.attrId as React.Key),
+                    );
+                    formRef.current?.setFieldsValue({
+                      selectedValueList: option.attrList,
+                    });
+                  },
                 }}
               />
             </ProForm.Item>
@@ -678,7 +676,8 @@ export const ProductDetail = () => {
               width="md"
               rules={patternMsg.text('商品编号')}
             />
-            <ProFormSelect
+            <StoreSelect
+              showNew
               width="md"
               name="storeCd"
               label="首选仓库"

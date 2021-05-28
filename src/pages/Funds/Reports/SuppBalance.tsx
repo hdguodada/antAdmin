@@ -2,7 +2,6 @@ import {
   billNoColumns,
   bussTypeColumns,
   cateIdColumns,
-  customerColumns,
   dateRangeColumns,
   memoColumns,
   moneyColumns,
@@ -10,6 +9,7 @@ import {
   skuIdColumns,
   spuCodeColumns,
   srcOrderColumns,
+  suppColumns,
   unitIdColumns,
 } from '@/utils/columns';
 import type { ProColumnType, ProTableProps } from '@ant-design/pro-table';
@@ -71,19 +71,19 @@ export const CustomerBalanceEntries: React.FC<CustomerBalanceEntriesProps> = ({
   return <ProTable options={false} pagination={false} search={false} columns={columns} {...rest} />;
 };
 
-export default function CustomerBalance() {
+export default function SuppBalance() {
   const columns: ProColumnType<any>[] = [
-    customerColumns(undefined, {
+    dateRangeColumns(),
+    suppColumns(undefined, {
       hideInTable: true,
       formItemProps: {
         rules: patternMsg.select(''),
       },
     }),
-    dateRangeColumns(),
     billNoColumns(),
     bussTypeColumns(),
     {
-      title: '增加应付款',
+      title: '采购金额',
       dataIndex: 'totalAmount',
       search: false,
       valueType: 'money',
@@ -96,29 +96,23 @@ export default function CustomerBalance() {
       valueType: 'money',
       width: 105,
     },
+
     {
-      title: '客户承担费用',
-      dataIndex: 'postfee',
-      search: false,
-      valueType: 'money',
-      width: 105,
-    },
-    {
-      title: '应收金额',
+      title: '应付金额',
       dataIndex: 'amount',
       search: false,
       valueType: 'money',
       width: 105,
     },
     {
-      title: '实际收款金额',
+      title: '实际付款金额',
       dataIndex: 'rpAmount',
       search: false,
       valueType: 'money',
       width: 105,
     },
     {
-      title: '应收款余额',
+      title: '应付款余额',
       dataIndex: 'inAmount',
       search: false,
       valueType: 'money',

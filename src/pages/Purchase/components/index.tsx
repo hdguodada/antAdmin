@@ -10,6 +10,7 @@ import type { FormInstance } from 'antd';
 import { Button, Input, message, Select, Space } from 'antd';
 import { ClearOutlined, SearchOutlined } from '@ant-design/icons';
 import {
+  cateIdColumns,
   currentQtyColumns,
   indexColumns,
   keywordColumns,
@@ -21,7 +22,7 @@ import {
   tableAlertOptionRenderDom,
 } from '@/utils/columns';
 import { getCode } from '@/services/Sys';
-import { calPrice } from '@/utils/utils';
+import { calPrice, transProTableParamsToMyRequest } from '@/utils/utils';
 import { patternMsg } from '@/utils/validator';
 import { AccountSelect, DepSelect, UserSelect } from '@/utils/form';
 import { useModel, useParams, useRequest, history, useLocation } from 'umi';
@@ -41,7 +42,6 @@ import { EditableProTable } from '@ant-design/pro-table';
 import { CheckTwoButton } from '@/components/CheckButton';
 import { SN } from '@/pages/Store/serNum/serNumDetail';
 import { queryPurchaseUnStockIn } from '@/services/Purchase';
-import { InputNumber } from 'antd';
 import { getCurrentStock, getSkuStock } from '@/services/Store';
 import ProCard from '@ant-design/pro-card';
 import GlobalWrapper from '@/components/GlobalWrapper';
@@ -67,7 +67,7 @@ export const SupplierSelect: React.FC<{
     if (value && suppName) {
       return suppName;
     }
-    return '';
+    return undefined;
   });
   const handleChange = (supplier?: BAS.Supplier[]) => {
     if (labelInValue) {
@@ -85,7 +85,7 @@ export const SupplierSelect: React.FC<{
     handleCancel();
   };
   useEffect(() => {
-    setInputValue(suppName || '');
+    setInputValue(suppName);
   }, [suppName]);
   return (
     <>
@@ -127,7 +127,7 @@ export const SkuSelect: React.FC<{
   type?: 'button' | 'input';
   multiple?: boolean;
   labelInValue?: boolean;
-  accumulate?: boolean;
+  accumulate?: boolean; // 是否累加
 }> = ({ value, onChange, disabled, type = 'button', multiple, labelInValue, accumulate }) => {
   const [visible, setVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
@@ -135,7 +135,10 @@ export const SkuSelect: React.FC<{
     if (labelInValue) {
       return (value as PUR.Entries[])?.map((i) => i.skuCode).join(', ');
     }
-    return value?.join(', ');
+    if (Array.isArray(value)) {
+      return value?.join(', ');
+    }
+    return '';
   });
   const handleOk = (recordList: PUR.Entries[]) => {
     const v =
@@ -171,23 +174,13 @@ export const SkuSelect: React.FC<{
       placeholder: '请输入商品名称或编码',
     }),
     indexColumns,
-    {
-      dataIndex: 'skuName',
-      title: '商品名称',
-      search: false,
-      fixed: 'left',
-    },
+    skuIdColumns({ search: false }),
     skuCodeColumns,
-    {
-      dataIndex: 'cateName',
-      title: '商品类别',
-      search: false,
-    },
+    cateIdColumns({ search: false }),
     currentQtyColumns(),
     {
       dataIndex: 'isSerNum',
-      title: '是否序列号管理',
-      search: false,
+      title: '序列号管理',
       valueType: 'select',
       // @ts-ignore
       valueEnum: new Map([
@@ -288,11 +281,7 @@ export const SkuSelect: React.FC<{
             ]);
           }}
           request={async (params) => {
-            const response = await querySkuList({
-              ...params,
-              pageNumber: params.current,
-              queryFilter: params,
-            });
+            const response = await querySkuList(transProTableParamsToMyRequest(params));
             return {
               data: response.data.rows,
               success: response.code === 0,
@@ -318,7 +307,9 @@ export enum BussType {
   盘盈 = 41,
   其他出库单 = 42,
   盘亏 = 43,
-  调拨单 = 44,
+  调拨出库 = 44,
+  调拨入库 = 45,
+  调拨单 = 46,
   付款单 = 50,
   收款单 = 51,
   核销单 = 53,
@@ -548,7 +539,7 @@ export const BussTypeFormField = ({
 };
 
 export const SkuStock: React.FC<{
-  skuId: React.Key;
+  skuId: K;
   skuName: string;
 }> = ({ skuId, skuName }) => {
   return (
@@ -604,7 +595,7 @@ export const StoreSelectChangeCurrentQty: React.FC<{
   );
   return (
     <Space>
-      <SkuStock skuId={entries[index].skuId} skuName={entries[index].skuName} />
+      <SkuStock skuId={entries[index].skuId} skuName={entries[index].skuName || ''} />
       <Select
         options={storeOptions}
         loading={loading}
@@ -776,22 +767,22 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
         </Button>,
       ],
     },
-    skuIdColumns,
+    skuIdColumns({ search: false, editable: false }),
     {
       title: () => (
         <div>
-          <span className="error-color">*</span>单位
+          <span className="error-color">*</span>
         </div>
       ),
       dataIndex: 'unitId',
       render: (_, record) => <div>{record.unitName}</div>,
       renderFormItem: ({ index }) => {
         const entries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
-        if (entries[index as number].unitList) {
+        if (index !== undefined && entries[index].unitList) {
           return (
             <Select
               style={{ width: '216px' }}
-              options={entries[index as number].unitList.map((unit) => ({
+              options={entries[index].unitList?.map((unit) => ({
                 label: unit.unitName,
                 value: unit.unitId,
               }))}
@@ -808,19 +799,20 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
           <span className="error-color">*</span>数量
         </div>
       ),
-      dataIndex: 'qty',
+      dataIndex: 'qtyMid',
       valueType: 'digit',
+      width: 255,
+      render: (_, record) => <div>{record.qty}</div>,
       renderFormItem: ({ index }) => {
-        const entries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
-        if (
-          getOrderType(OrderType.订单).indexOf(bussType) < 0 &&
-          entries[index as number].isSerNum
-        ) {
+        if (index !== undefined) {
+          const entries = formRef.current?.getFieldValue('entries');
           return (
             <SN
-              entries={entries}
-              index={index as number}
-              formRef={formRef}
+              sku={entries[index]}
+              initValue={{
+                qty: entries[index].qty || 0,
+                serNumList: entries[index].serNumList || [],
+              }}
               stockType={
                 [BussType.采购单, BussType.采购订单].indexOf(bussType) > -1
                   ? StockType.入库
@@ -829,7 +821,7 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
             />
           );
         }
-        return <InputNumber min={0} style={{ width: 104 }} />;
+        return <div />;
       },
     },
     {
@@ -955,13 +947,32 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
       }
       recordCreatorProps={false}
       columns={columns}
+      postData={(v) =>
+        v.map((i) => ({
+          ...i,
+          qtyMid: {
+            qty: i.qty,
+            serNumList: i.serNumList,
+          },
+        }))
+      }
       editable={{
         type: 'multiple',
         editableKeys,
         onChange: setEditableKeys,
         actionRender: (row, config, defaultDom) => [defaultDom.delete],
         onValuesChange: (record, recordList) => {
-          onChange?.(recordList);
+          onChange?.(
+            recordList.map((i) => {
+              return i.autoId === record.autoId
+                ? {
+                    ...i,
+                    qty: i.qtyMid?.qty || 0,
+                    serNumList: i.qtyMid?.serNumList || [],
+                  }
+                : i;
+            }),
+          );
         },
       }}
       value={value}
@@ -1219,13 +1230,27 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
               />
               {getOrderType(OrderType.购货).indexOf(bussType) > -1 && (
                 <>
-                  <DepSelect name="depId" label="采购部门" showNew disabled={checked} />
+                  <ProForm.Item name="depId" label="采购部门">
+                    <DepSelect
+                      showNew
+                      fieldProps={{
+                        disabled: checked,
+                      }}
+                    />
+                  </ProForm.Item>
                   <UserSelect showNew name="operId" label="采购员" disabled={checked} />
                 </>
               )}
               {getOrderType(OrderType.销货).indexOf(bussType) > -1 && (
                 <>
-                  <DepSelect name="depId" label="销售部门" showNew disabled={checked} />
+                  <ProForm.Item name="depId" label="销售部门">
+                    <DepSelect
+                      showNew
+                      fieldProps={{
+                        disabled: checked,
+                      }}
+                    />
+                  </ProForm.Item>
                   <UserSelect showNew name="operId" label="销售员" disabled={checked} />
                 </>
               )}

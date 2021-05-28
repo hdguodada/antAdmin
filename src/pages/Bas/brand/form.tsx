@@ -1,21 +1,12 @@
 import ProForm, { ProFormText, ModalForm, ProFormUploadDragger } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
 import React, { useRef } from 'react';
-import type { ActionType } from '@ant-design/pro-table';
 import { addBrand, updBrand } from '@/services/Bas';
 import { StateForm } from '@/utils/form';
 import { patternMsg } from '@/utils/validator';
 import { useModel } from 'umi';
 
-type FormProps = {
-  action: 'add' | 'upd';
-  actionRef?: React.MutableRefObject<ActionType | undefined>;
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-  initialValues: BAS.Brand;
-  addCb?: () => void;
-};
-export default (props: FormProps) => {
+export default function BrandForm(props: FormProps<BAS.Brand>) {
   const { action, visible, setVisible, initialValues } = props;
   const formRef = useRef<FormInstance>();
   const { query } = useModel('brand', (model) => ({
@@ -27,7 +18,7 @@ export default (props: FormProps) => {
         state: 1,
       }}
       formRef={formRef}
-      title={action === 'add' ? '新建商品品牌' : `修改商品品牌(${initialValues.brandName})`}
+      title={action === 'add' ? '新建商品品牌' : `修改商品品牌(${initialValues?.brandName})`}
       visible={visible}
       onFinish={async (values) => {
         if (action === 'upd') {
@@ -47,7 +38,7 @@ export default (props: FormProps) => {
         } else {
           formRef.current?.resetFields();
         }
-        setVisible(v);
+        setVisible?.(v);
       }}
     >
       <ProForm.Group>
@@ -90,4 +81,4 @@ export default (props: FormProps) => {
       {StateForm}
     </ModalForm>
   );
-};
+}

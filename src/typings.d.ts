@@ -37,7 +37,7 @@ type RowResponse<T> = {
     pageSize: number;
     pageNumber: number;
     columns?: string[];
-    summary?: Record<string, number>;
+    summary?: Record<string, any> | Record<string, any>[];
   };
   msg: string;
 };

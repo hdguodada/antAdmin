@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import { getCode } from '@/services/Sys';
 
 const { confirm } = Modal;
-const DepForm: React.FC<FormProps<BAS.Store>> = (props) => {
+const StoreForm: React.FC<FormProps<BAS.Store>> = (props) => {
   const { action, actionRef, visible, setVisible, initialValues } = props;
   const { query } = useModel('store', (model) => ({
     query: model.query,
@@ -86,4 +86,4 @@ const DepForm: React.FC<FormProps<BAS.Store>> = (props) => {
   );
 };
 
-export default DepForm;
+export default StoreForm;

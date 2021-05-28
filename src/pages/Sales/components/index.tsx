@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import type { FormInstance } from 'antd';
-import { Button, InputNumber, message, Select, Space } from 'antd';
+import { Button, message, Select, Space, Typography } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRequest, history, useParams, useLocation, useModel } from 'umi';
 import {
@@ -12,7 +12,13 @@ import {
   queryPurchaseUnStockIn,
   updPurchase,
 } from '@/services/Purchase';
-import type { AdvancedSearchFormField } from '@/utils/columns';
+import {
+  AdvancedSearchFormField,
+  bussTypeColumns,
+  customerColumns,
+  dateRangeColumns,
+  userColumns,
+} from '@/utils/columns';
 import {
   AdvancedSearch,
   AdvancedSearchForm,
@@ -33,7 +39,6 @@ import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import {
-  BussTypeEnum,
   calAmountTitle,
   calPriceTitle,
   CheckAudit,
@@ -71,6 +76,7 @@ import ProForm, {
 import { patternMsg } from '@/utils/validator';
 import CustomerSelect from '@/pages/Bas/customer/customerSelect';
 import { AccountSelect, DepSelect, UserSelect } from '@/utils/form';
+import { EditableProTableProps } from '@ant-design/pro-table/lib/components/EditableTable';
 
 export type SnapshotQtyProps = {
   skuId: React.Key;
@@ -95,26 +101,13 @@ export const XhTableColumns = ({
   const base: ProColumns<PUR.Purchase>[] = [
     keywordColumns({ placeholder: '请输入编号或者客户名称查询' }),
     indexColumns,
-    {
-      title: '单据日期',
+    dateRangeColumns({
       dataIndex: 'date',
-      valueType: 'dateRange',
-      hideInTable: true,
-      initialValue: [moment().startOf('month'), moment()],
-      search: {
-        transform: (value) => ({
-          beginDate: value[0],
-          endDate: value[1],
-        }),
-      },
-    },
-    {
-      dataIndex: 'date',
-      title: '单据日期',
-      valueType: 'date',
-      search: false,
-    },
-    billNoColumns(),
+    }),
+    billNoColumns({
+      fixed: 'left',
+      bussType,
+    }),
   ];
   return base.concat([
     {
@@ -122,27 +115,19 @@ export const XhTableColumns = ({
       dataIndex: 'deliveryDate',
       search: false,
       valueType: 'date',
+      width: 105,
     },
-    {
-      dataIndex: 'bussType',
-      title: '业务类别',
-      search: false,
-      valueType: 'select',
-      valueEnum: BussTypeEnum,
+    bussTypeColumns({
       hideInTable: bussType !== BussType.销售订单,
-    },
-    {
+    }),
+    userColumns({
       title: '销售员',
       dataIndex: 'operId',
-      render: (_, record) => <div>{record.operName}</div>,
+      render: (_, record) => <div>{(record as any).operName}</div>,
       valueType: 'select',
       valueEnum: userEnum,
-    },
-    {
-      title: '客户',
-      dataIndex: 'custName',
-      search: false,
-    },
+    }),
+    customerColumns(undefined, { search: false }),
     totalAmountColumns({
       title: '销售金额',
     }),
@@ -151,6 +136,7 @@ export const XhTableColumns = ({
       hideInTable: [BussType.销售订单, BussType.销售退货订单].indexOf(bussType) > -1,
       dataIndex: 'hxStateCode',
       valueType: 'select',
+      width: 105,
       search: bussType === BussType.销售订单 ? false : undefined,
       valueEnum:
         bussType === BussType.销售单
@@ -170,7 +156,9 @@ export const XhTableColumns = ({
       [BussType.采购订单, BussType.销售退货订单].indexOf(bussType) < 0,
       [BussType.采购订单, BussType.采购退货订单].indexOf(bussType) > -1 ? undefined : false,
     ),
-    checkStatusColumns(getOrderType(OrderType.购销货).indexOf(bussType) > -1 ? undefined : false),
+    checkStatusColumns({
+      search: getOrderType(OrderType.购销货).indexOf(bussType) > -1 ? undefined : false,
+    }),
     crtNameColumns(),
     checkName(),
     memoColumns(),
@@ -220,7 +208,8 @@ export function XhTable(props: XhTableProps) {
             }
             return '';
           }}
-          scroll={{ x: 1500 }}
+          bordered
+          scroll={{ x: 2500 }}
           params={advancedSearchFormValues}
           actionRef={actionRef}
           search={AdvancedSearch({
@@ -235,7 +224,7 @@ export function XhTable(props: XhTableProps) {
                 bussType={bussType}
               />,
             ],
-            other: {
+            searchConfig: {
               defaultCollapsed: false,
             },
             myReset: () => {
@@ -309,7 +298,7 @@ export function XhTable(props: XhTableProps) {
           }}
         />
       }
-    ></PageContainer>
+    />
   );
 }
 
@@ -325,6 +314,7 @@ export type XhddEntriesProps = {
   bussType: BussType;
   checked: boolean;
   formRef: any;
+  rest?: EditableProTableProps<PUR.Entries, any>;
 };
 export const XhddEntries: React.FC<XhddEntriesProps> = ({
   bussType,
@@ -332,6 +322,7 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
   formRef,
   value,
   onChange,
+  rest,
 }) => {
   const actionRef = useRef<ActionType>();
   const [editableKeys, setEditableKeys] = useState<React.Key[]>();
@@ -355,7 +346,7 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
         </Button>,
       ],
     },
-    skuIdColumns,
+    skuIdColumns({ editable: false }),
     {
       title: () => (
         <div>
@@ -366,46 +357,50 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
       render: (_, record) => <div>{record.unitName}</div>,
       renderFormItem: ({ index }) => {
         const entries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
-        if (entries[index as number].unitList) {
-          return (
-            <Select
-              style={{ width: '216px' }}
-              options={entries[index as number].unitList.map((unit) => ({
-                label: unit.unitName,
-                value: unit.unitId,
-              }))}
-            />
-          );
+        if (index !== undefined) {
+          if (entries[index].unitList) {
+            return (
+              <Select
+                style={{ width: '216px' }}
+                options={entries[index].unitList?.map((unit) => ({
+                  label: unit.unitName,
+                  value: unit.unitId,
+                }))}
+              />
+            );
+          }
         }
         return <div>请先选择商品</div>;
       },
     },
     currentQtyColumns(),
     {
-      title: () => (
-        <div>
-          <span className="error-color">*</span>数量
-        </div>
-      ),
-      dataIndex: 'qty',
+      title: '数量',
+      dataIndex: 'qtyMid',
       valueType: 'digit',
+      formItemProps: {
+        required: true,
+      },
+      width: 155,
       renderFormItem: ({ index }) => {
-        const entries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
-        if (
-          getOrderType(OrderType.订单).indexOf(bussType) < 0 &&
-          entries[index as number].isSerNum
-        ) {
+        const oldEntries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
+        if (index !== undefined) {
+          const record = oldEntries[index];
           return (
             <SN
-              entries={entries}
-              index={index as number}
-              formRef={formRef}
-              stockType={StockType.出库}
+              sku={record}
+              disabled={checked || (record.currentQty || 0) <= 0}
+              initValue={{
+                qty: record.qty || 0,
+                serNumList: record.serNumList || [],
+              }}
+              stockType={bussType === BussType.销售退货单 ? StockType.入库 : StockType.出库}
             />
           );
         }
-        return <InputNumber min={0} style={{ width: 104 }} />;
+        return <div />;
       },
+      render: (_, record) => <Typography.Text type="danger">{record.qty}</Typography.Text>,
     },
     {
       title: () => (
@@ -531,16 +526,36 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
       }
       recordCreatorProps={false}
       columns={columns}
+      postData={(v) =>
+        v.map((i) => ({
+          ...i,
+          qtyMid: {
+            qty: i.qty,
+            serNumList: i.serNumList,
+          },
+        }))
+      }
       editable={{
         type: 'multiple',
         editableKeys,
         onChange: setEditableKeys,
         actionRender: (row, config, defaultDom) => [defaultDom.delete],
         onValuesChange: (record, recordList) => {
-          onChange?.(recordList);
+          onChange?.(
+            recordList.map((i) => {
+              return record.autoId === i.autoId
+                ? {
+                    ...i,
+                    qty: i.qtyMid?.qty || 0,
+                    serNumList: i.qtyMid?.serNumList || [],
+                  }
+                : i;
+            }),
+          );
         },
       }}
       value={value}
+      {...rest}
     />
   );
 };
@@ -818,7 +833,14 @@ export const XhForm = (props: XhFormProps) => {
               disabled
               rules={patternMsg.text('单据编号')}
             />
-            <DepSelect name="depId" label="销售部门" showNew disabled={checked} />
+            <ProForm.Item name="depId" label="销售部门">
+              <DepSelect
+                showNew
+                fieldProps={{
+                  disabled: checked,
+                }}
+              />
+            </ProForm.Item>
             <UserSelect showNew name="operId" label="销售员" disabled={checked} />
           </ProForm.Group>
           <ProForm.Group>

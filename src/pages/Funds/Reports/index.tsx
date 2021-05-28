@@ -1,14 +1,18 @@
 import GlobalWrapper from '@/components/GlobalWrapper';
+import { BussType } from '@/pages/Purchase/components';
 import { PageContainer } from '@ant-design/pro-layout';
 import React from 'react';
 import AccountsPayableDetail from './AccountsPayableDetail';
 import CustomerBalance from './CustomerBalance';
 import FundBalance from './FundBalance';
+import SuppBalance from './SuppBalance';
 
-export type FundsReportItem = {
+export type FundsReportItem = Partial<{
   suppId: K;
   suppName: string;
-};
+  bussType: BussType;
+  entries: PUR.Entries[];
+}>;
 export default () => {
   return (
     <GlobalWrapper type="list">
@@ -36,7 +40,8 @@ export default () => {
           },
           {
             tab: '供应商对账表',
-            key: 'Detail',
+            key: 'SuppBalance',
+            children: <SuppBalance />,
           },
           {
             tab: '其他收支明细表',
@@ -49,7 +54,7 @@ export default () => {
         ]}
         tabProps={{
           type: 'card',
-          defaultActiveKey: 'CustomerBalance',
+          defaultActiveKey: 'SuppBalance',
         }}
       />
     </GlobalWrapper>

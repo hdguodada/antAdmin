@@ -1,26 +1,14 @@
-import { useModel } from '@@/plugin-model/useModel';
 import { addSupplier } from '@/services/Bas';
-import { getCode, queryUsers } from '@/services/Sys';
+import { getCode } from '@/services/Sys';
 import { patternMsg } from '@/utils/validator';
-import SuppTypeForm from '@/pages/Bas/suppType/form';
 import React, { useRef } from 'react';
 import type { FormInstance } from 'antd';
-import { Button, Divider, TreeSelect } from 'antd';
 import { Form } from 'antd';
-import { useState } from 'react';
-import ProForm, { ModalForm, ProFormRadio, ProFormSelect, ProFormText } from '@ant-design/pro-form';
-import { PlusOutlined } from '@ant-design/icons';
+import ProForm, { ModalForm, ProFormRadio, ProFormText } from '@ant-design/pro-form';
 import ProCard from '@ant-design/pro-card';
+import { DepSelect, SuppTreeSelect, UserSelect } from '@/utils/form';
 
 export const BaseSupplierFormGroup = ({ action }: { action: 'add' | 'upd' }) => {
-  const { treeDataSimpleMode } = useModel('suppType', (model) => ({
-    treeDataSimpleMode: model.treeDataSimpleMode,
-  }));
-  const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<BAS.SuppType>();
-  const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
-
-  const { depTree } = useModel('dep', (model) => ({ depTree: model.treeDataSimpleMode }));
   return (
     <>
       <ProForm.Group>
@@ -42,65 +30,24 @@ export const BaseSupplierFormGroup = ({ action }: { action: 'add' | 'upd' }) => 
           style={{ width: '328px' }}
           rules={patternMsg.select('')}
         >
-          <TreeSelect
-            showSearch
-            placeholder="请选择"
-            allowClear
-            treeDefaultExpandAll
-            treeData={treeDataSimpleMode}
-            treeDataSimpleMode={true}
-            treeNodeFilterProp="title"
-            dropdownRender={(menu) => (
-              <div>
-                {menu}
-                <Divider style={{ margin: '4px 0' }} />
-                <Button
-                  style={{ margin: '4px 0' }}
-                  type="ghost"
-                  block
-                  onClick={() => {
-                    setFormAction('add');
-                    setModalFormInit(undefined);
-                    setModalVisit(true);
-                  }}
-                >
-                  <PlusOutlined />
-                  新建供应商类别
-                </Button>
-              </div>
-            )}
-          />
+          <SuppTreeSelect showNew isLeaf />
         </Form.Item>
 
-        <ProFormSelect
+        <UserSelect
           width="md"
           label="采购员"
           name={action === 'add' ? ['basSupplier', 'buyerId'] : 'buyerId'}
           showSearch
+          showNew
           rules={patternMsg.select('')}
-          request={async () => {
-            return (await queryUsers({ pageNumber: -1 })).data.rows.map((item) => ({
-              label: item.realName,
-              value: item.userId,
-            }));
-          }}
         />
-        <Form.Item
-          label="所属部门"
-          style={{ width: '328px' }}
+        <ProForm.Item
           name={action === 'add' ? ['basSupplier', 'depId'] : 'depId'}
-          rules={patternMsg.select('')}
+          style={{ width: '328px' }}
+          label={'所属部门'}
         >
-          <TreeSelect
-            showSearch
-            placeholder="请选择"
-            allowClear
-            treeDefaultExpandAll
-            treeData={depTree}
-            treeDataSimpleMode={true}
-            treeNodeFilterProp="title"
-          />
-        </Form.Item>
+          <DepSelect showNew />
+        </ProForm.Item>
         <ProFormText
           width="md"
           label="Email"
@@ -148,12 +95,6 @@ export const BaseSupplierFormGroup = ({ action }: { action: 'add' | 'upd' }) => 
           ]}
         />
       </ProForm.Group>
-      <SuppTypeForm
-        action={formAction}
-        visible={modalVisit}
-        setVisible={setModalVisit}
-        initialValues={modalFormInit}
-      />
     </>
   );
 };

@@ -86,7 +86,7 @@ declare namespace BAS {
     path: string;
     attrList: Attr[];
     iconUrl: string;
-
+    isLeaf: 0 | 1;
     children: ProductType[];
   } & DefaultField;
   type mulspecListItem = {

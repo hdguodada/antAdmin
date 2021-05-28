@@ -21,18 +21,21 @@ export default function AccountsPayableDetail() {
           dataIndex: 'income',
           search: false,
           valueType: 'money',
+          width: 105,
         },
         {
           title: '增加预付款',
           dataIndex: 'expenditure',
           search: false,
           valueType: 'money',
+          width: 105,
         },
         {
           title: '应付款余额',
           dataIndex: 'balance',
           search: false,
           valueType: 'money',
+          width: 105,
         },
         memoColumns(),
       ]}

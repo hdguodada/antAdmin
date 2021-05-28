@@ -67,7 +67,7 @@ declare namespace PUR {
     code?: K;
     skuImageUrl?: string;
     spec?: string;
-    skuId?: K;
+    skuId: K;
     skuName?: string;
     unitId?: K;
     unitList?: BAS.Unit[];
@@ -82,6 +82,10 @@ declare namespace PUR {
     outDefaultLocationUnitId?: K;
     isSerNum?: boolean;
     qty?: number; // 数量
+    qtyMid?: {
+      qty: number;
+      serNumList: SN[];
+    };
     price?: number; // 单价
     discountRate?: number; // 折扣
     deduction?: number; // 折扣额

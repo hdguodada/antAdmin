@@ -7,7 +7,7 @@ import { BussType } from '@/pages/Purchase/components';
 export default () => {
   return (
     <GlobalWrapper type="list">
-      <PageContainer content={<FundsTable bussType={BussType.核销单} />} />
+      <PageContainer title={false} content={<FundsTable bussType={BussType.核销单} />} />
     </GlobalWrapper>
   );
 };

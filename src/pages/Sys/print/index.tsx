@@ -38,7 +38,7 @@ export class PrintClassDom extends React.PureComponent<{
       );
     const columns: ProColumns<PUR.Entries>[] = [
       indexColumns,
-      skuIdColumns,
+      skuIdColumns({ search: false }),
       unitIdColumns,
       qtyColumns({
         dataIndex: 'qty',

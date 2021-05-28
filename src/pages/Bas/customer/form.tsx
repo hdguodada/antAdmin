@@ -1,6 +1,6 @@
 import ProForm, { ModalForm, ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
-import { Form, TreeSelect } from 'antd';
+import { Form } from 'antd';
 import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { history, useModel } from 'umi';
@@ -11,7 +11,7 @@ import { patternMsg } from '@/utils/validator';
 import type { ActionType } from '@ant-design/pro-table';
 import ProCard from '@ant-design/pro-card';
 import { CustomerFinanceFormFields } from './custFinanceForm';
-import { DepSelect } from '@/utils/form';
+import { CustAreaSelect, CustTypeSelect, DepSelect, OptionSelect } from '@/utils/form';
 
 type FormProps = {
   action: 'add' | 'upd';
@@ -28,10 +28,7 @@ const CustomerForm: React.FC<FormProps> = (props) => {
       basCustFinance: BAS.CustomerFinance;
     }>
   >();
-  const { treeDataSimpleMode } = useModel('custType');
-  const { areaTree } = useModel('custArea', (model) => ({ areaTree: model.treeDataSimpleMode }));
   const { levelOptions } = useModel('custLevel');
-  const { typeOption } = useModel('options', (module) => ({ typeOption: module.typeOption }));
   return (
     <>
       <ModalForm<{
@@ -43,7 +40,7 @@ const CustomerForm: React.FC<FormProps> = (props) => {
           await newCustomer(values);
           return true;
         }}
-        width={1000}
+        width={1200}
         visible={visible}
         title="新建客户"
         onVisibleChange={async (v) => {
@@ -64,28 +61,20 @@ const CustomerForm: React.FC<FormProps> = (props) => {
               label="公司"
               tooltip="最长为 24 位"
               placeholder="公司名称"
-              width="lg"
+              width="md"
               rules={patternMsg.text('')}
             />
-            <ProFormText name={['basCustomer', 'custShort']} label="简称" width="sm" />
+            <ProFormText name={['basCustomer', 'custShort']} label="简称" width="md" />
             <Form.Item
               name={['basCustomer', 'custTypeId']}
               label="客户类别"
-              style={{ width: '440px' }}
+              style={{ width: '328px' }}
               rules={patternMsg.select('')}
             >
-              <TreeSelect
-                showSearch
-                placeholder="请选择"
-                allowClear
-                treeDefaultExpandAll
-                treeData={treeDataSimpleMode}
-                treeDataSimpleMode={true}
-                treeNodeFilterProp="title"
-              />
+              <CustTypeSelect showNew isLeaf />
             </Form.Item>
             <ProFormText
-              width="sm"
+              width="md"
               name={['basCustomer', 'custCd']}
               label="编号"
               rules={patternMsg.text('')}
@@ -116,29 +105,12 @@ const CustomerForm: React.FC<FormProps> = (props) => {
               }}
             />
 
-            <ProFormSelect
+            <OptionSelect
+              showNew
+              option="CustSource"
               width="md"
               label="客户来源"
               name={['basCustomer', 'SourceId']}
-              options={typeOption('CustSource')}
-              tooltip="数据字典"
-              fieldProps={{
-                dropdownRender: (menu) => (
-                  <>
-                    {menu}
-                    <Button
-                      type="dashed"
-                      block
-                      onClick={() => {
-                        history.push('/init/dictDef');
-                      }}
-                    >
-                      <PlusOutlined />
-                      新建字典
-                    </Button>
-                  </>
-                ),
-              }}
             />
             <ProFormSelect
               showSearch
@@ -162,17 +134,15 @@ const CustomerForm: React.FC<FormProps> = (props) => {
               style={{ width: '328px' }}
               rules={patternMsg.select('')}
             >
-              <TreeSelect
-                showSearch
-                placeholder="请选择"
-                allowClear
-                treeDefaultExpandAll
-                treeData={areaTree}
-                treeDataSimpleMode={true}
-                treeNodeFilterProp="title"
-              />
+              <CustAreaSelect isLeaf showNew />
             </Form.Item>
-            <DepSelect name={['basCustomer', 'depId']} label={'所属部门'} showNew />
+            <ProForm.Item
+              name={['basCustomer', 'depId']}
+              label={'所属部门'}
+              style={{ width: '328px' }}
+            >
+              <DepSelect showNew />
+            </ProForm.Item>
           </ProForm.Group>
         </ProCard>
         <ProCard collapsible title="财务信息">

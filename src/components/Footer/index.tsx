@@ -2,8 +2,7 @@ import React from 'react';
 import { useModel, history, useRequest } from 'umi';
 
 export default () => {
-  const { queryCustArea, queryCustAreaTree } = useModel('custArea', (models) => ({
-    queryCustArea: models.queryCustArea,
+  const { queryCustAreaTree } = useModel('custArea', (models) => ({
     queryCustAreaTree: models.queryCustAreaTree,
   }));
   const { queryProductType } = useModel('productType', (model) => ({
@@ -35,9 +34,8 @@ export default () => {
     querySupp: model.query,
     queryTreeSupp: model.queryTree,
   }));
-  const { queryCustTypeTree, queryCustType } = useModel('custType', (model) => ({
+  const { queryCustTypeTree } = useModel('custType', (model) => ({
     queryCustTypeTree: model.queryCustTypeTree,
-    queryCustType: model.queryCustType,
   }));
   const { queryUserRoles } = useModel('userRole', (model) => ({
     queryUserRoles: model.queryUserRoles,
@@ -66,9 +64,7 @@ export default () => {
         await Promise.all([
           queryTreeSupp(),
           queryCustAreaTree(),
-          queryCustArea(),
           queryCustTypeTree(),
-          queryCustType(),
           queryProductType(),
           queryCustLevel(),
           querySupp(),

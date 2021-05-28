@@ -74,7 +74,9 @@ const UserForm: React.FC<UserFormProps> = (props) => {
         </ProForm.Group>
       )}
       <ProForm.Group>
-        <DepSelect name="depId" label="所属部门" showNew={true} />
+        <ProForm.Item name="depId" label="所属部门">
+          <DepSelect showNew={true} />
+        </ProForm.Item>
         <ProFormSelect
           showSearch
           params={{}}

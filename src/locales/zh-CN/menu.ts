@@ -67,6 +67,7 @@ export default {
   'menu.productionManagement.inboundList': '生产入库列表',
   'menu.productionManagement.inBoundDetail': '生产入库明细',
   'menu.bas.employ': '人事管理',
+  'menu.bas.p': 'test',
   'menu.purchase': '购货',
   'menu.purchase.purcOrder': '采购订单',
   'menu.purchase.Ghdd': '采购订单',

@@ -1,7 +1,8 @@
 import { DownOutlined, EditFilled, PlusOutlined } from '@ant-design/icons';
 import type { ProColumns, ProColumnType } from '@ant-design/pro-table';
 import type { FormInstance } from 'antd';
-import { Button, DatePicker, Dropdown, Menu, Space, Tooltip } from 'antd';
+import { message } from 'antd';
+import { Button, Dropdown, Menu, Space, Tooltip } from 'antd';
 import React, { useRef } from 'react';
 import DelButton from '@/components/DelPopconfirm/next';
 import type { SearchConfig } from '@ant-design/pro-table/lib/components/Form/FormRender';
@@ -16,10 +17,11 @@ import ProForm, {
   ProFormText,
 } from '@ant-design/pro-form';
 import type { StockType } from '@/pages/Purchase/components';
-import { BussTypeEnum } from '@/pages/Purchase/components';
-import { BussTypeComponentUrl } from '@/pages/Purchase/components';
 import {
   BussType,
+  BussTypeApiUrl,
+  BussTypeComponentUrl,
+  BussTypeEnum,
   getOrderType,
   OrderType,
   SkuSelect,
@@ -39,15 +41,16 @@ export const checkStatusValueEnum = new Map([
 /**
  * 审核状态
  */
-export const checkStatusColumns = <T extends unknown>(search: undefined | false): ProColumns<T> => {
+export const checkStatusColumns = (props?: ProColumnType): ProColumns => {
   return {
     title: '审核状态',
     dataIndex: 'checkStatus',
     valueType: 'select',
     valueEnum: checkStatusValueEnum,
-    search,
+    width: 105,
     index: 105,
     order: -1,
+    ...props,
   };
 };
 
@@ -97,27 +100,30 @@ export const billStatusColumns = <T extends unknown>(
   fieldProps: {
     mode: 'multiple',
   },
+  width: 105,
   valueEnum: billStatusValueEnum.get(type),
   hideInTable,
   search,
 });
 
-export const skuIdColumns: ProColumns = {
-  title: '商品',
-  dataIndex: 'skuId',
-  render: (_, record) => <div>{record.skuName}</div>,
-  search: false,
-  editable: false,
-  copyable: true,
-  fixed: 'left',
-  width: 250,
-};
+export function skuIdColumns(props?: ProColumnType): ProColumns {
+  return {
+    title: '商品',
+    dataIndex: 'skuId',
+    render: (_, record) => <div>{record.skuName}</div>,
+    renderFormItem: () => <SkuSelect type="input" multiple />,
+    copyable: true,
+    fixed: 'left',
+    width: 250,
+    ...props,
+  };
+}
 
 export const memoColumns = <T extends unknown>(): ProColumns<T> => ({
   title: '备注',
   dataIndex: 'memo',
   search: false,
-  index: 103,
+  index: 200,
   width: 200,
 });
 
@@ -143,12 +149,14 @@ export const crtNameColumns = <T extends unknown>(): ProColumns<T> => ({
   title: '制单人',
   dataIndex: 'crtName',
   search: false,
+  width: 105,
   index: 100,
 });
 export const checkName = <T extends unknown>(): ProColumns<T> => ({
   title: '审核人',
   dataIndex: 'checkName',
   search: false,
+  width: 105,
   index: 101,
 });
 
@@ -161,12 +169,16 @@ export const indexColumns: ProColumns = {
   key: 'index',
 };
 
-export const cateIdColumns: ProColumns = {
-  title: '商品类别',
-  dataIndex: 'cateId',
-  render: (_, record) => <div>{record.cateName}</div>,
-  renderFormItem: () => <ProductTypeTreeSelect />,
-};
+export function cateIdColumns(props?: ProColumnType): ProColumns {
+  return {
+    title: '商品类别',
+    dataIndex: 'cateId',
+    width: 105,
+    render: (_, record) => <div>{record.cateName}</div>,
+    renderFormItem: () => <ProductTypeTreeSelect isLeaf />,
+    ...props,
+  };
+}
 
 export const unitIdColumns: ProColumns = {
   title: '单位',
@@ -180,6 +192,7 @@ export const unitIdColumns: ProColumns = {
 export const baseUnitIdColumns: ProColumns = {
   title: '单位',
   dataIndex: 'baseUnitId',
+  width: 105,
   render: (_, record) => <div>{record.baseUnitName}</div>,
   search: false,
 };
@@ -188,15 +201,7 @@ export const secondUnitColumns: ProColumns = {
   title: '副单位',
   dataIndex: 'secondUnit',
   search: false,
-};
-
-export const codeColumns: ProColumns = {
-  title: '商品编号',
-  dataIndex: 'code',
-  search: false,
-  copyable: true,
-  ellipsis: true,
-  editable: false,
+  width: 105,
 };
 
 export const spuCodeColumns: ProColumns = {
@@ -227,34 +232,26 @@ export const dateColumns = <T extends unknown>({
   };
 };
 
-export const qtyColumns = <T extends unknown>({
-  title = '数量',
-  dataIndex = 'totalQty',
-  hideInTable = false,
-  rest = {},
-} = {}): ProColumns<T> => {
+export function qtyColumns(props?: ProColumnType): ProColumns {
   return {
-    title,
-    dataIndex,
+    title: '数量',
+    dataIndex: 'totalQty',
     search: false,
     valueType: 'digit',
-    hideInTable,
-    width: 100,
-    ...rest,
+    hideInTable: false,
+    width: 105,
+    ...props,
   };
-};
+}
 
-export function customerColumns({
-  title = '客户',
-  dataIndex = 'custId',
-  hideInTable = false,
-  search = true,
-} = {}): ProColumns {
+export function customerColumns(
+  { title = '客户', dataIndex = 'custId' } = {},
+  props?: ProColumnType,
+): ProColumns {
   return {
     title,
     dataIndex,
-    hideInTable,
-    search: search ? undefined : false,
+    width: 155,
     render: (_, record) => (
       <Button
         type="link"
@@ -265,36 +262,43 @@ export function customerColumns({
         {record.custName || record.contactName || '-'}
       </Button>
     ),
-    renderFormItem: () => <SupplierSelect multiple />,
+    renderFormItem: () => <CustomerSelect multiple />,
+    ...props,
   };
 }
 
-export function suppColumns({
-  title = '供应商',
-  dataIndex = 'suppId',
-  hideInTable = false,
-  search = true,
-} = {}): ProColumns {
+export function suppColumns(
+  { title = '供应商', dataIndex = 'suppId', renderName = 'suppName' } = {},
+  props?: ProColumnType,
+): ProColumns {
   return {
     title,
     dataIndex,
-    hideInTable,
-    search: search ? undefined : false,
+    width: 205,
     render: (_, record) => (
       <Button
         type="link"
         onClick={() => {
-          history.push(`/bas/supplier/${(record as any).suppId}`);
+          history.push(`/bas/supplier/${record.suppId}`);
         }}
       >
-        {(record as any).suppName}
+        {record[renderName]}
       </Button>
     ),
     renderFormItem: () => <SupplierSelect multiple />,
+    ...props,
+  };
+}
+export function userColumns(props: ProColumnType): ProColumns {
+  return {
+    dataIndex: 'userId',
+    title: '用户',
+    width: 105,
+    ...props,
   };
 }
 
-export function suppTypeColumns(suppEnum: Map<React.Key, string> | undefined): ProColumns {
+export function suppTypeColumns(suppEnum: Map<K, string> | undefined): ProColumns {
   return {
     title: '供应商类别',
     dataIndex: 'suppTypeId',
@@ -304,19 +308,24 @@ export function suppTypeColumns(suppEnum: Map<React.Key, string> | undefined): P
   };
 }
 
-export function dateRangeColumns({ title = '单据日期', dataIndex = 'dateStr' } = {}): ProColumns {
+export function dateRangeColumns(
+  { title = '单据日期', dataIndex = 'dateStr' } = {},
+  props?: ProColumnType,
+): ProColumns {
   return {
+    width: 105,
     title,
     dataIndex,
     valueType: 'dateRange',
     initialValue: [moment().startOf('month'), moment()],
-    render: (_, record) => <div>{record[dataIndex]}</div>,
+    render: (_, record) => <div>{moment(record[dataIndex]).format('YYYY-MM-DD')}</div>,
     search: {
       transform: (value) => ({
         beginDate: value[0],
         endDate: value[1],
       }),
     },
+    ...props,
   };
 }
 
@@ -341,6 +350,16 @@ export const storeCdColumns: ProColumns = {
   render: (_, record) => <div>{record.storeName}</div>,
   width: 100,
 };
+
+export function storeColumns(props?: ProColumnType): ProColumns {
+  return {
+    title: '仓库',
+    dataIndex: 'storeCd',
+    render: (_, record) => <div>{record.storeName}</div>,
+    width: 155,
+    ...props,
+  };
+}
 export const stateColumns: ProColumns = {
   title: '状态',
   dataIndex: 'state',
@@ -352,7 +371,7 @@ export const stateColumns: ProColumns = {
   ]),
 };
 
-export function billNoColumns(): ProColumns {
+export function billNoColumns(props?: ProColumnType & { bussType: BussType }): ProColumns {
   return {
     title: '订单编号',
     dataIndex: 'billNo',
@@ -360,23 +379,30 @@ export function billNoColumns(): ProColumns {
     render: (_, record) => (
       <Button
         onClick={() => {
-          history.push(`${BussTypeComponentUrl[BussType[record.bussType]]}/${record.billId}`);
+          if (props?.bussType) {
+            history.push(`${BussTypeComponentUrl[BussType[props?.bussType]]}/${record.billId}`);
+          } else {
+            message.error('unknow bussType');
+          }
         }}
         type="link"
       >
         {_}
       </Button>
     ),
+    width: 155,
+    ...props,
   };
 }
 
-export function bussTypeColumns(): ProColumns {
+export function bussTypeColumns(props?: ProColumnType): ProColumns {
   return {
     title: '业务类型',
     dataIndex: 'bussType',
     valueEnum: BussTypeEnum,
     valueType: 'select',
-    search: false,
+    width: 155,
+    ...props,
   };
 }
 
@@ -387,7 +413,7 @@ export const srcOrderColumns = <T extends unknown>(
 ): ProColumns<T> => {
   return {
     dataIndex,
-    ...props,
+    width: 155,
     render: (_, record) => {
       if (record && record[dataIndex] && record[dataIndex].length > 0) {
         const menu = (
@@ -419,6 +445,7 @@ export const srcOrderColumns = <T extends unknown>(
       }
       return '-';
     },
+    ...props,
   };
 };
 
@@ -430,18 +457,30 @@ export const srcOrderSearch = <T extends unknown>({ title = '源订单号' } = {
   };
 };
 
-export const totalAmountColumns = <T extends unknown>({
-  title = '购货金额',
-  hideInTable = false,
-} = {}): ProColumns<T> => {
+export const totalAmountColumns = (
+  { title = '购货金额', dataIndex = 'totalAmount', hideInTable = false } = {},
+  props?: ProColumnType,
+): ProColumns => {
   return {
     title,
-    dataIndex: 'totalAmount',
+    dataIndex,
     search: false,
     valueType: 'money',
     hideInTable,
+    width: 105,
+    ...props,
   };
 };
+
+export function moneyColumns(props: ProColumnType): ProColumnType {
+  return {
+    valueType: 'money',
+    search: false,
+    align: 'right',
+    width: 135,
+    ...props,
+  };
+}
 
 export const billDescColumns = <T extends unknown>({
   title = '整单备注',
@@ -454,38 +493,31 @@ export const billDescColumns = <T extends unknown>({
   };
 };
 
-export const rpAmountColumns = <T extends unknown>({
-  title = '已付款',
-  hideInTable = true,
-} = {}): ProColumns<T> => {
+export const rpAmountColumns = (props: ProColumnType): ProColumns => {
   return {
-    title,
+    title: '已付款',
     dataIndex: 'rpAmount',
     search: false,
+    width: 105,
     valueType: 'money',
-    hideInTable,
+    hideInTable: true,
+    ...props,
   };
 };
 
-export const amountColumns = <T extends unknown>({
-  title = '优惠后金额',
-  hideInTable = true,
-} = {}): ProColumns<T> => {
+export const amountColumns = (props?: ProColumnType): ProColumns => {
   return {
-    title,
+    title: '优惠后金额',
     dataIndex: 'amount',
     search: false,
     valueType: 'money',
-    hideInTable,
+    hideInTable: true,
+    width: 105,
+    ...props,
   };
 };
 
-export const hxStateCodeColumns = <T extends unknown>(
-  key = 1,
-  hideInTable = true,
-  search: false | undefined,
-): ProColumns<T> => {
-  const title = key === 1 ? '付款状态' : '退款状态';
+export const hxStateCodeColumns = (props?: ProColumnType, key = 1): ProColumns => {
   const valueEnum =
     key === 1
       ? new Map([
@@ -499,12 +531,12 @@ export const hxStateCodeColumns = <T extends unknown>(
           [3, { text: '全部退款', status: 'Success' }],
         ]);
   return {
-    title,
+    title: '付款状态',
     dataIndex: 'hxStateCode',
     valueType: 'select',
+    width: 105,
     valueEnum,
-    hideInTable,
-    search,
+    ...props,
   };
 };
 
@@ -530,32 +562,32 @@ export const isDeafultColumns = <T extends unknown>(): ProColumns<T> => {
  * @param jsxList
  * @returns
  */
-export const optionColumns = <T extends unknown>({
-  modify,
-  del,
-  width = 105,
-  fixed = 'right',
-  jsxList = [],
-}: {
+interface optionColumnsProps extends ProColumnType {
   modify?: ({
     record,
     _index,
     action,
   }: {
-    record: T;
+    record: any;
     _index: number;
     action: any;
   }) => Promise<void>;
-  del?: ({ record, _index, action }: { record: T; _index: number; action: any }) => Promise<void>;
+  del?: ({ record, _index, action }: { record: any; _index: number; action: any }) => Promise<void>;
   width?: number;
   fixed?: 'left' | 'right';
   jsxList?: JSX.Element[];
-}): ProColumns<T> => {
+}
+export function optionColumns({
+  modify,
+  del,
+  jsxList = [],
+  ...rest
+}: optionColumnsProps): ProColumns {
   return {
     title: '操作',
     valueType: 'option',
-    width,
-    fixed,
+    fixed: 'right',
+    width: 105,
     render: (_, record, _index, action) => [
       <div key="modify">
         {modify && (
@@ -583,8 +615,9 @@ export const optionColumns = <T extends unknown>({
       </div>,
       <div key="jsxList">{jsxList}</div>,
     ],
+    ...rest,
   };
-};
+}
 /**
  *
  * @param fn 新增按钮的点击函数
@@ -595,10 +628,12 @@ export const baseSearch = ({
   fn,
   url,
   jsxList,
+  submit,
 }: {
   fn?: () => void;
   url?: string;
   jsxList?: JSX.Element[];
+  submit?: (params: any) => void;
 }): false | SearchConfig => {
   return {
     optionRender: ({ searchText, resetText }, { form }) => {
@@ -609,6 +644,7 @@ export const baseSearch = ({
           className={Style.buttonColorCyan}
           onClick={() => {
             form?.submit();
+            submit?.(form?.getFieldsValue());
           }}
         >
           {searchText}
@@ -647,17 +683,17 @@ export const baseSearch = ({
 export type AdvancedSearchFormField = Partial<{
   beginDate: string;
   endDate: string;
-  crtId: React.Key;
-  updId: React.Key;
-  checkId: React.Key;
+  crtId: K;
+  updId: K;
+  checkId: K;
   checkStatus: number;
   entryDesc: string;
   beginArriveDate: string;
   endArriveDate: string;
   bussType: BussType[];
-  suppId: React.Key;
-  skuId: React.Key;
-  storeCd: React.Key;
+  suppId: K[];
+  skuId: K;
+  storeCd: K;
   status: number;
   srcGhdNo: string;
   srcXhddNo: string;
@@ -810,18 +846,20 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
  * @param fn 新增按钮的点击函数
  * @param url 新增按钮的跳转链接
  * @param jsxList // 其他按钮
+ * @param searchConfig
+ * @param myReset
  */
 export const AdvancedSearch = ({
   fn,
   url,
   jsxList,
-  other,
+  searchConfig,
   myReset,
 }: {
   fn?: () => void;
   url?: string;
   jsxList?: JSX.Element[];
-  other?: any;
+  searchConfig?: SearchConfig;
   myReset?: () => void;
 }): false | SearchConfig => {
   return {
@@ -862,7 +900,7 @@ export const AdvancedSearch = ({
       ];
       return jsxList ? jsxList.concat(base) : base;
     },
-    ...other,
+    ...searchConfig,
   };
 };
 
@@ -940,12 +978,8 @@ export const keywordColumns = <T extends unknown>({ placeholder = '' }): ProColu
 };
 
 export const OrderTableColumns = <T extends Record<string, unknown>>({
-  url = '',
-  componentUrl = '',
   bussType,
 }: {
-  url: string;
-  componentUrl: string;
   stockType?: StockType;
   money?: 'S' | 'B';
   bussType: BussType;
@@ -953,15 +987,13 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
   const base: ProColumns<T>[] = [
     keywordColumns({ placeholder: '请输入编号或者客户名称查询' }),
     indexColumns,
-    {
+    dateRangeColumns({
       dataIndex: 'date',
-      title: '单据日期',
-      valueType: 'date',
-      renderFormItem: () => (
-        <DatePicker.RangePicker defaultValue={[moment().startOf('month'), moment()]} />
-      ),
-    },
-    billNoColumns(),
+    }),
+    billNoColumns({
+      fixed: 'left',
+      bussType,
+    }),
   ];
   return base.concat([
     {
@@ -970,62 +1002,24 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
       search: false,
       valueType: 'date',
       hideInTable: getOrderType(OrderType.订单).indexOf(bussType) < 0,
+      width: 105,
     },
-    {
-      dataIndex: 'bussType',
-      title: '业务类别',
-      search: false,
-      valueType: 'select',
-      valueEnum: BussTypeEnum,
+    bussTypeColumns({
       hideInTable: [BussType.采购单, BussType.采购退货单, BussType.调拨单].indexOf(bussType) > -1,
-    },
-    {
-      dataIndex: 'inStoreName',
-      title: '调入仓库',
       search: false,
-      hideInTable: BussType.调拨单 !== bussType,
-    },
-    {
-      dataIndex: 'outStoreName',
-      title: '调出仓库',
-      search: false,
-      hideInTable: BussType.调拨单 !== bussType,
-    },
-    {
-      title: '供应商',
-      dataIndex: 'contactName',
-      search: false,
-      hideInTable:
-        [BussType.其他出库单, BussType.调拨单, ...getOrderType(OrderType.销货)].indexOf(bussType) >
-        -1,
-    },
-    {
-      title: () => {
-        if (getOrderType(OrderType.购货).indexOf(bussType) > -1) {
-          return '采购员';
-        }
-        if (getOrderType(OrderType.销货).indexOf(bussType) > -1) {
-          return '销售员';
-        }
-        return '';
-      },
+    }),
+    suppColumns({ renderName: 'contactName' }, { search: false }),
+    userColumns({
+      title: '销售员',
       dataIndex: 'operId',
       search: false,
       render: (_, record) => <div>{(record as any).operName}</div>,
-      hideInTable: getOrderType(OrderType.其他出入库).indexOf(bussType) > -1,
-    },
-    {
-      title: '客户',
-      dataIndex: 'contactName',
-      search: false,
-      hideInTable:
-        [BussType.其他入库单, BussType.调拨单, ...getOrderType(OrderType.购货)].indexOf(bussType) >
-        -1,
-    },
+    }),
     srcOrderColumns(
       {
         title: '关联购货单号',
         hideInTable: [BussType.采购订单, BussType.采购退货单].indexOf(bussType) < 0,
+        search: false,
       },
       'srcGhdBillNo',
       BussTypeComponentUrl.采购单,
@@ -1034,6 +1028,7 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
       {
         title: '关联购货退货单号',
         hideInTable: bussType !== BussType.采购单,
+        search: false,
       },
       'srcThdBillNo',
       BussTypeComponentUrl.采购退货单,
@@ -1043,6 +1038,7 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
         title: '关联购货订单号',
         dataIndex: 'srcGhddBillNo',
         hideInTable: [BussType.采购单, BussType.采购退货单].indexOf(bussType) < 0,
+        search: false,
       },
       'srcGhddBillNo',
       BussTypeComponentUrl.采购订单,
@@ -1064,25 +1060,30 @@ export const OrderTableColumns = <T extends Record<string, unknown>>({
       hideInTable: [BussType.采购单, BussType.采购退货单].indexOf(bussType) < 0,
     }),
     hxStateCodeColumns(
+      {
+        hideInTable: [BussType.采购单, BussType.采购退货单].indexOf(bussType) < 0,
+        search: bussType === BussType.采购订单 ? false : undefined,
+      },
       bussType === BussType.采购单 ? 1 : 2,
-      [BussType.采购单, BussType.采购退货单].indexOf(bussType) < 0,
-      getOrderType(OrderType.购销货).indexOf(bussType) > -1 ? undefined : false,
     ),
     billStatusColumns(
       BussType.采购订单 === bussType ? 1 : 2,
       [BussType.采购订单, BussType.销售退货订单].indexOf(bussType) < 0,
       [BussType.采购订单, BussType.采购退货订单].indexOf(bussType) > -1 ? undefined : false,
     ),
-    checkStatusColumns(getOrderType(OrderType.购销货).indexOf(bussType) > -1 ? undefined : false),
+    checkStatusColumns(),
     crtNameColumns(),
     checkName(),
     memoColumns(),
     optionColumns({
       modify: async ({ record }) => {
-        history.push(`${componentUrl}/${record.billId}`);
+        history.push(`${BussTypeComponentUrl[BussType[bussType]]}/${record.billId}`);
       },
       del: async ({ record }) => {
-        const res = await delPurchase([(record as any).billId], `${url}/del`);
+        const res = await delPurchase(
+          [(record as any).billId],
+          `${BussTypeApiUrl[BussType[bussType]]}/del`,
+        );
         showSysInfo(res);
       },
     }),

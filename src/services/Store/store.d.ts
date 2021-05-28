@@ -1,6 +1,7 @@
 declare namespace STORE {
   export type SN = {
-    autoId: number;
+    autoId: K;
+    serId?: string;
     serNum: string;
     memo?: string;
     date?: string;
@@ -19,10 +20,17 @@ declare namespace STORE {
     showZero?: number;
     isSerNum: number;
   };
+  export type SerNumValue = Partial<{
+    newSerNum: { serNum: K; serId?: string }[];
+    delSerNum: { serNum: K; serId?: string }[];
+    length: number;
+    checkInventoryQty: number;
+  }>;
   export type invOiEntries = {
     cateId: K;
     cateName: string;
-    checkInventoryQty?: any;
+    checkInventoryQty?: number;
+    checkInventoryQtyMid?: SerNumValue;
     dtlId?: any;
     isSerNum: number;
     memmo: string;
@@ -36,7 +44,7 @@ declare namespace STORE {
     unitName: string;
     autoId: K;
     unitList: PUR.Entries['unitList'];
-    inventoryResult: any;
+    inventoryResult: SerNumValue;
   };
   export type invOiForm = {
     billId: K;

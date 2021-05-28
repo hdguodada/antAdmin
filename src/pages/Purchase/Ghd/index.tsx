@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import React from 'react';
 import { delPurchase, queryPurchase } from '@/services/Purchase';
-import OrderTable from '@/pages/Purchase/components/OrderTable';
+import OrderTable from '@/pages/Purchase/components/PurchaseTable';
 import { BussType } from '../components';
 import GlobalWrapper from '@/components/GlobalWrapper';
 

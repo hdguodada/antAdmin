@@ -4,6 +4,7 @@ import {
   BussType,
   BussTypeApiUrl,
   BussTypeComponentUrl,
+  BussTypeEnum,
   CheckAudit,
   SupplierSelect,
 } from '@/pages/Purchase/components';
@@ -23,7 +24,8 @@ import {
 import { AccountSelect, UserSelect } from '@/utils/form';
 import { patternMsg } from '@/utils/validator';
 import ProCard from '@ant-design/pro-card';
-import { FormInstance, ProFormTextArea } from '@ant-design/pro-form';
+import type { FormInstance } from '@ant-design/pro-form';
+import { ProFormTextArea } from '@ant-design/pro-form';
 import { ProFormSelect } from '@ant-design/pro-form';
 import ProForm, {
   ProFormDatePicker,
@@ -611,19 +613,19 @@ export const FundsForm: React.FC<{
           method: 'GET',
         })
       ).data;
-      const data = {
+      const d = {
         ...res,
         entries: res.entries?.map((item) => ({
           ...item,
           autoId: +(Math.random() * 1000000).toFixed(0),
         })),
       };
-      setChecked(data.checkStatus === 2);
-      if (data.checkStatus !== 2) {
-        setEditableKeys(data.entries?.map((i) => i.autoId));
+      setChecked(d.checkStatus === 2);
+      if (d.checkStatus !== 2) {
+        setEditableKeys(d.entries?.map((i) => i.autoId));
       }
       return {
-        data,
+        data: d,
         success: true,
       };
     },
@@ -713,6 +715,7 @@ export const FundsForm: React.FC<{
   return (
     <PageContainer
       loading={loading}
+      title={false}
       footer={[
         <CheckAudit checkStatus={checked} key={'checkImg'} />,
         <Space key="action">
@@ -740,108 +743,88 @@ export const FundsForm: React.FC<{
         />,
         <Button key="refresh" type={'dashed'} onClick={refresh} children={'刷新'} />,
       ]}
-    >
-      <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }}>
-        <ProForm<FUND.fundItem>
-          submitter={false}
-          formRef={formRef}
-          onValuesChange={(values: FUND.fundItem) => {
-            if (values.entries) {
-              formRef.current?.setFieldsValue({
-                ...calFundPrice({ entries: values.entries }),
-              });
-            }
-            if (values.rpAmount) {
-              formRef.current?.setFieldsValue({
-                ...calFundPrice({
-                  rpAmount: values.rpAmount,
-                  totalAmount: formRef.current?.getFieldValue('totalAmount'),
-                }),
-              });
-            }
-          }}
-          onFinish={async (v) => {
-            addUpd.run(v);
-          }}
-        >
-          <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
-          <ProForm.Group>
-            {bussType === BussType.核销单 && (
-              <ProFormSelect name="hxType" label="业务类型" width="md" valueEnum={HxTypeEnum} />
-            )}
-            {bussType !== BussType.资金转账单 && (
-              <ProFormDependency name={['contactName']}>
-                {({ contactName }) => {
-                  if ([BussType.付款单, BussType.其他支出单].indexOf(bussType) > -1) {
+      content={
+        <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }}>
+          <ProForm<FUND.fundItem>
+            submitter={false}
+            formRef={formRef}
+            onValuesChange={(values: FUND.fundItem) => {
+              if (values.entries) {
+                formRef.current?.setFieldsValue({
+                  ...calFundPrice({ entries: values.entries }),
+                });
+              }
+              if (values.rpAmount) {
+                formRef.current?.setFieldsValue({
+                  ...calFundPrice({
+                    rpAmount: values.rpAmount,
+                    totalAmount: formRef.current?.getFieldValue('totalAmount'),
+                  }),
+                });
+              }
+            }}
+            onFinish={async (v) => {
+              addUpd.run(v);
+            }}
+          >
+            <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
+            <ProForm.Group>
+              {bussType === BussType.核销单 && (
+                <ProFormSelect name="hxType" label="业务类型" width="md" valueEnum={HxTypeEnum} />
+              )}
+              {bussType !== BussType.资金转账单 && (
+                <ProFormDependency name={['contactName']}>
+                  {({ contactName }) => {
+                    if ([BussType.付款单, BussType.其他支出单].indexOf(bussType) > -1) {
+                      return (
+                        <ProForm.Item
+                          name="suppId"
+                          label="供应商"
+                          rules={
+                            [BussType.付款单].indexOf(bussType) > -1
+                              ? patternMsg.select('')
+                              : undefined
+                          }
+                        >
+                          <SupplierSelect suppName={contactName} disabled={checked} />
+                        </ProForm.Item>
+                      );
+                    }
                     return (
                       <ProForm.Item
-                        name="suppId"
-                        label="供应商"
+                        name="custId"
+                        label="客户"
+                        style={{ width: '328px' }}
                         rules={
-                          [BussType.付款单].indexOf(bussType) > -1
+                          [BussType.收款单].indexOf(bussType) > -1
                             ? patternMsg.select('')
                             : undefined
                         }
                       >
-                        <SupplierSelect suppName={contactName} disabled={checked} />
+                        <CustomerSelect custName={contactName} disabled={checked} />
                       </ProForm.Item>
                     );
-                  }
-                  return (
-                    <ProForm.Item
-                      name="custId"
-                      label="客户"
-                      rules={
-                        [BussType.收款单].indexOf(bussType) > -1 ? patternMsg.select('') : undefined
-                      }
-                    >
-                      <CustomerSelect custName={contactName} disabled={checked} />
-                    </ProForm.Item>
-                  );
-                }}
-              </ProFormDependency>
+                  }}
+                </ProFormDependency>
+              )}
+              <ProFormDatePicker width="md" name="date" label="单据日期" disabled={checked} />
+              <ProFormText
+                width="md"
+                name="billNo"
+                label="单据编号"
+                disabled
+                rules={patternMsg.text('单据编号')}
+              />
+            </ProForm.Group>
+            {bussType === BussType.收款单 && (
+              <ProForm.Group>
+                <ProFormDigit name="totalArrears" label="总欠款" disabled width="md" />
+                <UserSelect showNew name="operId" label="收款人" disabled={checked} />
+              </ProForm.Group>
             )}
-            <ProFormDatePicker width="md" name="date" label="单据日期" disabled={checked} />
-            <ProFormText
-              width="md"
-              name="billNo"
-              label="单据编号"
-              disabled
-              rules={patternMsg.text('单据编号')}
-            />
-          </ProForm.Group>
-          {bussType === BussType.收款单 && (
-            <ProForm.Group>
-              <ProFormDigit name="totalArrears" label="总欠款" disabled width="md" />
-              <UserSelect showNew name="operId" label="收款人" disabled={checked} />
-            </ProForm.Group>
-          )}
-          {[BussType.其他收入单, BussType.其他支出单].indexOf(bussType) > -1 && (
-            <ProForm.Item name="entries" trigger="onValuesChange">
-              <EditableProTable<FUND.Entries>
-                rowKey="autoId"
-                bordered
-                recordCreatorProps={{
-                  newRecordType: 'dataSource',
-                  record: {
-                    autoId: +(Math.random() * 1000000).toFixed(0),
-                  },
-                }}
-                columns={columns}
-                editable={{
-                  type: 'multiple',
-                  editableKeys,
-                  onChange: setEditableKeys,
-                  actionRender: (row, config, defaultDom) => [defaultDom.delete],
-                }}
-              />
-            </ProForm.Item>
-          )}
-
-          {[BussType.收款单, BussType.付款单].indexOf(bussType) > -1 && (
-            <>
-              <ProForm.Item name="accounts" trigger="onValuesChange">
-                <EditableProTable<FUND.Accounts>
+            {[BussType.其他收入单, BussType.其他支出单].indexOf(bussType) > -1 && (
+              <ProForm.Item name="entries" trigger="onValuesChange">
+                <EditableProTable<FUND.Entries>
                   rowKey="autoId"
                   bordered
                   recordCreatorProps={{
@@ -850,172 +833,196 @@ export const FundsForm: React.FC<{
                       autoId: +(Math.random() * 1000000).toFixed(0),
                     },
                   }}
+                  columns={columns}
                   editable={{
                     type: 'multiple',
                     editableKeys,
                     onChange: setEditableKeys,
                     actionRender: (row, config, defaultDom) => [defaultDom.delete],
                   }}
-                  columns={[
-                    indexColumns,
-                    {
-                      dataIndex: 'accountId',
-                      title: '结算账户',
-                      valueType: 'select',
-                      valueEnum: accountEnum,
-                    },
-                    {
-                      dataIndex: 'payment',
-                      title: '收款金额',
-                      valueType: 'money',
-                    },
-                    {
-                      dataIndex: 'settlement',
-                      title: '结算方式',
-                      valueType: 'select',
-                      valueEnum: SettlementEnum,
-                    },
-                    {
-                      dataIndex: 'settlementNo',
-                      title: '结算号',
-                    },
-                    {
-                      dataIndex: 'memo',
-                      title: '备注',
-                    },
-                  ]}
                 />
               </ProForm.Item>
-              <ProForm.Item name="entries">
-                <EditableProTable<FUND.Entries>
-                  rowKey="autoId"
-                  toolbar={{
-                    actions: [
-                      <ProForm.Item key="select" name="entries" noStyle>
-                        <FindUnHxList children="选择源单" formRef={formRef} bussType={bussType} />
-                      </ProForm.Item>,
-                    ],
-                  }}
-                  bordered
-                  recordCreatorProps={false}
-                  columns={FindUnHxListColumns(false)}
-                />
-              </ProForm.Item>
-            </>
-          )}
-          {[BussType.其他收入单, BussType.其他支出单].indexOf(bussType) > -1 && (
-            <ProForm.Group>
-              <AccountSelect
-                name="accountId"
-                label="结算账户"
-                formRef={formRef}
-                disabled={checked}
-              />
-              <ProFormDigit width="sm" name="totalAmount" label="合计" disabled />
-              <ProFormDigit width="sm" name="arrears" label="本次欠款" disabled />
-              <ProFormDependency name={['totalAmount']}>
-                {({ totalAmount }) => (
-                  <ProFormDigit width="sm" name="rpAmount" label="收款金额" max={totalAmount} />
-                )}
-              </ProFormDependency>
-            </ProForm.Group>
-          )}
+            )}
 
-          {bussType === BussType.核销单 && (
-            <>
-              <ProForm.Item name="entriesA" trigger="onValuesChange">
-                <EditableProTable<FUND.Entries>
-                  rowKey="autoId"
-                  toolbar={{
-                    actions: [
-                      <ProForm.Item key="select" name="entries" noStyle>
-                        <FindUnHxList children="选择源单" formRef={formRef} bussType={bussType} />
-                      </ProForm.Item>,
-                    ],
-                  }}
-                  bordered
-                  recordCreatorProps={false}
-                  columns={FindUnHxListColumns(false)}
+            {[BussType.收款单, BussType.付款单].indexOf(bussType) > -1 && (
+              <>
+                <ProForm.Item name="accounts" trigger="onValuesChange">
+                  <EditableProTable<FUND.Accounts>
+                    rowKey="autoId"
+                    bordered
+                    recordCreatorProps={{
+                      newRecordType: 'dataSource',
+                      record: {
+                        autoId: +(Math.random() * 1000000).toFixed(0),
+                      },
+                    }}
+                    editable={{
+                      type: 'multiple',
+                      editableKeys,
+                      onChange: setEditableKeys,
+                      actionRender: (row, config, defaultDom) => [defaultDom.delete],
+                    }}
+                    columns={[
+                      indexColumns,
+                      {
+                        dataIndex: 'accountId',
+                        title: '结算账户',
+                        valueType: 'select',
+                        valueEnum: accountEnum,
+                      },
+                      {
+                        dataIndex: 'payment',
+                        title: '收款金额',
+                        valueType: 'money',
+                      },
+                      {
+                        dataIndex: 'settlement',
+                        title: '结算方式',
+                        valueType: 'select',
+                        valueEnum: SettlementEnum,
+                      },
+                      {
+                        dataIndex: 'settlementNo',
+                        title: '结算号',
+                      },
+                      {
+                        dataIndex: 'memo',
+                        title: '备注',
+                      },
+                    ]}
+                  />
+                </ProForm.Item>
+                <ProForm.Item name="entries">
+                  <EditableProTable<FUND.Entries>
+                    rowKey="autoId"
+                    toolbar={{
+                      actions: [
+                        <ProForm.Item key="select" name="entries" noStyle>
+                          <FindUnHxList children="选择源单" formRef={formRef} bussType={bussType} />
+                        </ProForm.Item>,
+                      ],
+                    }}
+                    bordered
+                    recordCreatorProps={false}
+                    columns={FindUnHxListColumns(false)}
+                  />
+                </ProForm.Item>
+              </>
+            )}
+            {[BussType.其他收入单, BussType.其他支出单].indexOf(bussType) > -1 && (
+              <ProForm.Group>
+                <AccountSelect
+                  name="accountId"
+                  label="结算账户"
+                  formRef={formRef}
+                  disabled={checked}
                 />
-              </ProForm.Item>
+                <ProFormDigit width="sm" name="totalAmount" label="合计" disabled />
+                <ProFormDigit width="sm" name="arrears" label="本次欠款" disabled />
+                <ProFormDependency name={['totalAmount']}>
+                  {({ totalAmount }) => (
+                    <ProFormDigit width="sm" name="rpAmount" label="收款金额" max={totalAmount} />
+                  )}
+                </ProFormDependency>
+              </ProForm.Group>
+            )}
 
-              <ProForm.Item name="entriesB" trigger="onValuesChange">
-                <EditableProTable<FUND.Entries>
-                  rowKey="autoId"
-                  toolbar={{
-                    actions: [
-                      <ProForm.Item key="select" name="entries" noStyle>
-                        <FindUnHxList children="选择源单" formRef={formRef} bussType={bussType} />
-                      </ProForm.Item>,
-                    ],
-                  }}
-                  bordered
-                  recordCreatorProps={false}
-                  columns={FindUnHxListColumns(false)}
-                />
-              </ProForm.Item>
-            </>
-          )}
+            {bussType === BussType.核销单 && (
+              <>
+                <ProForm.Item name="entriesA" trigger="onValuesChange">
+                  <EditableProTable<FUND.Entries>
+                    rowKey="autoId"
+                    toolbar={{
+                      actions: [
+                        <ProForm.Item key="select" name="entries" noStyle>
+                          <FindUnHxList children="选择源单" formRef={formRef} bussType={bussType} />
+                        </ProForm.Item>,
+                      ],
+                    }}
+                    bordered
+                    recordCreatorProps={false}
+                    columns={FindUnHxListColumns(false)}
+                  />
+                </ProForm.Item>
 
-          {bussType === BussType.资金转账单 && (
-            <>
-              <ProForm.Item name="accounts" trigger="onValuesChange">
-                <EditableProTable<FUND.Accounts>
-                  rowKey="autoId"
-                  bordered
-                  recordCreatorProps={{
-                    newRecordType: 'dataSource',
-                    record: {
-                      autoId: +(Math.random() * 1000000).toFixed(0),
-                    },
-                  }}
-                  editable={{
-                    type: 'multiple',
-                    editableKeys,
-                    onChange: setEditableKeys,
-                    actionRender: (row, config, defaultDom) => [defaultDom.delete],
-                  }}
-                  columns={[
-                    indexColumns,
-                    {
-                      dataIndex: 'payAccountId',
-                      title: '转出账户',
-                      valueType: 'select',
-                      valueEnum: accountEnum,
-                    },
-                    {
-                      dataIndex: 'recAccountId',
-                      title: '转入账户',
-                      valueType: 'select',
-                      valueEnum: accountEnum,
-                    },
-                    {
-                      dataIndex: 'amount',
-                      title: '金额',
-                      valueType: 'money',
-                    },
-                    {
-                      dataIndex: 'settlement',
-                      title: '结算方式',
-                      valueType: 'select',
-                      valueEnum: SettlementEnum,
-                    },
-                    {
-                      dataIndex: 'settlementNo',
-                      title: '结算号',
-                    },
-                    {
-                      dataIndex: 'remark',
-                      title: '备注',
-                    },
-                  ]}
-                />
-              </ProForm.Item>
-            </>
-          )}
-          <ProFormTextArea name="memo" label="备注" />
-        </ProForm>
-      </ProCard>
-    </PageContainer>
+                <ProForm.Item name="entriesB" trigger="onValuesChange">
+                  <EditableProTable<FUND.Entries>
+                    rowKey="autoId"
+                    toolbar={{
+                      actions: [
+                        <ProForm.Item key="select" name="entries" noStyle>
+                          <FindUnHxList children="选择源单" formRef={formRef} bussType={bussType} />
+                        </ProForm.Item>,
+                      ],
+                    }}
+                    bordered
+                    recordCreatorProps={false}
+                    columns={FindUnHxListColumns(false)}
+                  />
+                </ProForm.Item>
+              </>
+            )}
+
+            {bussType === BussType.资金转账单 && (
+              <>
+                <ProForm.Item name="accounts" trigger="onValuesChange">
+                  <EditableProTable<FUND.Accounts>
+                    rowKey="autoId"
+                    bordered
+                    recordCreatorProps={{
+                      newRecordType: 'dataSource',
+                      record: {
+                        autoId: +(Math.random() * 1000000).toFixed(0),
+                      },
+                    }}
+                    editable={{
+                      type: 'multiple',
+                      editableKeys,
+                      onChange: setEditableKeys,
+                      actionRender: (row, config, defaultDom) => [defaultDom.delete],
+                    }}
+                    columns={[
+                      indexColumns,
+                      {
+                        dataIndex: 'payAccountId',
+                        title: '转出账户',
+                        valueType: 'select',
+                        valueEnum: accountEnum,
+                      },
+                      {
+                        dataIndex: 'recAccountId',
+                        title: '转入账户',
+                        valueType: 'select',
+                        valueEnum: accountEnum,
+                      },
+                      {
+                        dataIndex: 'amount',
+                        title: '金额',
+                        valueType: 'money',
+                      },
+                      {
+                        dataIndex: 'settlement',
+                        title: '结算方式',
+                        valueType: 'select',
+                        valueEnum: SettlementEnum,
+                      },
+                      {
+                        dataIndex: 'settlementNo',
+                        title: '结算号',
+                      },
+                      {
+                        dataIndex: 'remark',
+                        title: '备注',
+                      },
+                    ]}
+                  />
+                </ProForm.Item>
+              </>
+            )}
+            <ProFormTextArea name="memo" label="备注" />
+          </ProForm>
+        </ProCard>
+      }
+    />
   );
 };

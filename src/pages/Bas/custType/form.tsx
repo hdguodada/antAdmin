@@ -1,28 +1,16 @@
 import ProForm, { ProFormText, ModalForm } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
-import { Form, TreeSelect } from 'antd';
+import { Form } from 'antd';
 import React, { useRef } from 'react';
-import type { ActionType } from '@ant-design/pro-table';
 import { addCusttype, updCusttype } from '@/services/Bas';
 import { useModel } from 'umi';
-import { StateForm } from '@/utils/form';
+import { CustTypeSelect, StateForm } from '@/utils/form';
 
-type FormProps = {
-  action: 'add' | 'upd';
-  actionRef?: React.MutableRefObject<ActionType | undefined>;
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-  initialValues: BAS.CustType | Record<string, unknown>;
-};
-const DepForm: React.FC<FormProps> = (props) => {
+const CustTypeForm: React.FC<FormProps<BAS.CustType>> = (props) => {
   const { action, visible, setVisible, initialValues } = props;
-  const { treeDataSimpleMode } = useModel('custType', (model) => ({
-    treeDataSimpleMode: model.treeDataSimpleMode,
-  }));
   const formRef = useRef<FormInstance>();
-  const { queryCustTypeTree, queryCustType } = useModel('custType', (model) => ({
+  const { queryCustTypeTree } = useModel('custType', (model) => ({
     queryCustTypeTree: model.queryCustTypeTree,
-    queryCustType: model.queryCustType,
   }));
   return (
     <ModalForm<BAS.CustType>
@@ -30,7 +18,7 @@ const DepForm: React.FC<FormProps> = (props) => {
         state: 1,
       }}
       formRef={formRef}
-      title={action === 'add' ? '新建客户分类' : `修改客户分类(${initialValues.custTypeName})`}
+      title={action === 'add' ? '新建客户分类' : `修改客户分类(${initialValues?.custTypeName})`}
       visible={visible}
       onFinish={async (values) => {
         if (action === 'upd') {
@@ -39,7 +27,6 @@ const DepForm: React.FC<FormProps> = (props) => {
           await addCusttype(values);
         }
         queryCustTypeTree();
-        queryCustType();
         return true;
       }}
       onVisibleChange={(v) => {
@@ -48,20 +35,12 @@ const DepForm: React.FC<FormProps> = (props) => {
         } else {
           formRef.current?.resetFields();
         }
-        setVisible(v);
+        setVisible?.(v);
       }}
     >
       <ProForm.Group>
         <Form.Item label="上级客户" name="pcustTypeId" style={{ width: '328px' }}>
-          <TreeSelect
-            showSearch
-            placeholder="请选择"
-            allowClear
-            treeDefaultExpandAll
-            treeData={treeDataSimpleMode}
-            treeDataSimpleMode={true}
-            treeNodeFilterProp="title"
-          />
+          <CustTypeSelect />
         </Form.Item>
         <ProFormText width="md" name="custTypeName" label="客户分类名称" />
       </ProForm.Group>
@@ -70,4 +49,4 @@ const DepForm: React.FC<FormProps> = (props) => {
   );
 };
 
-export default DepForm;
+export default CustTypeForm;

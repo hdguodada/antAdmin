@@ -10,6 +10,7 @@ import { queryDepTreelist } from '@/services/Sys/dep';
 import UserForm from './form';
 import { baseSearch, indexColumns, optionColumns, stateColumns } from '@/utils/columns';
 import { useModel, useRequest } from 'umi';
+import GlobalWrapper from '@/components/GlobalWrapper';
 
 export type DepDataType = API.Dep;
 
@@ -165,7 +166,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
   ];
   return (
     <>
-      <ProTable<API.CurrentUser, { depId: number | string }>
+      <ProTable<API.CurrentUser, { depId: K }>
         actionRef={actionRef}
         params={{ depId }}
         rowKey="userId"
@@ -216,7 +217,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
 };
 
 export default (): React.ReactNode => {
-  const [depId, setdepId] = useState<string | number>(0);
+  const [depId, setdepId] = useState<K>(0);
   const depColumns = [
     {
       title: 'depId',
@@ -233,24 +234,27 @@ export default (): React.ReactNode => {
     },
   ];
   return (
-    <PageContainer
-      content={
-        <ProCard split="vertical">
-          <ProCard colSpan="384px">
-            <div style={{ height: 25 }} />
-            <DepTable
-              columns={depColumns}
-              onChange={(id) => {
-                setdepId(id);
-              }}
-              depId={depId}
-            />
+    <GlobalWrapper type={'list'}>
+      <PageContainer
+        title={false}
+        content={
+          <ProCard split="vertical">
+            <ProCard colSpan="384px">
+              <div style={{ height: 25 }} />
+              <DepTable
+                columns={depColumns}
+                onChange={(id) => {
+                  setdepId(id);
+                }}
+                depId={depId}
+              />
+            </ProCard>
+            <ProCard>
+              <UserTable depId={depId} />
+            </ProCard>
           </ProCard>
-          <ProCard>
-            <UserTable depId={depId} />
-          </ProCard>
-        </ProCard>
-      }
-    />
+        }
+      />
+    </GlobalWrapper>
   );
 };

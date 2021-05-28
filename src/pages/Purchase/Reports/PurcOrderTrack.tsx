@@ -158,27 +158,29 @@ export default function PurcOrderTrack() {
       rowKey="autoId"
       options={false}
       bordered
-      summary={() => (
-        <Table.Summary.Row>
-          <Table.Summary.Cell index={0} colSpan={7}>
-            合计
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={2}>
-            <Text type="danger">¥{data?.summary?.qty}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={3}></Table.Summary.Cell>
-          <Table.Summary.Cell index={4}>
-            <Text type="danger">¥{data?.summary?.amount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={5}>
-            <Text type="danger">¥{data?.summary?.unQty}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={6}>
-            <Text type="danger"> ¥{data?.summary?.unAmount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={7} colSpan={4}></Table.Summary.Cell>
-        </Table.Summary.Row>
-      )}
+      summary={() =>
+        !(data?.summary instanceof Array) && (
+          <Table.Summary.Row>
+            <Table.Summary.Cell index={0} colSpan={7}>
+              合计
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={2}>
+              <Text type="danger">¥{data?.summary?.qty}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={3} />
+            <Table.Summary.Cell index={4}>
+              <Text type="danger">¥{data?.summary?.amount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={5}>
+              <Text type="danger">¥{data?.summary?.unQty}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={6}>
+              <Text type="danger"> ¥{data?.summary?.unAmount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={7} colSpan={4} />
+          </Table.Summary.Row>
+        )
+      }
       columns={columns}
       scroll={{ x: 2000 }}
       pagination={{

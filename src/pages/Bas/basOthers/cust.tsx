@@ -3,19 +3,22 @@ import ProCard from '@ant-design/pro-card';
 import CustLevel from '../custLevel';
 import CustArea from '../custArea';
 import CustType from '../custType';
+import GlobalWrapper from '@/components/GlobalWrapper';
 
 export default () => {
   return (
-    <ProCard split={'vertical'}>
-      <ProCard>
-        <CustLevel />
+    <GlobalWrapper type={'list'}>
+      <ProCard split={'vertical'}>
+        <ProCard>
+          <CustLevel />
+        </ProCard>
+        <ProCard>
+          <CustArea />
+        </ProCard>
+        <ProCard>
+          <CustType />
+        </ProCard>
       </ProCard>
-      <ProCard>
-        <CustArea />
-      </ProCard>
-      <ProCard>
-        <CustType />
-      </ProCard>
-    </ProCard>
+    </GlobalWrapper>
   );
 };

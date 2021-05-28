@@ -17,7 +17,7 @@ import BatchDel from '@/components/DelPopconfirm';
 import GlobalWrapper from '@/components/GlobalWrapper';
 import { Typography } from 'antd';
 import ProCard from '@ant-design/pro-card';
-import { ProdcutTypeTable } from '../productType';
+import ProdcutTypeTable from '../productType';
 
 const { Link } = Typography;
 const ProductsTable: React.FC<{
@@ -113,21 +113,17 @@ const ProductsTable: React.FC<{
   );
 };
 export default () => {
-  const [cateId, setCateId] = useState<K>(-1);
+  const [cateId, setCateId] = useState<K>();
+  console.log(cateId);
   return (
-    <GlobalWrapper type="descriptions">
+    <GlobalWrapper type="list">
       <PageContainer
+        title={false}
         content={
           <ProCard split="vertical">
             <ProCard colSpan="384px">
               <div style={{ height: 25 }} />
-              <ProdcutTypeTable
-                inSpuPage
-                cateId={cateId}
-                onChange={(id) => {
-                  setCateId(id);
-                }}
-              />
+              <ProdcutTypeTable inSpuPage cateId={cateId} setcateId={setCateId} />
             </ProCard>
             <ProCard>
               <ProductsTable cateId={cateId} />

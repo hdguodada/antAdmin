@@ -23,7 +23,7 @@ export const XhddReports: React.FC = () => {
   const { userOptions } = useModel('user', (model) => ({ userOptions: model.options }));
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
     spuCodeColumns,
-    skuIdColumns,
+    skuIdColumns({}),
     unitIdColumns,
     {
       title: '单据日期',
@@ -124,28 +124,30 @@ export const XhddReports: React.FC = () => {
       bordered
       options={false}
       scroll={{ x: 1800, y: 500 }}
-      summary={() => (
-        <Table.Summary.Row>
-          <Table.Summary.Cell index={0}>合计</Table.Summary.Cell>
-          <Table.Summary.Cell index={1} colSpan={4} />
-          <Table.Summary.Cell index={2}>
-            <Text type="danger">¥{data?.summary?.amount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={3}>
-            <Text type="danger">¥{data?.summary?.qty}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={4}>
-            <Text type="danger">¥{data?.summary?.amount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={5}>
-            <Text type="danger">¥{data?.summary?.unAmount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={6}>
-            <Text type="danger">¥{data?.summary?.unQty}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={7} />
-        </Table.Summary.Row>
-      )}
+      summary={() =>
+        !(data?.summary instanceof Array) && (
+          <Table.Summary.Row>
+            <Table.Summary.Cell index={0}>合计</Table.Summary.Cell>
+            <Table.Summary.Cell index={1} colSpan={4} />
+            <Table.Summary.Cell index={2}>
+              <Text type="danger">¥{data?.summary?.amount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={3}>
+              <Text type="danger">¥{data?.summary?.qty}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={4}>
+              <Text type="danger">¥{data?.summary?.amount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={5}>
+              <Text type="danger">¥{data?.summary?.unAmount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={6}>
+              <Text type="danger">¥{data?.summary?.unQty}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={7} />
+          </Table.Summary.Row>
+        )
+      }
     />
   );
 };

@@ -36,6 +36,7 @@ export function transformTreeData(
   key = 'id',
   title = 'label',
   children = 'children',
+  isLeaf = false,
 ): DataNode[] {
   return list.map((item) => {
     return {
@@ -43,8 +44,10 @@ export function transformTreeData(
       key: item[key],
       value: item[key],
       title: item[title],
+      disabled: isLeaf ? !item.isLeaf : false,
+      isLeaf: item.isLeaf,
       children: item[children]
-        ? transformTreeData(item[children], payload, key, title, children)
+        ? transformTreeData(item[children], payload, key, title, children, isLeaf)
         : undefined,
     };
   });
@@ -121,7 +124,7 @@ export function prefixInteger(num: string, length: number) {
   return (Array(length).join('0') + num).slice(-length);
 }
 
-export const calPrice = (values: PUR.Purchase, formRef: any, calRpAmount = false) => {
+export const calPrice = (values: Partial<PUR.Purchase>, formRef: any, calRpAmount = false) => {
   if (values.entries !== undefined) {
     let totalQty = 0;
     let totalAmount = 0;
@@ -134,6 +137,7 @@ export const calPrice = (values: PUR.Purchase, formRef: any, calRpAmount = false
       const taxPrice = toDecimal2((record.price || 0) * (1 + (record.taxRate || 0) / 100));
       const taxAmount = toDecimal2(tax + amount);
       const rate = calRate(record);
+      console.log(record.qty);
       return {
         ...record,
         rate,

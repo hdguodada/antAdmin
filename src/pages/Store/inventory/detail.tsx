@@ -14,14 +14,13 @@ import {
 import { queryToPd, stockInventoryInfo } from '@/services/Store';
 import moment from 'moment';
 import type { FormInstance } from 'antd';
-import { InputNumber, message, Modal, Space } from 'antd';
+import { Drawer } from 'antd';
+import { message, Space } from 'antd';
 import { Button } from 'antd';
 import { DatePicker } from 'antd';
 import { useRequest } from '@/.umi/plugin-request/request';
 import Style from '@/global.less';
 import ProForm, {
-  DrawerForm,
-  ModalForm,
   ProFormDatePicker,
   ProFormRadio,
   ProFormSelect,
@@ -35,11 +34,12 @@ import GlobalWrapper from '@/components/GlobalWrapper';
 import { BussType, BussTypeComponentUrl } from '@/pages/Purchase/components';
 import { StoreForm } from '../components';
 import { SNTransfer } from '../serNum/serNumDetail';
+import { history } from 'umi';
+import ProCard from '@ant-design/pro-card';
 
 export const Inventory: React.FC = () => {
   const formRef = useRef<FormInstance<STORE.invOiForm>>();
   const actionRef = useRef<ActionType>();
-  const [e, sE] = useState<K[]>([]);
   const { loading, run } = useRequest(
     async (params?: Partial<STORE.invOiForm>, url?: string) => {
       const res = await queryToPd(params, url);
@@ -64,7 +64,13 @@ export const Inventory: React.FC = () => {
     async (id: K) => {
       const { data, code } = await stockInventoryInfo(id);
       return {
-        data,
+        data: {
+          ...data,
+          entries: data.entries.map((i) => ({
+            ...i,
+            inventoryResult: JSON.parse(i.inventoryResult as string),
+          })),
+        },
         success: code === 0,
       };
     },
@@ -82,8 +88,9 @@ export const Inventory: React.FC = () => {
     },
     {
       manual: true,
-      onSuccess: () => {
-        message.success('保存盘点结果成功');
+      onSuccess: (v) => {
+        message.success(`新增盘点单成功.盘点单号为: ${v.billNo}`);
+        history.push(`${BussTypeComponentUrl.盘点}/${v.billId}`);
       },
     },
   );
@@ -119,7 +126,7 @@ export const Inventory: React.FC = () => {
       editable: false,
       width: 150,
     },
-    skuIdColumns,
+    skuIdColumns({ search: false }),
     unitIdColumns,
     qtyColumns({
       title: '系统库存',
@@ -127,7 +134,7 @@ export const Inventory: React.FC = () => {
       rest: { editable: false },
     }),
     {
-      dataIndex: 'checkInventoryQty',
+      dataIndex: 'checkInventoryQtyMid',
       title: () => (
         <div>
           <span className="error-color">*</span>盘点库存
@@ -136,18 +143,31 @@ export const Inventory: React.FC = () => {
       search: false,
       valueType: 'digit',
       width: 200,
-      renderFormItem: ({ index }) => {
-        const isSerNum = formRef.current?.getFieldValue('isSerNum');
-        const entries = formRef.current?.getFieldValue('entries');
-        const { skuId } = entries[index as number];
-        const { storeCd } = entries[index as number];
+      render: (_, record) => {
+        const { isSerNum } = record;
+        const { skuId, storeCd } = record;
         return (
           <SNTransfer
+            value={record.inventoryResult}
             isSerNum={isSerNum}
             skuId={skuId}
+            qty={record.qty}
             storeCd={storeCd}
-            formRef={formRef}
-            entries={entries}
+            onChange={(v) => {
+              const recordList: STORE.invOiEntries[] = formRef.current?.getFieldValue('entries');
+              const recordListCalChange = recordList.map((item) =>
+                item.autoId === record.autoId
+                  ? {
+                      ...item,
+                      inventoryResult: v,
+                      checkInventoryQty: v?.checkInventoryQty || undefined,
+                    }
+                  : item,
+              );
+              formRef.current?.setFieldsValue({
+                entries: recordListCalChange,
+              });
+            }}
           />
         );
       },
@@ -159,10 +179,18 @@ export const Inventory: React.FC = () => {
       editable: false,
       width: 100,
       render: (_, record) => {
-        if (record.inventoryResult !== undefined) {
+        if (record.inventoryResult) {
+          if (record.isSerNum) {
+            return (
+              <Space>
+                <div>盤盈: {record.inventoryResult.newSerNum?.length}</div>
+                <div>盤亏: {record.inventoryResult.delSerNum?.length}</div>
+              </Space>
+            );
+          }
           return (
-            <div className={record.inventoryResult < 0 ? Style['error-color'] : ''}>
-              {record.inventoryResult}
+            <div className={(record.inventoryResult?.length || 0) < 0 ? Style['error-color'] : ''}>
+              {record.inventoryResult?.length || record.inventoryResult}
             </div>
           );
         }
@@ -175,18 +203,36 @@ export const Inventory: React.FC = () => {
     type,
     inventoryId,
   }) => {
+    const [visible, setVisible] = useState(false);
     return inventoryId !== 'new' ? (
-      <DrawerForm
-        drawerProps={{ placement: 'bottom', height: '70vh' }}
-        trigger={<Button children={type === 'py' ? '生成盘盈单' : '生成盘亏单'} />}
-      >
-        <StoreForm
-          bussType={type === 'py' ? BussType.其他入库单 : BussType.其他出库单}
-          id="new"
-          query={{}}
-          inventoryInfo={stockInventoryUR.data}
-        />
-      </DrawerForm>
+      <>
+        <Drawer
+          placement="bottom"
+          height="70vh"
+          visible={visible}
+          onClose={() => {
+            setVisible(false);
+          }}
+        >
+          <ProCard>
+            <StoreForm
+              bussType={type === 'py' ? BussType.其他入库单 : BussType.其他出库单}
+              id="new"
+              query={{}}
+              inventoryInfo={stockInventoryUR.data}
+            />
+          </ProCard>
+        </Drawer>
+        <Button
+          type="dashed"
+          danger={type === 'pk'}
+          onClick={() => {
+            setVisible(true);
+          }}
+        >
+          {type === 'py' ? '生成盘盈单' : '生成盘亏单'}
+        </Button>
+      </>
     ) : (
       <div />
     );
@@ -200,7 +246,24 @@ export const Inventory: React.FC = () => {
           key="save"
           loading={stockInventoryAdd.loading}
           onClick={async () => {
-            await stockInventoryAdd.run(formRef.current?.getFieldsValue());
+            const addInventoryForm = formRef.current?.getFieldsValue();
+
+            const submitForm = {
+              ...addInventoryForm,
+              entries: addInventoryForm?.entries.map((i) => {
+                if (i.checkInventoryQty !== 0 && !i.checkInventoryQty) {
+                  message.error('请输入盘点库存');
+                  return false;
+                }
+                return {
+                  ...i,
+                  inventoryResult: JSON.stringify(i.inventoryResult),
+                };
+              }),
+            };
+            if (submitForm.entries?.find((i) => !i) === undefined) {
+              await stockInventoryAdd.run(submitForm);
+            }
           }}
         >
           保存盘点结果
@@ -225,7 +288,26 @@ export const Inventory: React.FC = () => {
                 options={[{ value: '', label: '所有仓库' }, ...storeOptions]}
                 width="md"
               />
-              <ProFormText name="skuName" label="商品" width="md" />
+              <ProFormText
+                name="skuName"
+                label="商品"
+                width="md"
+                fieldProps={{
+                  onKeyDownCapture: async (event) => {
+                    if (event.key === 'Enter') {
+                      const filterForm = formRef.current?.getFieldsValue();
+                      if (filterForm?.isSerNum) {
+                        await run(
+                          copyFilterObj(filterForm, ['entries']),
+                          '/bis/stockInventory/queryToSeriPd',
+                        );
+                      } else {
+                        await run(copyFilterObj(filterForm, ['entries']));
+                      }
+                    }
+                  },
+                }}
+              />
               <ProForm.Item name="showZero" label="零库存">
                 <ProFormCheckBoxZeroAndOne />
               </ProForm.Item>
@@ -255,11 +337,6 @@ export const Inventory: React.FC = () => {
                 rowKey="autoId"
                 bordered
                 loading={loading}
-                onRow={(record) => ({
-                  onClick: () => {
-                    sE([record.autoId]);
-                  },
-                })}
                 toolbar={{
                   actions: [
                     <Button
@@ -285,25 +362,7 @@ export const Inventory: React.FC = () => {
                 actionRef={actionRef}
                 recordCreatorProps={false}
                 editable={{
-                  editableKeys: e,
                   type: 'multiple',
-                  onValuesChange: (record, recordList) => {
-                    const isSerNum = formRef.current?.getFieldValue('isSerNum');
-                    if (isSerNum) {
-                      return;
-                    }
-                    const recordListCalChange = recordList.map((item) =>
-                      item.autoId === record.autoId
-                        ? {
-                            ...item,
-                            inventoryResult: (item.checkInventoryQty || 0) - item.qty,
-                          }
-                        : item,
-                    );
-                    formRef.current?.setFieldsValue({
-                      entries: recordListCalChange,
-                    });
-                  },
                 }}
               />
             </ProForm.Item>

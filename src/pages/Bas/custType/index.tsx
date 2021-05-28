@@ -8,17 +8,14 @@ import CustTypeForm from './form';
 import { delCusttype } from '@/services/Bas';
 import { optionColumns, stateColumns } from '@/utils/columns';
 
-const CustTypeTable: React.FC<{
-  columns?: ProColumns<BAS.CustType>[];
-}> = () => {
-  const { queryCustTypeTree, custTypeTree, queryCustType } = useModel('custType', (model) => ({
+export default function CustTypeTable() {
+  const { queryCustTypeTree, custTypeTree } = useModel('custType', (model) => ({
     queryCustTypeTree: model.queryCustTypeTree,
-    queryCustType: model.queryCustType,
     custTypeTree: model.custTypeTree,
   }));
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<BAS.CustType>>({});
+  const [modalFormInit, setModalFormInit] = useState<BAS.CustType>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const columns: ProColumns<BAS.CustType>[] = [
     {
@@ -37,42 +34,38 @@ const CustTypeTable: React.FC<{
       del: async ({ record }) => {
         await delCusttype([record.custTypeId]);
         queryCustTypeTree();
-        queryCustType();
       },
     }),
   ];
 
   return (
     <>
-      {custTypeTree.length > 0 && (
-        <ProTable<BAS.CustType>
-          pagination={false}
-          search={false}
-          rowKey="custTypeId"
-          actionRef={actionRef}
-          expandable={{
-            defaultExpandAllRows: true,
-          }}
-          headerTitle={'客户类别'}
-          options={false}
-          toolBarRender={() => [
-            <Button
-              type="primary"
-              onClick={() => {
-                setFormAction('add');
-                setModalFormInit({});
-                setModalVisit(true);
-              }}
-            >
-              <PlusOutlined />
-              新建
-            </Button>,
-          ]}
-          columns={columns}
-          dataSource={custTypeTree[0].children}
-        />
-      )}
-
+      <ProTable<BAS.CustType>
+        pagination={false}
+        search={false}
+        rowKey="custTypeId"
+        actionRef={actionRef}
+        expandable={{
+          defaultExpandAllRows: true,
+        }}
+        headerTitle={'客户类别'}
+        options={false}
+        toolBarRender={() => [
+          <Button
+            type="primary"
+            onClick={() => {
+              setFormAction('add');
+              setModalFormInit(undefined);
+              setModalVisit(true);
+            }}
+          >
+            <PlusOutlined />
+            新建
+          </Button>,
+        ]}
+        columns={columns}
+        dataSource={custTypeTree[0].children}
+      />
       <CustTypeForm
         action={formAction}
         visible={modalVisit}
@@ -82,7 +75,4 @@ const CustTypeTable: React.FC<{
       />
     </>
   );
-};
-export default () => {
-  return <CustTypeTable />;
-};
+}

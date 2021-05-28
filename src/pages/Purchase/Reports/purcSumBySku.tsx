@@ -29,7 +29,7 @@ export default () => {
         }),
       },
     },
-    cateIdColumns,
+    cateIdColumns(),
     {
       title: '供应商',
       dataIndex: 'suppId',
@@ -134,29 +134,31 @@ export default () => {
       request={async (params) => {
         return run(params);
       }}
-      summary={() => (
-        <Table.Summary.Row>
-          <Table.Summary.Cell index={0} colSpan={6}>
-            合计
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={2}>
-            <Text type="danger">{data?.summary?.baseQty}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={3}>
-            <Text type="danger">¥{data?.summary?.price}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={4}>
-            <Text type="danger">¥{data?.summary?.amount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={5}>
-            <Text type="danger">¥{data?.summary?.tax}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={6}>
-            <Text type="danger">¥{data?.summary?.taxAmount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={7}></Table.Summary.Cell>
-        </Table.Summary.Row>
-      )}
+      summary={() =>
+        !(data?.summary instanceof Array) && (
+          <Table.Summary.Row>
+            <Table.Summary.Cell index={0} colSpan={6}>
+              合计
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={2}>
+              <Text type="danger">{data?.summary?.baseQty}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={3}>
+              <Text type="danger">¥{data?.summary?.price}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={4}>
+              <Text type="danger">¥{data?.summary?.amount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={5}>
+              <Text type="danger">¥{data?.summary?.tax}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={6}>
+              <Text type="danger">¥{data?.summary?.taxAmount}</Text>
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={7} />
+          </Table.Summary.Row>
+        )
+      }
     />
   );
 };

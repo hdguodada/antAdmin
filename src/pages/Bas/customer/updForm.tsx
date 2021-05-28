@@ -155,8 +155,9 @@ export default ({ initialValues, refresh }: FormProps<BAS.Customer>) => {
               treeNodeFilterProp="title"
             />
           </Form.Item>
-
-          <DepSelect showNew={true} name={'depId'} label={'所属部门'} />
+          <ProForm.Item name={'depId'} label={'所属部门'}>
+            <DepSelect showNew />
+          </ProForm.Item>
           {StateForm}
         </ProForm.Group>
       </ModalForm>

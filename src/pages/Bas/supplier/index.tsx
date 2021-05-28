@@ -9,6 +9,7 @@ import {
   indexColumns,
   keywordColumns,
   stateColumns,
+  suppColumns,
   tableAlertOptionRenderDom,
 } from '@/utils/columns';
 import { history } from 'umi';
@@ -42,25 +43,12 @@ export const Supplier = forwardRef((props: SupplierProps, ref) => {
     keywordColumns({
       placeholder: '按供应商编号,供应商名称,等查询',
     }),
-
     indexColumns,
-    {
-      dataIndex: 'suppId',
-      title: '供应商类别',
-      valueType: 'select',
-      hideInTable: true,
-      render: (_, record) => <div>{record.suppTypeName}</div>,
-      search: false,
-    },
+    suppColumns(undefined, { search: false }),
     {
       dataIndex: 'suppCd',
       title: '供应商编号',
       copyable: true,
-      search: false,
-    },
-    {
-      dataIndex: 'suppName',
-      title: '供应商名称',
       search: false,
     },
     {

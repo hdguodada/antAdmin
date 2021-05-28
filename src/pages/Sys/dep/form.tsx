@@ -42,7 +42,9 @@ const DepForm: React.FC<FormProps<API.Dep>> = (props) => {
           label="部门名称"
           rules={patternMsg.text('部门名称')}
         />
-        <DepSelect name="pDepId" label="上级部门" showNew={false} />
+        <ProForm.Item name="pDepId" label="上级部门">
+          <DepSelect />
+        </ProForm.Item>
       </ProForm.Group>
       <ProForm.Group>
         <ProFormText width="md" name="leader" label="部门负责人" />

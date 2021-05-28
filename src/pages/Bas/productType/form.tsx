@@ -1,24 +1,17 @@
 import ProForm, { ProFormText, ModalForm, ProFormSlider } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
 import { Input, Select } from 'antd';
-import { Form, TreeSelect } from 'antd';
+import { Form } from 'antd';
 import React, { useRef, useState } from 'react';
-import type { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ProColumns } from '@ant-design/pro-table';
 import { EditableProTable } from '@ant-design/pro-table';
 import { addProductType, updProductType } from '@/services/Bas';
 import { useModel } from 'umi';
 import { AttrValuesSelect } from '../product/detail';
 import { patternMsg } from '@/utils/validator';
+import { ProductTypeTreeSelect } from '@/utils/form';
 
-type FormProps = {
-  action: 'add' | 'upd';
-  actionRef?: React.MutableRefObject<ActionType | undefined>;
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-  initialValues: BAS.ProductType | undefined;
-  addCb?: () => void;
-};
-export default (props: FormProps) => {
+export default function ProductTypeForm(props: FormProps<BAS.ProductType>) {
   const { action, visible, setVisible, initialValues } = props;
   const formRef = useRef<FormInstance>();
   const [specListEditableKeys, setSpecListEditableKeys] = useState<React.Key[]>([]);
@@ -26,10 +19,9 @@ export default (props: FormProps) => {
     attrListOptions: model.options,
     allAttrList: model.list,
   }));
-  const { queryTreeProductType, treeDataSimpleMode } = useModel('productType', (model) => ({
+  const { queryTreeProductType } = useModel('productType', (model) => ({
     queryProductType: model.query,
     queryTreeProductType: model.query,
-    treeDataSimpleMode: model.treeDataSimpleMode,
   }));
   const specColumns: ProColumns<BAS.Attr>[] = [
     {
@@ -70,7 +62,6 @@ export default (props: FormProps) => {
         if (action === 'upd') {
           await updProductType({ ...initialValues, ...values });
         } else {
-          console.log(values);
           await addProductType(values);
         }
         queryTreeProductType();
@@ -85,7 +76,7 @@ export default (props: FormProps) => {
         } else {
           formRef.current?.resetFields();
         }
-        setVisible(v);
+        setVisible?.(v);
       }}
     >
       <Form.Item
@@ -94,14 +85,7 @@ export default (props: FormProps) => {
         style={{ width: '328px' }}
         rules={patternMsg.select('上级类别')}
       >
-        <TreeSelect
-          showSearch
-          placeholder="请选择"
-          allowClear
-          treeDefaultExpandAll
-          treeData={treeDataSimpleMode}
-          treeNodeFilterProp="title"
-        />
+        <ProductTypeTreeSelect />
       </Form.Item>
       <ProForm.Group>
         <ProFormText
@@ -137,4 +121,4 @@ export default (props: FormProps) => {
       </ProForm.Group>
     </ModalForm>
   );
-};
+}

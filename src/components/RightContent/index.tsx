@@ -1,25 +1,26 @@
-import { Tag, Space, Menu, Button } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Tag, Space, Button } from 'antd';
 import React from 'react';
 import { useModel, SelectLang } from 'umi';
 import Avatar from './AvatarDropdown';
-import HeaderDropdown from '../HeaderDropdown';
 import HeaderSearch from '../HeaderSearch';
 import styles from './index.less';
-import { quickList, quickMap } from '@/pages/Desktop';
 import { history } from 'umi';
+import { useRequest } from 'umi';
 
 export type SiderTheme = 'light' | 'dark';
 
-const ENVTagColor = {
-  dev: 'orange',
-  test: 'green',
-  pre: '#87d068',
-};
-
 const GlobalHeaderRight: React.FC = () => {
   const { initialState } = useModel('@@initialState');
-
+  const { run, data } = useRequest<RowResponse<{ id: string; name: string; type: number }>>(
+    (params) => {
+      return {
+        url: '/bas/quickGo',
+        data: { dev: 'bas' },
+        params,
+      };
+    },
+    { manual: true },
+  );
   if (!initialState || !initialState.settings) {
     return null;
   }
@@ -30,27 +31,32 @@ const GlobalHeaderRight: React.FC = () => {
   if ((navTheme === 'dark' && layout === 'top') || layout === 'mix') {
     className = `${styles.right}  ${styles.dark}`;
   }
+
   return (
     <Space className={className}>
       <HeaderSearch
         className={`${styles.action} ${styles.search}`}
         placeholder="站内搜索"
-        options={quickList.map((item) => ({
+        options={data?.rows.map((item) => ({
           label: (
             <Button
               type="link"
               onClick={() => {
-                history.push(`${quickMap[item].componentUrl}/new`);
+                const url =
+                  item.type === 1 ? `/bas/customer/${item.id}` : `/bas/supplier/${item.id}`;
+                history.push(url);
               }}
             >
-              {quickMap[item].title}
+              {item.name} -- <Tag>{item.type === 1 ? '客户' : '供应商'}</Tag>
             </Button>
           ),
-          value: quickMap[item].title,
+          value: item.id,
         }))}
-        // onSearch={value => {
-        //   console.log('input', value);
-        // }}
+        onSearch={async (value) => {
+          await run({
+            keyword: value,
+          });
+        }}
       />
       {/* <HeaderDropdown
         overlay={
@@ -77,11 +83,6 @@ const GlobalHeaderRight: React.FC = () => {
         </span>
       </HeaderDropdown> */}
       <Avatar />
-      {REACT_APP_ENV && (
-        <span>
-          <Tag color={ENVTagColor[REACT_APP_ENV]}>{REACT_APP_ENV}</Tag>
-        </span>
-      )}
       <SelectLang className={styles.action} />
     </Space>
   );

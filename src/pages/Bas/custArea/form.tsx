@@ -1,10 +1,10 @@
 import ProForm, { ProFormText, ModalForm } from '@ant-design/pro-form';
 import type { FormInstance } from 'antd';
-import { Form, TreeSelect } from 'antd';
+import { Form } from 'antd';
 import React, { useRef } from 'react';
 import { addCustArea, updCustArea } from '@/services/Bas';
 import { useModel } from 'umi';
-import { StateForm } from '@/utils/form';
+import { CustAreaSelect, StateForm } from '@/utils/form';
 import { patternMsg } from '@/utils/validator';
 
 const CustAreaForm: React.FC<FormProps<BAS.CustArea>> = (props) => {
@@ -13,9 +13,6 @@ const CustAreaForm: React.FC<FormProps<BAS.CustArea>> = (props) => {
     queryCustArea: model.queryCustArea,
   }));
   const { action, visible, setVisible, initialValues } = props;
-  const { treeDataSimpleMode } = useModel('custArea', (model) => ({
-    treeDataSimpleMode: model.treeDataSimpleMode,
-  }));
   const formRef = useRef<FormInstance>();
   return (
     <ModalForm<BAS.CustArea>
@@ -51,15 +48,7 @@ const CustAreaForm: React.FC<FormProps<BAS.CustArea>> = (props) => {
           style={{ width: '328px' }}
           rules={patternMsg.select('上级区域')}
         >
-          <TreeSelect
-            showSearch
-            placeholder="请选择"
-            allowClear
-            treeDefaultExpandAll
-            treeData={treeDataSimpleMode}
-            treeDataSimpleMode={true}
-            treeNodeFilterProp="title"
-          />
+          <CustAreaSelect />
         </Form.Item>
         <ProFormText
           width="md"

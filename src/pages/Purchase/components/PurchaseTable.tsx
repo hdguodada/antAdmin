@@ -7,9 +7,8 @@ import type { AdvancedSearchFormField } from '@/utils/columns';
 import { OrderTableColumns } from '@/utils/columns';
 import { AdvancedSearch, AdvancedSearchForm } from '@/utils/columns';
 import { showSysInfo } from '@/components/SysInfo';
-import { CheckButton, OpenButton } from '../../../../components/CheckButton';
-import moment from 'moment';
-import { BussType } from '..';
+import { CheckButton, OpenButton } from '../../../components/CheckButton';
+import { BussType } from '.';
 import Style from '@/global.less';
 import { delPurchase } from '@/services/Purchase';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -33,8 +32,6 @@ export type OrderTableProps<T> = {
 export default function OrderTable<T extends Record<string, unknown>>(props: OrderTableProps<T>) {
   const { url, checkUrl, openCloseFn, queryList, componentUrl, initSearch, dev, bussType } = props;
   const columns = OrderTableColumns<T>({
-    url,
-    componentUrl,
     bussType,
   });
   const actionRef = useRef<ActionType>();
@@ -55,7 +52,7 @@ export default function OrderTable<T extends Record<string, unknown>>(props: Ord
             }
             return '';
           }}
-          scroll={{ x: 1500 }}
+          scroll={{ x: 2500 }}
           params={advancedSearchFormValues}
           actionRef={actionRef}
           search={AdvancedSearch({
@@ -70,13 +67,14 @@ export default function OrderTable<T extends Record<string, unknown>>(props: Ord
                 bussType={bussType}
               />,
             ],
-            other: {
-              defaultCollapsed: false,
+            searchConfig: {
+              span: 6,
             },
             myReset: () => {
               setAdvancedSearchFormValues(undefined);
             },
           })}
+          bordered
           onRow={(record) => {
             return {
               onDoubleClick: () => {
@@ -116,8 +114,6 @@ export default function OrderTable<T extends Record<string, unknown>>(props: Ord
           beforeSearchSubmit={(params) => {
             return {
               ...params,
-              beginDate: params.date?.[0] ?? moment().startOf('month').format('YYYY-MM-DD'),
-              endDate: params.date?.[1] ?? moment().format('YYYY-MM-DD'),
               status: params.billStatus ?? [],
             };
           }}
