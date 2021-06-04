@@ -3,6 +3,7 @@ import { mapModId } from '@/utils/utils';
 import { showSysInfo } from '@/components/SysInfo';
 import { Button, Dropdown, Menu } from 'antd';
 import React from 'react';
+import { useModel } from '@/.umi/plugin-model/useModel';
 
 type CheckButtonProps = {
   url: string;

@@ -2,7 +2,7 @@ import React, { useRef, useState, forwardRef, useImperativeHandle } from 'react'
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { delCustomer, queryCustomers } from '@/services/Bas';
-import { history } from 'umi';
+import { history, useModel } from 'umi';
 import CustomerForm from './form';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
@@ -14,11 +14,13 @@ import {
   tableAlertOptionRenderDom,
 } from '@/utils/columns';
 import BatchDel from '@/components/DelPopconfirm';
-import { Button } from 'antd';
+import { Button, Tree } from 'antd';
 import { copyFilterObjWithWhiteList } from '@/utils/utils';
+import ProCard from '@ant-design/pro-card';
+import GlobalWrapper from '@/components/GlobalWrapper';
 
 type CustomerTableProps = {
-  selectParams?: { state: number };
+  selectParams?: { state?: number; custTypeId?: K };
   select?: boolean;
   onChange?: (value: BAS.Customer[]) => void;
   multiple?: boolean;
@@ -78,7 +80,12 @@ export const CustomerTable = forwardRef((props: CustomerTableProps, ref) => {
               key="editable"
               onClick={async () => {
                 onChange?.([
-                  copyFilterObjWithWhiteList(entity, ['custCd', 'custId', 'accountPayableSum']),
+                  copyFilterObjWithWhiteList(entity, [
+                    'custCd',
+                    'custId',
+                    'accountPayableSum',
+                    'custName',
+                  ]),
                 ]);
               }}
             >
@@ -161,5 +168,33 @@ export const CustomerTable = forwardRef((props: CustomerTableProps, ref) => {
 });
 
 export default () => {
-  return <PageContainer title={false} content={<CustomerTable />} />;
+  const { custTypeTree } = useModel('custType', (model) => ({
+    custTypeTree: model.leafCanClickTreeData,
+  }));
+  const [custTypeId, setcustTypeId] = useState<K>();
+  return (
+    <GlobalWrapper type="descriptions">
+      <PageContainer
+        title={false}
+        content={
+          <ProCard split="vertical">
+            <ProCard style={{ width: '328px' }}>
+              <Tree
+                treeData={custTypeTree?.[0].children}
+                defaultExpandAll
+                showLine
+                showIcon
+                onSelect={(selectedKes) => {
+                  setcustTypeId(selectedKes[0]);
+                }}
+              />
+            </ProCard>
+            <ProCard>
+              <CustomerTable selectParams={{ custTypeId }} />
+            </ProCard>
+          </ProCard>
+        }
+      />
+    </GlobalWrapper>
+  );
 };

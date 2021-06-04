@@ -15,9 +15,9 @@ export default (): React.ReactNode => {
   const [modalVisit, setModalVisit] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const [moduleOptions, setModuleOptions] = useState<any[]>([]);
-  const [modalFormInit, setModalFormInit] = useState<Partial<API.Dep>>({});
+  const [modalFormInit, setModalFormInit] = useState<Partial<SYS.Dep>>({});
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
-  const columns: ProColumnType<API.Module>[] = [
+  const columns: ProColumnType<SYS.Module>[] = [
     {
       title: 'id',
       dataIndex: 'modId',
@@ -29,25 +29,25 @@ export default (): React.ReactNode => {
       title: '模块名称',
       dataIndex: 'modName',
       editable: false,
-      width: 250,
+      width: '60%',
       search: false,
     },
     memoColumns(),
-    {
-      title: '路由',
-      dataIndex: 'Path',
-      search: false,
-    },
-    {
-      title: '组件',
-      dataIndex: 'component',
-      search: false,
-    },
-    {
-      title: '图标',
-      dataIndex: 'icon',
-      search: false,
-    },
+    // {
+    //   title: '路由',
+    //   dataIndex: 'path',
+    //   search: false,
+    // },
+    // {
+    //   title: '组件',
+    //   dataIndex: 'component',
+    //   search: false,
+    // },
+    // {
+    //   title: '图标',
+    //   dataIndex: 'icon',
+    //   search: false,
+    // },
     stateColumns,
     optionColumns({
       modify: async ({ record }) => {
@@ -76,7 +76,7 @@ export default (): React.ReactNode => {
             actionRef={actionRef}
           />
           <ProCard split="vertical">
-            <ProTable<API.Module>
+            <ProTable<SYS.Module>
               search={false}
               actionRef={actionRef}
               rowKey="modId"
@@ -116,6 +116,6 @@ export default (): React.ReactNode => {
           </ProCard>
         </>
       }
-    ></PageContainer>
+    />
   );
 };

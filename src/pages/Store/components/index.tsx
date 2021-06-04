@@ -10,7 +10,7 @@ import {
   updPurchase,
 } from '@/services/Purchase';
 import type { AdvancedSearchFormField } from '@/utils/columns';
-import { bussTypeColumns, dateRangeColumns } from '@/utils/columns';
+import { bussTypeColumns, dateRangeColumns, qtyWithSNColumns } from '@/utils/columns';
 import {
   AdvancedSearch,
   AdvancedSearchForm,
@@ -50,7 +50,6 @@ import Style from '@/global.less';
 import { CheckButton, CheckTwoButton, OpenButton } from '@/components/CheckButton';
 import { showSysInfo } from '@/components/SysInfo';
 import moment from 'moment';
-import { SN } from '@/pages/Store/serNum/serNumDetail';
 import { getCode } from '@/services/Sys';
 import { calPrice, transProTableParamsToMyRequest } from '@/utils/utils';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
@@ -65,6 +64,7 @@ import ProForm, {
 } from '@ant-design/pro-form';
 import { patternMsg } from '@/utils/validator';
 import CustomerSelect from '@/pages/Bas/customer/customerSelect';
+import type { XhddEntriesProps } from '@/pages/Sales/components';
 
 export const StoreTableColumns = ({
   bussType,
@@ -274,13 +274,16 @@ export type StoreFormProps = {
   query: Record<string, string>;
   inventoryInfo?: STORE.invOiForm;
 };
-export const StoreForm = (props: StoreFormProps) => {
-  const { bussType, dev, id, query, inventoryInfo } = props;
+export const StoreEntries = ({
+  bussType,
+  checked,
+  formRef,
+  value,
+  onChange,
+  rest,
+}: XhddEntriesProps) => {
   const actionRef = useRef<ActionType>();
-  const formRef = useRef<FormInstance>();
   const [editableKeys, setEditableKeys] = useState<React.Key[]>();
-  const [checked, setChecked] = useState<boolean>(false);
-  const [isInfo, setIsInfo] = useState<boolean>(false);
   const { storeEnum } = useModel('store', (model) => ({ storeEnum: model.valueEnum }));
   const columns: ProColumns<PUR.Entries>[] = [
     indexColumns,
@@ -343,42 +346,11 @@ export const StoreForm = (props: StoreFormProps) => {
       hideInTable: bussType !== BussType.调拨单,
     },
     currentQtyColumns(),
-    {
-      title: () => (
-        <div>
-          <span className="error-color">*</span>数量
-        </div>
-      ),
-      dataIndex: 'qty',
-      valueType: 'digit',
-      editable: false,
-      width: 255,
-      render: (_, record) => {
-        return (
-          <SN
-            sku={record}
-            disabled={checked || (record.currentQty || 0) <= 0}
-            initValue={{
-              qty: record.qty || 0,
-              serNumList: record.serNumList || [],
-            }}
-            onChange={(v) => {
-              const oldEntries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
-              const newEntries: PUR.Entries[] = oldEntries.map((en) => {
-                return record.skuId === en.skuId
-                  ? { ...en, qty: v.qty, serNumList: v.serNumList }
-                  : en;
-              });
-              formRef.current?.setFieldsValue({
-                entries: newEntries,
-              });
-              calPrice({ entries: newEntries }, formRef);
-            }}
-            stockType={bussType === BussType.其他入库单 ? StockType.入库 : StockType.出库}
-          />
-        );
-      },
-    },
+    qtyWithSNColumns(
+      value,
+      bussType === BussType.其他入库单 ? StockType.入库 : StockType.出库,
+      checked,
+    ),
     {
       title: () => (
         <div>
@@ -416,7 +388,6 @@ export const StoreForm = (props: StoreFormProps) => {
       editable: false,
       hideInTable: bussType === BussType.调拨单,
     },
-
     {
       dataIndex: 'inStoreCd',
       title: '调入仓库',
@@ -427,6 +398,62 @@ export const StoreForm = (props: StoreFormProps) => {
     },
     memoColumns(),
   ];
+  useEffect(() => {
+    if (value && !checked) {
+      setEditableKeys(value.map((item: any) => item.autoId) || []);
+    }
+  }, [value, checked]);
+  return (
+    <EditableProTable<PUR.Entries>
+      rowKey="autoId"
+      bordered
+      actionRef={actionRef}
+      scroll={
+        [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1
+          ? undefined
+          : { x: 3000 }
+      }
+      recordCreatorProps={false}
+      columns={columns}
+      editable={{
+        type: 'multiple',
+        editableKeys,
+        onChange: setEditableKeys,
+        onValuesChange: (record, recordList) => {
+          onChange?.(
+            recordList.map((i) => {
+              return record?.autoId === i.autoId
+                ? {
+                    ...i,
+                    qty: i.qtyMid?.qty || 0,
+                    serNumList: i.qtyMid?.serNumList || [],
+                  }
+                : i;
+            }),
+          );
+        },
+        actionRender: (row, config, defaultDom) => [defaultDom.delete],
+      }}
+      postData={(v) =>
+        v.map((i) => ({
+          ...i,
+          qtyMid: {
+            qty: i.qty,
+            serNumList: i.serNumList,
+          },
+        }))
+      }
+      value={value}
+      {...rest}
+    />
+  );
+};
+export const StoreForm = (props: StoreFormProps) => {
+  const { bussType, dev, id, query, inventoryInfo } = props;
+  const formRef = useRef<FormInstance>();
+  const [checked, setChecked] = useState<boolean>(false);
+  const [isInfo, setIsInfo] = useState<boolean>(false);
+
   const { run, refresh, data } = useRequest(
     async () => {
       setIsInfo(id !== 'new');
@@ -498,8 +525,6 @@ export const StoreForm = (props: StoreFormProps) => {
                 unitList: item.unitList,
               }));
           }
-          setEditableKeys(entries.map((i) => i.autoId));
-          console.log('inventoryInfo', entries);
           return {
             data: {
               ...res,
@@ -524,9 +549,6 @@ export const StoreForm = (props: StoreFormProps) => {
         ...en,
         autoId: +(Math.random() * 1000000).toFixed(0),
       }));
-      if (info.checkStatus !== 2) {
-        setEditableKeys(entries?.map((i) => i.autoId));
-      }
       return {
         data: {
           ...info,
@@ -662,18 +684,7 @@ export const StoreForm = (props: StoreFormProps) => {
         </ProForm.Group>
         <ProForm.Group>
           <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
-            <SkuSelect
-              disabled={checked}
-              multiple
-              labelInValue
-              accumulate
-              onChange={(v) => {
-                setEditableKeys((v as PUR.Entries[]).map((i) => i.autoId));
-                formRef.current?.setFieldsValue({
-                  entries: v,
-                });
-              }}
-            />
+            <SkuSelect disabled={checked} multiple labelInValue accumulate />
           </ProForm.Item>
           {
             // 其他入库单 盘盈 ,其他入库
@@ -718,24 +729,8 @@ export const StoreForm = (props: StoreFormProps) => {
             )
           }
         </ProForm.Group>
-        <ProForm.Item name="entries" trigger="onValuesChange">
-          <EditableProTable<PUR.Entries>
-            rowKey="autoId"
-            bordered
-            actionRef={actionRef}
-            scroll={
-              [BussType.调拨单, ...getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1
-                ? undefined
-                : { x: 3000 }
-            }
-            recordCreatorProps={false}
-            columns={columns}
-            editable={{
-              type: 'multiple',
-              editableKeys,
-              onChange: setEditableKeys,
-            }}
-          />
+        <ProForm.Item name="entries">
+          <StoreEntries bussType={bussType} checked={checked} formRef={formRef} />
         </ProForm.Item>
         <ProFormTextArea name="memo" label="备注" disabled={checked} />
         <ProFormDependency name={['totalQty', 'totalAmount']}>

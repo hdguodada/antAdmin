@@ -12,9 +12,9 @@ import { baseSearch, indexColumns, optionColumns, stateColumns } from '@/utils/c
 import { useModel, useRequest } from 'umi';
 import GlobalWrapper from '@/components/GlobalWrapper';
 
-export type DepDataType = API.Dep;
+export type DepDataType = SYS.Dep;
 
-type UserDataType = API.CurrentUser;
+type UserDataType = SYS.CurrentUser;
 
 export type UserTableProps = {
   depId: number | string;
@@ -81,7 +81,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
   const { depId } = props;
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<API.CurrentUser>>({});
+  const [modalFormInit, setModalFormInit] = useState<Partial<SYS.CurrentUser>>({});
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const { queryUsers } = useModel('user', (model) => ({
     queryUsers: model.query,
@@ -166,7 +166,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
   ];
   return (
     <>
-      <ProTable<API.CurrentUser, { depId: K }>
+      <ProTable<SYS.CurrentUser, { depId: K }>
         actionRef={actionRef}
         params={{ depId }}
         rowKey="userId"

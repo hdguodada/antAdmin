@@ -119,6 +119,7 @@ export default {
   'menu.bas.suppRel': '供应商联系人',
   'menu.bas.store': '仓库管理',
   'menu.sys': '系统管理',
+  'menu.sys.sysParams': '系统参数',
   'menu.store': '仓库',
   'menu.store.storeOrder': '仓库报表',
   'menu.store.storeOrder.deliverDetail': '商品收发明细表',

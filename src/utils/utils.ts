@@ -44,7 +44,7 @@ export function transformTreeData(
       key: item[key],
       value: item[key],
       title: item[title],
-      disabled: isLeaf ? !item.isLeaf : false,
+      disabled: isLeaf ? !+item.isLeaf : false,
       isLeaf: item.isLeaf,
       children: item[children]
         ? transformTreeData(item[children], payload, key, title, children, isLeaf)

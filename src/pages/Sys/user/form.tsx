@@ -12,7 +12,7 @@ type UserFormProps = {
   actionRef?: React.MutableRefObject<ActionType | undefined>;
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  initialValues?: API.CurrentUser | Record<string, unknown>;
+  initialValues?: SYS.CurrentUser | Record<string, unknown>;
   refresh?: () => void;
 };
 const UserForm: React.FC<UserFormProps> = (props) => {
@@ -23,7 +23,7 @@ const UserForm: React.FC<UserFormProps> = (props) => {
     userType: model.typeOption('UserType'),
   }));
   return (
-    <ModalForm<API.CurrentUser>
+    <ModalForm<SYS.CurrentUser>
       key="edit"
       initialValues={{
         passWord: '123456',

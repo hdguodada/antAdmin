@@ -3,6 +3,7 @@ import {
   bussTypeColumns,
   cateIdColumns,
   dateRangeColumns,
+  indexColumns,
   memoColumns,
   moneyColumns,
   skuCodeColumns,
@@ -17,8 +18,9 @@ import ProTable from '@ant-design/pro-table';
 import React from 'react';
 import FundReportTable from './components';
 import { BussType, BussTypeComponentUrl } from '@/pages/Purchase/components';
-import ProCard from '@ant-design/pro-card';
 import { patternMsg } from '@/utils/validator';
+import { StatisticCard } from '@ant-design/pro-card';
+import _ from 'lodash';
 
 type CustomerBalanceEntriesProps = { bussType: BussType } & ProTableProps<any, any>;
 export const CustomerBalanceEntries: React.FC<CustomerBalanceEntriesProps> = ({
@@ -73,15 +75,21 @@ export const CustomerBalanceEntries: React.FC<CustomerBalanceEntriesProps> = ({
 
 export default function SuppBalance() {
   const columns: ProColumnType<any>[] = [
+    indexColumns,
     dateRangeColumns(),
-    suppColumns(undefined, {
-      hideInTable: true,
-      formItemProps: {
-        rules: patternMsg.select(''),
+    suppColumns(
+      { multiple: false },
+      {
+        hideInTable: true,
+        formItemProps: {
+          rules: patternMsg.select(''),
+        },
       },
-    }),
+    ),
     billNoColumns(),
-    bussTypeColumns(),
+    bussTypeColumns({
+      search: false,
+    }),
     {
       title: '采购金额',
       dataIndex: 'totalAmount',
@@ -122,25 +130,60 @@ export default function SuppBalance() {
   ];
   return (
     <FundReportTable
-      url="/funds/reports/customerBalance"
+      url="/report/fund/supplierBalance"
       columns={columns}
       form={{
         ignoreRules: false,
       }}
-      expandable={{
-        expandedRowRender: (record) => {
-          return (
-            record.bussType && (
-              <ProCard>
-                <CustomerBalanceEntries
-                  bussType={record.bussType}
-                  dataSource={record.entries}
-                  bordered
-                />
-              </ProCard>
-            )
-          );
-        },
+      footer={(recordList) => {
+        return (
+          <StatisticCard.Group>
+            <StatisticCard
+              statistic={{
+                title: '采购金额',
+                value: recordList.reduce((a, b) => _.add(a, b.totalAmount || 0), 0),
+                precision: 2,
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '优惠金额',
+                value: recordList.reduce((a, b) => _.add(a, b.disAmount || 0), 0),
+                precision: 2,
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '应付金额',
+                value: recordList.reduce((a, b) => _.add(a, b.amount || 0), 0),
+                precision: 2,
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '实际付款金额',
+                value: recordList.reduce((a, b) => _.add(a, b.rpAmount || 0), 0),
+                precision: 2,
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '应付款余额',
+                value: recordList.reduce((a, b) => _.add(a, b.inAmount || 0), 0),
+                precision: 2,
+                suffix: '元',
+              }}
+            />
+          </StatisticCard.Group>
+        );
       }}
     />
   );

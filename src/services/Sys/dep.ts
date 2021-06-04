@@ -9,7 +9,7 @@ export interface DepFilters {
 export async function queryDepList(
   options?: DepFilters | any,
   headers = { modId: mapModId.dep },
-): Promise<MyResponse<API.DepList>> {
+): Promise<MyResponse<SYS.DepList>> {
   return request('/sys/dep/list', {
     method: 'POST',
     data: options,
@@ -20,7 +20,7 @@ export async function queryDepList(
 export async function queryDepTreelist(
   options: DepFilters,
   headers = { modId: mapModId.dep },
-): Promise<MyResponse<API.DepList>> {
+): Promise<MyResponse<SYS.DepList>> {
   return request('/sys/dep/treelist', {
     method: 'POST',
     data: options,
@@ -42,7 +42,7 @@ export async function queryDepTreeSelect(
 export async function queryDepInfo(
   id: number | string,
   headers = { modId: mapModId.dep },
-): Promise<MyResponse<API.Dep>> {
+): Promise<MyResponse<SYS.Dep>> {
   return request('/sys/dep/info', {
     method: 'POST',
     params: { id },
@@ -50,7 +50,7 @@ export async function queryDepInfo(
   });
 }
 
-export async function updDep(data: API.Dep, headers = { modId: mapModId.dep }) {
+export async function updDep(data: SYS.Dep, headers = { modId: mapModId.dep }) {
   return request('/sys/dep/upd', {
     method: 'POST',
     data,
@@ -60,7 +60,7 @@ export async function updDep(data: API.Dep, headers = { modId: mapModId.dep }) {
   });
 }
 
-export async function delDep(data: API.Dep['depId'][], headers = { modId: mapModId.dep }) {
+export async function delDep(data: SYS.Dep['depId'][], headers = { modId: mapModId.dep }) {
   return request('/sys/dep/del', {
     method: 'POST',
     data,
@@ -70,7 +70,7 @@ export async function delDep(data: API.Dep['depId'][], headers = { modId: mapMod
   });
 }
 
-export async function addDep(data: API.Dep, headers = { modId: mapModId.dep }) {
+export async function addDep(data: SYS.Dep, headers = { modId: mapModId.dep }) {
   return request('/sys/dep/add', {
     method: 'POST',
     data,

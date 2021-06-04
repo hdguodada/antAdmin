@@ -5,11 +5,11 @@ import { addDep, updDep } from '@/services/Sys';
 import { patternMsg } from '@/utils/validator';
 import { DepSelect, StateForm } from '@/utils/form';
 
-const DepForm: React.FC<FormProps<API.Dep>> = (props) => {
+const DepForm: React.FC<FormProps<SYS.Dep>> = (props) => {
   const { action, actionRef, visible, setVisible, initialValues, refresh } = props;
   const formRef = useRef<FormInstance>();
   return (
-    <ModalForm<API.Dep>
+    <ModalForm<SYS.Dep>
       initialValues={{
         state: 1,
       }}

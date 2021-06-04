@@ -14,7 +14,6 @@ import tbck from '@/images/tbck.png';
 import tbrk from '@/images/tbrk.png';
 import lpz from '@/images/lpz.png';
 import cpz from '@/images/cpz.png';
-import xsdd from '@/images/xsdd.png';
 import { Divider, Space } from 'antd';
 import GlobalWrapper from '@/components/GlobalWrapper';
 import Avatar from 'antd/lib/avatar/avatar';
@@ -27,18 +26,17 @@ const imgStyle = {
   height: 42,
 };
 export const quickMap = {
-  xsck: { img: xsck, title: '销售出库', componentUrl: BussTypeComponentUrl.采购订单 },
-  xsth: { img: xsth, title: '销售退货', componentUrl: BussTypeComponentUrl.采购订单 },
+  xsck: { img: xsck, title: '销售出库', componentUrl: BussTypeComponentUrl.销售单 },
+  xsth: { img: xsth, title: '销售退货', componentUrl: BussTypeComponentUrl.销售退货单 },
   cgdd: { img: cgdd, title: '采购订单', componentUrl: BussTypeComponentUrl.采购订单 },
-  cgrk: { img: cgrk, title: '采购入库', componentUrl: BussTypeComponentUrl.采购订单 },
-  cgth: { img: cgth, title: '采购退货', componentUrl: BussTypeComponentUrl.采购订单 },
-  sk: { img: sk, title: '收款', componentUrl: BussTypeComponentUrl.采购订单 },
-  fk: { img: fk, title: '付款', componentUrl: BussTypeComponentUrl.采购订单 },
-  tbck: { img: tbck, title: '调拨出库', componentUrl: BussTypeComponentUrl.采购订单 },
-  tbrk: { img: tbrk, title: '调拨入库', componentUrl: BussTypeComponentUrl.采购订单 },
+  cgrk: { img: cgrk, title: '采购入库', componentUrl: BussTypeComponentUrl.采购单 },
+  cgth: { img: cgth, title: '采购退货', componentUrl: BussTypeComponentUrl.采购退货单 },
+  sk: { img: sk, title: '收款', componentUrl: BussTypeComponentUrl.收款单 },
+  fk: { img: fk, title: '付款', componentUrl: BussTypeComponentUrl.付款单 },
+  tbck: { img: tbck, title: '其他入库', componentUrl: BussTypeComponentUrl.其他入库单 },
+  tbrk: { img: tbrk, title: '其他出库', componentUrl: BussTypeComponentUrl.其他出库单 },
   lpz: { img: lpz, title: '录凭证', componentUrl: BussTypeComponentUrl.采购订单 },
   cpz: { img: cpz, title: '查凭证', componentUrl: BussTypeComponentUrl.采购订单 },
-  xsdd: { img: xsdd, title: '销售订单', componentUrl: BussTypeComponentUrl.采购订单 },
 };
 
 export const quickList = [
@@ -53,7 +51,6 @@ export const quickList = [
   'tbrk',
   'lpz',
   'cpz',
-  'xsdd',
 ];
 export const QuickUse: React.FC = () => {
   return (
@@ -252,7 +249,7 @@ export const SaleData: React.FC = () => {
 export default (): React.ReactNode => {
   return (
     <GlobalWrapper type="descriptions">
-      <PageContainer>
+      <PageContainer title={false}>
         <ProCard ghost>
           <QuickUse />
           <div style={{ height: '20px' }}></div>

@@ -14,7 +14,7 @@ export type GlobalHeaderRightProps = {
   onNoticeClear?: (tabName?: string) => void;
 };
 
-const getNoticeData = (notices: API.NoticeIconData[]): Record<string, API.NoticeIconData[]> => {
+const getNoticeData = (notices: SYS.NoticeIconData[]): Record<string, SYS.NoticeIconData[]> => {
   if (!notices || notices.length === 0 || !Array.isArray(notices)) {
     return {};
   }
@@ -54,7 +54,7 @@ const getNoticeData = (notices: API.NoticeIconData[]): Record<string, API.Notice
   return groupBy(newNotices, 'type');
 };
 
-const getUnreadData = (noticeData: Record<string, API.NoticeIconData[]>) => {
+const getUnreadData = (noticeData: Record<string, SYS.NoticeIconData[]>) => {
   const unreadMsg: Record<string, number> = {};
   Object.keys(noticeData).forEach((key) => {
     const value = noticeData[key];
@@ -73,7 +73,7 @@ const getUnreadData = (noticeData: Record<string, API.NoticeIconData[]>) => {
 const NoticeIconView = () => {
   const { initialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
-  const [notices, setNotices] = useState<API.NoticeIconData[]>([]);
+  const [notices, setNotices] = useState<SYS.NoticeIconData[]>([]);
 
   useEffect(() => {
     queryNotices().then(({ data }) => setNotices(data));

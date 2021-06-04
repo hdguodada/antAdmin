@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import type { FormInstance } from 'antd';
-import { Button, message, Select, Space, Typography } from 'antd';
+import { Button, message, Select, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRequest, history, useParams, useLocation, useModel } from 'umi';
 import {
@@ -17,6 +17,8 @@ import {
   bussTypeColumns,
   customerColumns,
   dateRangeColumns,
+  qtyWithSNColumns,
+  TaxColumns,
   userColumns,
 } from '@/utils/columns';
 import {
@@ -58,7 +60,6 @@ import Style from '@/global.less';
 import { CheckButton, CheckTwoButton, OpenButton } from '@/components/CheckButton';
 import { showSysInfo } from '@/components/SysInfo';
 import moment from 'moment';
-import { SN } from '@/pages/Store/serNum/serNumDetail';
 import { queryCustomerAddress } from '@/services/Bas';
 import { getCode } from '@/services/Sys';
 import { calPrice, transProTableParamsToMyRequest } from '@/utils/utils';
@@ -326,6 +327,10 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
 }) => {
   const actionRef = useRef<ActionType>();
   const [editableKeys, setEditableKeys] = useState<React.Key[]>();
+  const { useTax } = useModel('params', (model) => ({
+    useTax: model.sysParams?.useTax || 0,
+    tax: model.sysParams?.tax,
+  }));
   const columns: ProColumns<PUR.Entries>[] = [
     indexColumns,
     {
@@ -374,34 +379,11 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
       },
     },
     currentQtyColumns(),
-    {
-      title: '数量',
-      dataIndex: 'qtyMid',
-      valueType: 'digit',
-      formItemProps: {
-        required: true,
-      },
-      width: 155,
-      renderFormItem: ({ index }) => {
-        const oldEntries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
-        if (index !== undefined) {
-          const record = oldEntries[index];
-          return (
-            <SN
-              sku={record}
-              disabled={checked || (record.currentQty || 0) <= 0}
-              initValue={{
-                qty: record.qty || 0,
-                serNumList: record.serNumList || [],
-              }}
-              stockType={bussType === BussType.销售退货单 ? StockType.入库 : StockType.出库}
-            />
-          );
-        }
-        return <div />;
-      },
-      render: (_, record) => <Typography.Text type="danger">{record.qty}</Typography.Text>,
-    },
+    qtyWithSNColumns(
+      value,
+      bussType === BussType.销售退货单 ? StockType.入库 : StockType.出库,
+      checked,
+    ),
     {
       title: () => (
         <div>
@@ -443,12 +425,7 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
       dataIndex: 'price',
       valueType: 'money',
     },
-    {
-      title: '含税单价',
-      dataIndex: 'taxPrice',
-      editable: false,
-      valueType: 'money',
-    },
+
     {
       title: () => (
         <div>
@@ -476,23 +453,7 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
       valueType: 'money',
       editable: false,
     },
-    {
-      title: '税率',
-      dataIndex: 'taxRate',
-      valueType: 'percent',
-    },
-    {
-      title: '税额',
-      dataIndex: 'tax',
-      valueType: 'money',
-      editable: false,
-    },
-    {
-      title: '价税合计',
-      dataIndex: 'taxAmount',
-      valueType: 'money',
-      editable: false,
-    },
+    ...TaxColumns<PUR.Entries>(useTax),
     memoColumns(),
     {
       title: '关联销货订单号',
@@ -543,7 +504,7 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
         onValuesChange: (record, recordList) => {
           onChange?.(
             recordList.map((i) => {
-              return record.autoId === i.autoId
+              return record?.autoId === i.autoId
                 ? {
                     ...i,
                     qty: i.qtyMid?.qty || 0,
@@ -803,7 +764,7 @@ export const XhForm = (props: XhFormProps) => {
               {({ custId }) =>
                 custId ? (
                   <ProFormSelect
-                    width="md"
+                    width="lg"
                     name="addressId"
                     label="客户地址"
                     options={addressOptions.map((i) => ({
@@ -816,7 +777,8 @@ export const XhForm = (props: XhFormProps) => {
                 )
               }
             </ProFormDependency>
-
+          </ProForm.Group>
+          <ProForm.Group>
             <ProFormDatePicker width="md" name="date" label="单据日期" disabled={checked} />
             {bussType === BussType.销售订单 && (
               <ProFormDatePicker
@@ -833,8 +795,9 @@ export const XhForm = (props: XhFormProps) => {
               disabled
               rules={patternMsg.text('单据编号')}
             />
-            <ProForm.Item name="depId" label="销售部门">
+            <ProForm.Item name="depId" label="销售部门" style={{ width: '328px' }}>
               <DepSelect
+                isLeaf
                 showNew
                 fieldProps={{
                   disabled: checked,

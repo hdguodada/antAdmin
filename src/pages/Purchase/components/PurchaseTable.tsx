@@ -74,7 +74,6 @@ export default function OrderTable<T extends Record<string, unknown>>(props: Ord
               setAdvancedSearchFormValues(undefined);
             },
           })}
-          bordered
           onRow={(record) => {
             return {
               onDoubleClick: () => {
@@ -132,6 +131,7 @@ export default function OrderTable<T extends Record<string, unknown>>(props: Ord
               total: response.data.total,
             };
           }}
+          pagination={{ pageSize: 10 }}
         />
       }
     />

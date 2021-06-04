@@ -1,10 +1,11 @@
 import GlobalWrapper from '@/components/GlobalWrapper';
-import { BussType } from '@/pages/Purchase/components';
+import type { BussType } from '@/pages/Purchase/components';
 import { PageContainer } from '@ant-design/pro-layout';
 import React from 'react';
 import AccountsPayableDetail from './AccountsPayableDetail';
 import CustomerBalance from './CustomerBalance';
 import FundBalance from './FundBalance';
+import OriDetail from './OriDetail';
 import SuppBalance from './SuppBalance';
 
 export type FundsReportItem = Partial<{
@@ -12,12 +13,19 @@ export type FundsReportItem = Partial<{
   suppName: string;
   bussType: BussType;
   entries: PUR.Entries[];
+  income: number;
+  expenditure: number;
+  balance: number;
+  [key: string]: any;
 }>;
 export default () => {
   return (
     <GlobalWrapper type="list">
       <PageContainer
         title={false}
+        tabProps={{
+          defaultActiveKey: 'OriDetail',
+        }}
         tabList={[
           {
             tab: '现金银行报表',
@@ -45,17 +53,14 @@ export default () => {
           },
           {
             tab: '其他收支明细表',
-            key: 'Detail1',
+            key: 'OriDetail',
+            children: <OriDetail />,
           },
           {
             tab: '利润表',
             key: 'Detail2',
           },
         ]}
-        tabProps={{
-          type: 'card',
-          defaultActiveKey: 'SuppBalance',
-        }}
       />
     </GlobalWrapper>
   );

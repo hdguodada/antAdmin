@@ -16,17 +16,19 @@ import {
   keywordColumns,
   memoColumns,
   qtyColumns,
+  qtyWithSNColumns,
   skuCodeColumns,
   skuIdColumns,
   storeCdColumns,
   tableAlertOptionRenderDom,
+  TaxColumns,
 } from '@/utils/columns';
 import { getCode } from '@/services/Sys';
 import { calPrice, transProTableParamsToMyRequest } from '@/utils/utils';
 import { patternMsg } from '@/utils/validator';
 import { AccountSelect, DepSelect, UserSelect } from '@/utils/form';
 import { useModel, useParams, useRequest, history, useLocation } from 'umi';
-import { PageContainer } from '@ant-design/pro-layout';
+import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
 import moment from 'moment';
 import ProForm, {
   ModalForm,
@@ -40,7 +42,6 @@ import ProForm, {
 import { ProFormTextArea } from '@ant-design/pro-form';
 import { EditableProTable } from '@ant-design/pro-table';
 import { CheckTwoButton } from '@/components/CheckButton';
-import { SN } from '@/pages/Store/serNum/serNumDetail';
 import { queryPurchaseUnStockIn } from '@/services/Purchase';
 import { getCurrentStock, getSkuStock } from '@/services/Store';
 import ProCard from '@ant-design/pro-card';
@@ -140,6 +141,10 @@ export const SkuSelect: React.FC<{
     }
     return '';
   });
+  const { useTax, tax } = useModel('params', (model) => ({
+    useTax: model.sysParams?.useTax || 0,
+    tax: model.sysParams?.tax,
+  }));
   const handleOk = (recordList: PUR.Entries[]) => {
     const v =
       recordList?.map((item) => ({
@@ -148,7 +153,7 @@ export const SkuSelect: React.FC<{
         unitId: item.inLocationUnitId,
         rate: item.inLocationUnitRate,
         discountRate: 0,
-        taxRate: 0,
+        taxRate: useTax ? tax : 0,
         outStoreCd: item.storeCd,
       })) || [];
     if (labelInValue) {
@@ -295,6 +300,7 @@ export const SkuSelect: React.FC<{
 };
 
 export enum BussType {
+  期初余额 = 5,
   采购订单 = 10,
   采购退货订单 = 11,
   采购单 = 12,
@@ -352,11 +358,11 @@ export enum BussTypeApiUrl {
   其他出库单 = '/bis/stockOut',
   调拨单 = '/bis/stockTrans',
   其他收入单 = '/funds/ori',
-  其他支出单 = '/funds/ori',
+  其他支出单 = '/funds/opm',
   收款单 = '/funds/receipt',
-  付款单 = '/funds/receipt',
+  付款单 = '/bis/payment',
   核销单 = '/funds/verifica',
-  资金转账单 = '/funds/fundTf',
+  资金转账单 = '/bis/accountTrans',
   销售订单 = '/sales/xhdd',
   销售单 = '/sales/xhd',
   销售退货单 = '/sales/thd',
@@ -372,7 +378,7 @@ export enum BussTypeComponentUrl {
   调拨单 = '/store/stockChange',
   盘点 = '/store/inventory',
   其他收入单 = '/funds/ori',
-  其他支出单 = '/funds/ori',
+  其他支出单 = '/funds/opm',
   收款单 = '/funds/receipt',
   付款单 = '/funds/payment',
   核销单 = '/funds/verifica',
@@ -747,6 +753,8 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
 }) => {
   const actionRef = useRef<ActionType>();
   const [editableKeys, setEditableKeys] = useState<React.Key[]>();
+  const { sysParams } = useModel('params', (model) => ({ sysParams: model.sysParams }));
+  const useTax = sysParams?.useTax || 0;
   const columns: ProColumns<PUR.Entries>[] = [
     indexColumns,
     {
@@ -772,6 +780,7 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
       title: () => (
         <div>
           <span className="error-color">*</span>
+          单位
         </div>
       ),
       dataIndex: 'unitId',
@@ -793,37 +802,11 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
       },
     },
     currentQtyColumns(),
-    {
-      title: () => (
-        <div>
-          <span className="error-color">*</span>数量
-        </div>
-      ),
-      dataIndex: 'qtyMid',
-      valueType: 'digit',
-      width: 255,
-      render: (_, record) => <div>{record.qty}</div>,
-      renderFormItem: ({ index }) => {
-        if (index !== undefined) {
-          const entries = formRef.current?.getFieldValue('entries');
-          return (
-            <SN
-              sku={entries[index]}
-              initValue={{
-                qty: entries[index].qty || 0,
-                serNumList: entries[index].serNumList || [],
-              }}
-              stockType={
-                [BussType.采购单, BussType.采购订单].indexOf(bussType) > -1
-                  ? StockType.入库
-                  : StockType.出库
-              }
-            />
-          );
-        }
-        return <div />;
-      },
-    },
+    qtyWithSNColumns(
+      value,
+      [BussType.采购单, BussType.采购订单].indexOf(bussType) > -1 ? StockType.入库 : StockType.出库,
+      checked,
+    ),
     {
       title: () => (
         <div>
@@ -865,12 +848,6 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
       valueType: 'money',
     },
     {
-      title: '含税单价',
-      dataIndex: 'taxPrice',
-      editable: false,
-      valueType: 'money',
-    },
-    {
       title: () => (
         <div>
           <span className="error-color">*</span>折扣率(%)
@@ -897,23 +874,7 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
       valueType: 'money',
       editable: false,
     },
-    {
-      title: '税率',
-      dataIndex: 'taxRate',
-      valueType: 'percent',
-    },
-    {
-      title: '税额',
-      dataIndex: 'tax',
-      valueType: 'money',
-      editable: false,
-    },
-    {
-      title: '价税合计',
-      dataIndex: 'taxAmount',
-      valueType: 'money',
-      editable: false,
-    },
+    ...TaxColumns<PUR.Entries>(useTax),
     memoColumns(),
     {
       title: '关联购货订单号',
@@ -960,17 +921,22 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
         type: 'multiple',
         editableKeys,
         onChange: setEditableKeys,
-        actionRender: (row, config, defaultDom) => [defaultDom.delete],
+        actionRender: (row, config, defaultDom) => {
+          return [defaultDom.delete];
+        },
         onValuesChange: (record, recordList) => {
           onChange?.(
             recordList.map((i) => {
-              return i.autoId === record.autoId
-                ? {
-                    ...i,
-                    qty: i.qtyMid?.qty || 0,
-                    serNumList: i.qtyMid?.serNumList || [],
-                  }
-                : i;
+              if (record) {
+                return i.autoId === record.autoId
+                  ? {
+                      ...i,
+                      qty: i.qtyMid?.qty || 0,
+                      serNumList: i.qtyMid?.serNumList || [],
+                    }
+                  : i;
+              }
+              return i;
             }),
           );
         },
@@ -1106,50 +1072,7 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
   }, [id, run]);
   return (
     <GlobalWrapper type="descriptions">
-      <PageContainer
-        title={initialValues.title}
-        footer={[
-          <CheckAudit checkStatus={checked} key={'checkImg'} />,
-          <Space key="action">
-            {isInfo ? (
-              <>
-                {checked && (
-                  <GenerateButton
-                    bussType={data?.bussType}
-                    billStatus={data?.bussType}
-                    billId={data?.billId}
-                  />
-                )}
-                <CheckTwoButton
-                  key="check"
-                  url={initialValues.checkButton.url}
-                  selectedRowKeys={[id]}
-                  refresh={refresh}
-                  checkStatus={checked ? 1 : 2}
-                />
-              </>
-            ) : (
-              <div />
-            )}
-          </Space>,
-          <Button
-            key="save"
-            type={'primary'}
-            onClick={async () => {
-              formRef.current?.submit();
-            }}
-            children={'保存'}
-          />,
-          <Button key="refresh" type={'dashed'} onClick={refresh} children={'刷新'} />,
-          <Button
-            key="print"
-            type="link"
-            target="_blank"
-            href={`#/sys/print/${id}/${bussType}`}
-            children={'打印'}
-          />,
-        ]}
-      >
+      <PageContainer title={initialValues.title}>
         <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }}>
           <ProForm<PUR.Purchase>
             onFinish={async (values) => {
@@ -1190,7 +1113,53 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
               calPrice(values, formRef);
             }}
             formRef={formRef}
-            submitter={false}
+            submitter={{
+              render: ({ form }) => (
+                <FooterToolbar>
+                  {[
+                    <CheckAudit checkStatus={checked} key={'checkImg'} />,
+                    <Space key="action">
+                      {isInfo ? (
+                        <>
+                          {checked && (
+                            <GenerateButton
+                              bussType={data?.bussType}
+                              billStatus={data?.bussType}
+                              billId={data?.billId}
+                            />
+                          )}
+                          <CheckTwoButton
+                            key="check"
+                            url={initialValues.checkButton.url}
+                            selectedRowKeys={[id]}
+                            refresh={refresh}
+                            checkStatus={checked ? 1 : 2}
+                          />
+                        </>
+                      ) : (
+                        <div />
+                      )}
+                    </Space>,
+                    <Button
+                      key="save"
+                      type={'primary'}
+                      onClick={async () => {
+                        form?.submit();
+                      }}
+                      children={'保存'}
+                    />,
+                    <Button key="refresh" type={'dashed'} onClick={refresh} children={'刷新'} />,
+                    <Button
+                      key="print"
+                      type="link"
+                      target="_blank"
+                      href={`#/sys/print/${id}/${bussType}`}
+                      children={'打印'}
+                    />,
+                  ]}
+                </FooterToolbar>
+              ),
+            }}
           >
             <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
             <ProForm.Group>
@@ -1221,6 +1190,8 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
                   disabled={checked}
                 />
               )}
+            </ProForm.Group>
+            <ProForm.Group>
               <ProFormText
                 width="md"
                 name="billNo"
@@ -1228,32 +1199,17 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
                 disabled
                 rules={patternMsg.text('单据编号')}
               />
-              {getOrderType(OrderType.购货).indexOf(bussType) > -1 && (
-                <>
-                  <ProForm.Item name="depId" label="采购部门">
-                    <DepSelect
-                      showNew
-                      fieldProps={{
-                        disabled: checked,
-                      }}
-                    />
-                  </ProForm.Item>
-                  <UserSelect showNew name="operId" label="采购员" disabled={checked} />
-                </>
-              )}
-              {getOrderType(OrderType.销货).indexOf(bussType) > -1 && (
-                <>
-                  <ProForm.Item name="depId" label="销售部门">
-                    <DepSelect
-                      showNew
-                      fieldProps={{
-                        disabled: checked,
-                      }}
-                    />
-                  </ProForm.Item>
-                  <UserSelect showNew name="operId" label="销售员" disabled={checked} />
-                </>
-              )}
+
+              <ProForm.Item name="depId" label="采购部门" style={{ width: '328px' }}>
+                <DepSelect
+                  isLeaf
+                  showNew
+                  fieldProps={{
+                    disabled: checked,
+                  }}
+                />
+              </ProForm.Item>
+              <UserSelect showNew name="operId" label="采购员" disabled={checked} />
             </ProForm.Group>
             <ProForm.Group>
               <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>

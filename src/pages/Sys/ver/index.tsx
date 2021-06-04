@@ -5,7 +5,7 @@ import ProTable from '@ant-design/pro-table';
 import { queryVers } from '@/services/Sys';
 
 export default (): React.ReactNode => {
-  const columns: ProColumnType<API.Ver>[] = [
+  const columns: ProColumnType<SYS.Ver>[] = [
     {
       title: '平台',
       dataIndex: 'platform',
@@ -18,7 +18,7 @@ export default (): React.ReactNode => {
   return (
     <PageContainer
       content={
-        <ProTable<API.Ver>
+        <ProTable<SYS.Ver>
           search={false}
           rowKey="verId"
           postData={(dataSource) => {

@@ -5,7 +5,7 @@ import { mapModId } from '@/utils/utils';
 import { message } from 'antd';
 
 export async function queryRoleList(
-  options: MyRequest<API.UserRole>,
+  options: MyRequest<SYS.UserRole>,
   headers = { modId: mapModId.role },
 ): Promise<RowResponse<RoleDataType>> {
   return request('/sys/role/list', {
@@ -18,7 +18,7 @@ export async function queryRoleList(
 export async function queryRoleInfo(
   id: number | string,
   headers = { modId: mapModId.role },
-): Promise<InfoResponse<API.UserRole>> {
+): Promise<InfoResponse<SYS.UserRole>> {
   return request('/sys/role/info', {
     method: 'POST',
     params: { id },
@@ -26,7 +26,7 @@ export async function queryRoleInfo(
   });
 }
 
-export async function updRole(data: API.UserRole, headers = { modId: mapModId.role }) {
+export async function updRole(data: SYS.UserRole, headers = { modId: mapModId.role }) {
   return request('/sys/role/upd', {
     method: 'POST',
     data,
@@ -36,7 +36,7 @@ export async function updRole(data: API.UserRole, headers = { modId: mapModId.ro
   });
 }
 
-export async function addRole(data: API.UserRole, headers = { modId: mapModId.role }) {
+export async function addRole(data: SYS.UserRole, headers = { modId: mapModId.role }) {
   return request('/sys/role/add', {
     method: 'POST',
     data,

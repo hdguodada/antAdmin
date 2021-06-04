@@ -23,14 +23,14 @@ import { indexColumns, optionColumns, stateColumns } from '@/utils/columns';
 import Style from '@/global.less';
 
 const DictDef: React.FC<{
-  dictTypeId: API.DictType['dictTypeId'];
+  dictTypeId: SYS.DictType['dictTypeId'];
 }> = (props) => {
   const { dictTypeId } = props;
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<API.Dict>>({});
+  const [modalFormInit, setModalFormInit] = useState<Partial<SYS.Dict>>({});
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
-  const columns: ProColumnType<API.Dict>[] = [
+  const columns: ProColumnType<SYS.Dict>[] = [
     indexColumns,
     {
       title: '字典名称',
@@ -77,7 +77,7 @@ const DictDef: React.FC<{
         initialValues={modalFormInit}
       />
       {dictTypeId > 0 && (
-        <ProTable<API.Dict, { dictTypeId: API.DictType['dictTypeId'] }>
+        <ProTable<SYS.Dict, { dictTypeId: SYS.DictType['dictTypeId'] }>
           toolBarRender={() => [
             <Button
               type="primary"
@@ -132,19 +132,19 @@ const DictDef: React.FC<{
 };
 
 const DictType: React.FC<{
-  onChange: (id: API.DictType['dictTypeId']) => void;
-  dictTypeId: API.DictType['dictTypeId'];
+  onChange: (id: SYS.DictType['dictTypeId']) => void;
+  dictTypeId: SYS.DictType['dictTypeId'];
 }> = (props) => {
   const actionRef = useRef<ActionType>();
   const ref = useRef<FormInstance>();
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<API.DictType>>({});
+  const [modalFormInit, setModalFormInit] = useState<Partial<SYS.DictType>>({});
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const { onChange, dictTypeId } = props;
   const [queryFilter, setQueryFilter] = useState({
     keyword: '',
   });
-  const columns: ProColumnType<API.DictType>[] = [
+  const columns: ProColumnType<SYS.DictType>[] = [
     indexColumns,
     {
       title: '分类名称',
@@ -197,7 +197,7 @@ const DictType: React.FC<{
         setVisible={setModalVisit}
         initialValues={modalFormInit}
       />
-      <ProTable<API.DictType>
+      <ProTable<SYS.DictType>
         toolBarRender={() => [
           <Button
             type="primary"

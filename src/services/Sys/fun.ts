@@ -3,9 +3,9 @@ import { mapModId } from '@/utils/utils';
 import { message } from 'antd';
 
 export async function queryFuns(
-  data: MyRequest<API.Fun>,
+  data: MyRequest<SYS.Fun>,
   headers = { modId: mapModId.fun },
-): Promise<RowResponse<API.Fun>> {
+): Promise<RowResponse<SYS.Fun>> {
   return request('/sys/fun/list', {
     data,
     method: 'POST',
@@ -13,7 +13,7 @@ export async function queryFuns(
   });
 }
 
-export async function updFuns(data: MyRequest<API.Fun>, headers = { modId: mapModId.fun }) {
+export async function updFuns(data: MyRequest<SYS.Fun>, headers = { modId: mapModId.fun }) {
   return request('/sys/fun/upd', {
     data,
     method: 'POST',
@@ -23,7 +23,7 @@ export async function updFuns(data: MyRequest<API.Fun>, headers = { modId: mapMo
   });
 }
 
-export async function delFuns(data: API.Fun['funId'][], headers = { modId: mapModId.fun }) {
+export async function delFuns(data: SYS.Fun['funId'][], headers = { modId: mapModId.fun }) {
   return request('/sys/fun/del', {
     data,
     method: 'POST',
@@ -33,7 +33,7 @@ export async function delFuns(data: API.Fun['funId'][], headers = { modId: mapMo
   });
 }
 
-export async function addFuns(data: MyRequest<API.Fun>, headers = { modId: mapModId.fun }) {
+export async function addFuns(data: MyRequest<SYS.Fun>, headers = { modId: mapModId.fun }) {
   return request('/sys/fun/add', {
     data,
     method: 'POST',

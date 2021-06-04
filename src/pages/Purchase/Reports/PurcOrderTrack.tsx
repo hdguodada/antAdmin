@@ -1,10 +1,13 @@
 import { purchaseOrderListByGhdd } from '@/services/Purchase';
 import {
+  billNoColumns,
   dateRangeColumns,
   memoColumns,
+  skuIdColumns,
   spuCodeColumns,
   suppColumns,
   suppTypeColumns,
+  unitIdColumns,
 } from '@/utils/columns';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-table';
@@ -12,44 +15,22 @@ import ProTable from '@ant-design/pro-table';
 import { Button, Table, Typography } from 'antd';
 import moment from 'moment';
 import React from 'react';
-import { BussTypeComponentUrl, SkuSelect } from '../components';
-import { useModel, useRequest, history } from 'umi';
+import { BussType } from '../components';
+import { useModel, useRequest } from 'umi';
+import { StatisticCard } from '@ant-design/pro-card';
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
 export default function PurcOrderTrack() {
   const { suppTypeEnum } = useModel('suppType', (model) => ({ suppTypeEnum: model.valueEnum }));
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
     dateRangeColumns(),
     spuCodeColumns,
-    {
-      title: '商品名称',
-      dataIndex: 'skuId',
-      key: 'skuId',
-      renderFormItem: () => <SkuSelect type="input" multiple />,
-      render: (_, record) => <div>{record.skuName}</div>,
-    },
-    {
-      title: '单位',
-      dataIndex: 'unitName',
-      key: 'unitName',
-      search: false,
-    },
-
-    {
-      title: '采购订单编号',
-      dataIndex: 'billNo',
-      key: 'billNo',
-      render: (_, record) => (
-        <Link
-          onClick={() => {
-            history.push(`${BussTypeComponentUrl.采购订单}/${record.billId}`);
-          }}
-        >
-          {_}
-        </Link>
-      ),
-    },
+    skuIdColumns(),
+    unitIdColumns,
+    billNoColumns({
+      bussType: BussType.采购订单,
+    }),
     suppTypeColumns(suppTypeEnum),
     suppColumns(),
     {
@@ -158,10 +139,50 @@ export default function PurcOrderTrack() {
       rowKey="autoId"
       options={false}
       bordered
+      footer={() => {
+        return (
+          !(data?.summary instanceof Array) && (
+            <StatisticCard.Group>
+              <StatisticCard
+                statistic={{
+                  title: '入库数量',
+                  value: data?.summary?.qty,
+                  status: 'success',
+                }}
+              />
+              <StatisticCard.Divider />
+              <StatisticCard
+                statistic={{
+                  title: '入库金额',
+                  value: data?.summary?.amount,
+                  status: 'success',
+                }}
+              />
+              <StatisticCard.Divider />
+              <StatisticCard
+                statistic={{
+                  title: '未入库数量',
+                  value: data?.summary?.unQty,
+                  status: 'error',
+                }}
+              />
+              <StatisticCard.Divider />
+              <StatisticCard
+                statistic={{
+                  title: '未入库金额',
+                  value: data?.summary?.unAmount,
+                  status: 'error',
+                }}
+              />
+            </StatisticCard.Group>
+          )
+        );
+      }}
       summary={() =>
         !(data?.summary instanceof Array) && (
           <Table.Summary.Row>
-            <Table.Summary.Cell index={0} colSpan={7}>
+            <Table.Summary.Cell index={0} />
+            <Table.Summary.Cell index={0} colSpan={6}>
               合计
             </Table.Summary.Cell>
             <Table.Summary.Cell index={2}>

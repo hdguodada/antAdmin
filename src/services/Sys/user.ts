@@ -1,6 +1,7 @@
 import { request } from 'umi';
 import { mapModId } from '@/utils/utils';
 import { message } from 'antd';
+import { MenuDataItem } from '@@/plugin-layout/runtime';
 
 /**
  * 获取用户列表
@@ -8,10 +9,10 @@ import { message } from 'antd';
  * @param headers
  */
 export async function queryUsers(
-  options: QueryRequest<API.CurrentUser>,
+  options: QueryRequest<SYS.CurrentUser>,
   headers = { modId: mapModId.user },
 ) {
-  return request<MyResponse<API.UserList>>('/sys/user/list', {
+  return request<MyResponse<SYS.UserList>>('/sys/user/list', {
     method: 'POST',
     data: options,
     headers,
@@ -25,7 +26,7 @@ export async function queryUsers(
 export async function queryUserInfo(
   id: React.Key,
   headers = { modId: mapModId.user },
-): Promise<MyResponse<API.CurrentUser>> {
+): Promise<MyResponse<SYS.CurrentUser>> {
   return request('/sys/user/info', {
     method: 'POST',
     params: {
@@ -45,7 +46,7 @@ export async function delUser(options: any[], headers = { modId: mapModId.user }
   });
 }
 
-export async function updUser(params: API.CurrentUser, headers = { modId: mapModId.user }) {
+export async function updUser(params: SYS.CurrentUser, headers = { modId: mapModId.user }) {
   return request('/sys/user/upd', {
     method: 'POST',
     data: params,
@@ -53,7 +54,7 @@ export async function updUser(params: API.CurrentUser, headers = { modId: mapMod
   });
 }
 
-export async function addUser(params: API.CurrentUser, headers = { modId: mapModId.user }) {
+export async function addUser(params: SYS.CurrentUser, headers = { modId: mapModId.user }) {
   return request('/sys/user/add', {
     method: 'POST',
     data: params,
@@ -71,13 +72,15 @@ export async function resetPassword(
 }
 
 export async function queryCurrent(headers = { modId: mapModId.user }) {
-  return request<MyResponse<API.CurrentUser>>('/sys/user/current', {
+  return request<MyResponse<SYS.CurrentUser>>('/sys/user/current', {
     method: 'POST',
     headers,
   });
 }
 
-export async function queryRouters(headers = { modId: mapModId.user }): Promise<any> {
+export async function queryRouters(
+  headers = { modId: mapModId.user },
+): Promise<InfoResponse<MenuDataItem[]>> {
   return request('/sys/user/routers', {
     method: 'POST',
     headers,
@@ -89,7 +92,7 @@ export async function queryUserRoles(
     pageNumber: number;
   },
   headers = { modId: mapModId.user },
-): Promise<MyResponse<API.UserRoleList>> {
+): Promise<MyResponse<SYS.UserRoleList>> {
   return request('/sys/role/list', {
     method: 'POST',
     data: options,

@@ -66,6 +66,7 @@ const HeaderSearch: React.FC<HeaderSearchProps> = (props) => {
         onChange={setValue}
       >
         <Input
+          style={{ width: '456px' }}
           ref={inputRef}
           defaultValue={defaultValue}
           aria-label={placeholder}

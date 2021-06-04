@@ -9,10 +9,10 @@ import { indexColumns, optionColumns, stateColumns } from '@/utils/columns';
 
 export const CodelRuleTable: React.FC = () => {
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<API.CodeRule>();
+  const [modalFormInit, setModalFormInit] = useState<SYS.CodeRule>();
   const actionRef = useRef<ActionType>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
-  const columns: ProColumnType<API.CodeRule>[] = [
+  const columns: ProColumnType<SYS.CodeRule>[] = [
     indexColumns,
     optionColumns({
       modify: async ({ record }) => {
@@ -45,7 +45,7 @@ export const CodelRuleTable: React.FC = () => {
   ];
   return (
     <>
-      <ProTable<API.CodeRule>
+      <ProTable<SYS.CodeRule>
         actionRef={actionRef}
         rowKey="codeId"
         request={async (params) => {

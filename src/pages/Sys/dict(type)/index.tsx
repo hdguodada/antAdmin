@@ -15,7 +15,7 @@ export default (): React.ReactNode => {
   const [queryFilter, setQueryFilter] = useState({
     keyword: '',
   });
-  const columns: ProColumnType<API.DictType>[] = [
+  const columns: ProColumnType<SYS.DictType>[] = [
     {
       title: '分类名称',
       dataIndex: 'dictTypeName',
@@ -30,7 +30,7 @@ export default (): React.ReactNode => {
     <PageHeaderWrapper>
       <ProCard split="vertical">
         <ProCard colSpan={'440px'} ghost>
-          <ProTable<API.DictType>
+          <ProTable<SYS.DictType>
             search={false}
             params={queryFilter}
             rowKey="dictTypeId"

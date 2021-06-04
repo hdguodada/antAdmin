@@ -20,14 +20,14 @@ type FormProps = {
   actionRef?: React.MutableRefObject<ActionType | undefined>;
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  initialValues: API.Module | Record<string, unknown>;
+  initialValues: SYS.Module | Record<string, unknown>;
   moduleOptions: SelectOptions;
 };
 const ModuleForm: React.FC<FormProps> = (props) => {
   const { action, actionRef, visible, setVisible, initialValues, moduleOptions } = props;
   const formRef = useRef<FormInstance>();
   return (
-    <ModalForm<API.Module>
+    <ModalForm<SYS.Module>
       initialValues={{
         state: 1,
         ver1: 1,
@@ -88,7 +88,7 @@ const ModuleForm: React.FC<FormProps> = (props) => {
         <ProFormText width="md" name="memo" label="中文名称" rules={patternMsg.text('中文名称')} />
       </ProForm.Group>
       <ProForm.Group>
-        <ProFormText width="md" name="path" label="路径" disabled={action === 'upd'} />
+        <ProFormText width="md" name="path" label="路径" />
         <ProFormText width="md" name="url" label="模块地址" />
       </ProForm.Group>
       <ProForm.Group>

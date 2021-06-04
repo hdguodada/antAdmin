@@ -7,7 +7,7 @@ import { queryLogList } from '@/services/Init';
 import { indexColumns } from '@/utils/columns';
 
 export default withRouter(() => {
-  const columns: ProColumnType<API.Log>[] = [
+  const columns: ProColumnType<SYS.Log>[] = [
     indexColumns,
 
     {
@@ -25,7 +25,7 @@ export default withRouter(() => {
   return (
     <PageContainer
       content={
-        <ProTable<API.Log>
+        <ProTable<SYS.Log>
           search={false}
           rowKey="autoId"
           expandable={{

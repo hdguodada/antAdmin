@@ -5,7 +5,7 @@ import { transformTreeData } from '@/utils/utils';
 import type { DataNode } from 'antd/lib/tree';
 
 export default () => {
-  const [depTree, setDepTree] = useState<API.Dep[]>([]);
+  const [depTree, setDepTree] = useState<SYS.Dep[]>([]);
   const [treeDataSimpleMode, setTreeDataSimpleMode] = useState<DataNode[]>([]);
   const [leafCanClickTreeData, setLeafCanClickTreeData] = useState<DataNode[]>();
   const queryDepTree = useCallback(

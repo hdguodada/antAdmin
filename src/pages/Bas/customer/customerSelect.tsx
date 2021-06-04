@@ -45,11 +45,11 @@ const CustomerSelect: React.FC<{
         onChange?.(ttt?.[0]);
       }
     } else if (multiple) {
-      onChange?.(ttt?.map((i) => i.custId));
+      onChange?.(ttt?.map((i) => i.custName));
     } else {
       onChange?.(ttt?.[0].custId);
     }
-    setInputValue(ttt?.map((i) => i.custCd).join(','));
+    setInputValue(ttt?.map((i) => i.custName).join(','));
     handleCancel();
   };
   useEffect(() => {

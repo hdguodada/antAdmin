@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { queryUsers } from '@/services/Sys';
 
 export default () => {
-  const [list, setList] = useState<API.CurrentUser[]>([]);
+  const [list, setList] = useState<SYS.CurrentUser[]>([]);
   const [options, setOptions] = useState<SelectOptions>([]);
   const [valueEnum, setValueEnum] = useState<Map<React.Key, string>>();
   const query = useCallback(

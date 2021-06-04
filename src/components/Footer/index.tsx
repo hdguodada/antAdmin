@@ -5,6 +5,7 @@ export default () => {
   const { queryCustAreaTree } = useModel('custArea', (models) => ({
     queryCustAreaTree: models.queryCustAreaTree,
   }));
+  const { queryParams } = useModel('params', (model) => ({ queryParams: model.query }));
   const { queryProductType } = useModel('productType', (model) => ({
     queryProductType: model.query,
   }));
@@ -53,6 +54,7 @@ export default () => {
     async () => {
       if (history.location.pathname !== '/user/login') {
         await Promise.all([
+          queryParams(),
           queryUserRoles(),
           queryOptions(),
           queryDepTree(),

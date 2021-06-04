@@ -1,12 +1,25 @@
 declare namespace FUND {
   export type Entries = {
     autoId: K;
-    raccttype?: K;
+    custId?: K;
+    billId?: K;
+    billNo?: K;
+    bussType?: number;
+    bussTypeName?: string;
+    billDate?: string;
+    billDateStr?: string;
+    billPrice?: number;
+    hasCheck?: number;
+    notCheck?: number;
+    nowCheck?: number;
+    memo?: string;
     amount?: number;
     remark?: string;
+    raccttype?: K;
   };
   export type Accounts = {
     autoId: K;
+    raccttype?: K;
     accountId?: K;
     accountName?: string;
     payment?: number;
@@ -21,6 +34,9 @@ declare namespace FUND {
     amount?: number;
   };
   export type fundItem = {
+    bDeAmount?: number;
+    deAmount?: number;
+    operName?: string;
     date: string | number;
     billNo: K;
     billId: K;
@@ -39,5 +55,6 @@ declare namespace FUND {
     totalAmount: number; // 合计
     arrears: number; // 本次欠款
     checkStatus?: 1 | 2 | 3; // 审核状态
+    discount?: number;
   };
 }

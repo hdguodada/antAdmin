@@ -4,9 +4,9 @@ import type React from 'react';
 import { message } from 'antd';
 
 export async function queryDicts(
-  data: MyRequest<API.Dict>,
+  data: MyRequest<SYS.Dict>,
   headers = { modId: mapModId.dict },
-): Promise<RowResponse<API.Dict>> {
+): Promise<RowResponse<SYS.Dict>> {
   return request('/sys/dictDef/list', {
     data,
     method: 'POST',
@@ -14,7 +14,7 @@ export async function queryDicts(
   });
 }
 
-export async function updDict(data: API.Dict, headers = { modId: mapModId.dict }) {
+export async function updDict(data: SYS.Dict, headers = { modId: mapModId.dict }) {
   return request('/sys/dictDef/upd', {
     data,
     method: 'POST',
@@ -37,7 +37,7 @@ export async function delDict(
   });
 }
 
-export async function addDict(data: API.Dict, headers = { modId: mapModId.dict }) {
+export async function addDict(data: SYS.Dict, headers = { modId: mapModId.dict }) {
   return request('/sys/dictDef/add', {
     data,
     method: 'POST',
@@ -53,7 +53,7 @@ export async function queryDictInfo(
     id: number;
   },
   headers = { modId: mapModId.dict },
-): Promise<InfoResponse<API.Dict>> {
+): Promise<InfoResponse<SYS.Dict>> {
   return request('/sys/dictDef/info', {
     params,
     method: 'POST',
@@ -62,9 +62,9 @@ export async function queryDictInfo(
 }
 
 export async function queryDictTypes(
-  data: QueryRequest<API.DictType>,
+  data: QueryRequest<SYS.DictType>,
   headers = { modId: mapModId.dict },
-): Promise<RowResponse<API.DictType>> {
+): Promise<RowResponse<SYS.DictType>> {
   return request('/sys/dicttype/list', {
     method: 'POST',
     headers,
@@ -72,7 +72,7 @@ export async function queryDictTypes(
   });
 }
 
-export async function updDictType(data: API.DictType, headers = { modId: mapModId.dict }) {
+export async function updDictType(data: SYS.DictType, headers = { modId: mapModId.dict }) {
   return request('/sys/dicttype/upd', {
     data,
     method: 'POST',
@@ -82,7 +82,7 @@ export async function updDictType(data: API.DictType, headers = { modId: mapModI
   });
 }
 
-export async function addDictType(data: API.DictType, headers = { modId: mapModId.dict }) {
+export async function addDictType(data: SYS.DictType, headers = { modId: mapModId.dict }) {
   return request('/sys/dicttype/add', {
     data,
     method: 'POST',
@@ -93,7 +93,7 @@ export async function addDictType(data: API.DictType, headers = { modId: mapModI
 }
 
 export async function delDictType(
-  data: API.DictType['dictTypeId'][],
+  data: SYS.DictType['dictTypeId'][],
   headers = { modId: mapModId.dict },
 ) {
   return request('/sys/dicttype/del', {

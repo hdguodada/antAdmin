@@ -12,9 +12,9 @@ import { indexColumns, optionColumns, stateColumns } from '@/utils/columns';
 export default (): React.ReactNode => {
   const actionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<Partial<API.Dict>>({});
+  const [modalFormInit, setModalFormInit] = useState<Partial<SYS.Dict>>({});
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
-  const columns: ProColumnType<API.Fun>[] = [
+  const columns: ProColumnType<SYS.Fun>[] = [
     indexColumns,
     {
       title: '操作名称',
@@ -49,7 +49,7 @@ export default (): React.ReactNode => {
             initialValues={modalFormInit}
           />
           <ProCard split="vertical">
-            <EditableProTable<API.Fun>
+            <EditableProTable<SYS.Fun>
               actionRef={actionRef}
               bordered
               recordCreatorProps={false}

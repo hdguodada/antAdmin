@@ -5,7 +5,7 @@ import ProTable from '@ant-design/pro-table';
 import { queryException } from '@/services/Sys';
 
 export default (): React.ReactNode => {
-  const columns: ProColumnType<API.Exception>[] = [
+  const columns: ProColumnType<SYS.Exception>[] = [
     {
       title: '用户Id',
       dataIndex: 'userId',
@@ -26,7 +26,7 @@ export default (): React.ReactNode => {
   return (
     <PageContainer
       content={
-        <ProTable<API.Exception>
+        <ProTable<SYS.Exception>
           search={false}
           rowKey="autoId"
           request={async (params) => {

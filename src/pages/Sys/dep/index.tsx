@@ -16,7 +16,7 @@ export default (): React.ReactNode => {
     queryDepTree: model.queryDepTree,
   }));
   const [modalVisit, setModalVisit] = useState(false);
-  const [modalFormInit, setModalFormInit] = useState<API.Dep>();
+  const [modalFormInit, setModalFormInit] = useState<SYS.Dep>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const depColumns: ProColumnType<DepDataType>[] = [
     {

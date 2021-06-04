@@ -41,7 +41,7 @@ const goto = () => {
 
 const Login: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
-  const [userLoginState, setUserLoginState] = useState<API.LoginStateType>({});
+  const [userLoginState, setUserLoginState] = useState<SYS.LoginStateType>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
 

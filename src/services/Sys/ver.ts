@@ -4,7 +4,7 @@ import { mapModId } from '@/utils/utils';
 export async function queryVers(
   data: MyRequest<Record<string, unknown>>,
   headers = { modId: mapModId.ver },
-): Promise<RowResponse<API.Ver>> {
+): Promise<RowResponse<SYS.Ver>> {
   return request('/sys/ver/list', {
     method: 'POST',
     data,
@@ -15,7 +15,7 @@ export async function queryVers(
 export async function queryVerInfo(
   id: number,
   headers = { modId: mapModId.ver },
-): Promise<InfoResponse<API.Ver>> {
+): Promise<InfoResponse<SYS.Ver>> {
   return request('/sys/ver/info', {
     method: 'POST',
     params: { id },

@@ -12,6 +12,9 @@ export default () => {
     <GlobalWrapper type="descriptions">
       <PageContainer
         title={false}
+        tabProps={{
+          defaultActiveKey: 'ghdd',
+        }}
         tabList={[
           {
             tab: '采购订单追踪表',
@@ -39,9 +42,6 @@ export default () => {
             children: <Detail />,
           },
         ]}
-        tabProps={{
-          defaultActiveKey: 'Pay',
-        }}
       />
     </GlobalWrapper>
   );

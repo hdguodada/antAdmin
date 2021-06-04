@@ -10,12 +10,12 @@ import { indexColumns, optionColumns, refreshAndNew, stateColumns } from '@/util
 import { PageContainer } from '@ant-design/pro-layout';
 import { useRequest, useModel } from 'umi';
 
-export type RoleDataType = API.UserRole;
+export type RoleDataType = SYS.UserRole;
 
 export default (): React.ReactNode => {
   const actionRef = useRef<ActionType>();
   const [roleId, setRoleId] = useState(1);
-  const [modalFormInit, setModalFormInit] = useState<API.UserRole | undefined>();
+  const [modalFormInit, setModalFormInit] = useState<SYS.UserRole | undefined>();
   const [formAction, setFormAction] = useState<'upd' | 'add'>('upd');
   const [modalVisit, setModalVisit] = useState(false);
   const { userRoleList, queryUserRoles } = useModel('userRole', (model) => ({
@@ -67,7 +67,7 @@ export default (): React.ReactNode => {
             visible={modalVisit}
             actionRef={actionRef}
             setVisible={setModalVisit}
-            initialValues={modalFormInit as API.UserRole}
+            initialValues={modalFormInit as SYS.UserRole}
           />
           <ProCard split="vertical">
             <ProCard colSpan="700px">

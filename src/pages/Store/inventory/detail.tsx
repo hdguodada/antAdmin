@@ -131,7 +131,7 @@ export const Inventory: React.FC = () => {
     qtyColumns({
       title: '系统库存',
       dataIndex: 'qty',
-      rest: { editable: false },
+      editable: false,
     }),
     {
       dataIndex: 'checkInventoryQtyMid',

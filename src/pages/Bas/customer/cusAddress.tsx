@@ -2,6 +2,7 @@ import { delCustomerAddress, queryCustomerAddress } from '@/services/Bas';
 import { EditFilled, PlusOutlined } from '@ant-design/icons';
 import ProList from '@ant-design/pro-list';
 import type { FormInstance } from 'antd';
+import { message } from 'antd';
 import { Button, Cascader, Space, Tag, Tooltip } from 'antd';
 import React, { useRef, useState } from 'react';
 import Style from '@/global.less';
@@ -36,6 +37,9 @@ export const CustAddressForm: React.FC<{ custId: K } & FormProps<BAS.CustAddress
     },
     {
       manual: true,
+      onSuccess: () => {
+        message.success('数据更新更改');
+      },
     },
   );
   const formRef = useRef<FormInstance>();
@@ -68,6 +72,7 @@ export const CustAddressForm: React.FC<{ custId: K } & FormProps<BAS.CustAddress
         setVisible?.(v);
       }}
     >
+      <ProFormText name="addressId" hidden />
       <ProFormText initialValue={custId} name="custId" hidden />
       <ProFormText name="regioncd" hidden />
       <ProForm.Group>
@@ -189,6 +194,7 @@ export const CustAddressTable: React.FC<{
               type={'primary'}
               onClick={() => {
                 setFormAction('add');
+                setModalFormInit(undefined);
                 setModalVisit(true);
               }}
             >

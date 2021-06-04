@@ -14,8 +14,29 @@ export * from './module';
 export async function queryOptions(
   data = {},
   headers = { modId: '92' },
-): Promise<MyResponse<API.Option[]>> {
+): Promise<MyResponse<SYS.Option[]>> {
   return request('/sys/option/all', {
+    method: 'POST',
+    data,
+    headers,
+  });
+}
+
+export async function queryParams(
+  data = {},
+  headers = { modId: '92' },
+): Promise<MyResponse<SYS.SysParams>> {
+  return request('/sys/para/info', {
+    data,
+    headers,
+  });
+}
+
+export async function saveParams(
+  data = {},
+  headers = { modId: '92' },
+): Promise<MyResponse<Record<string, string>>> {
+  return request('/sys/para/save', {
     method: 'POST',
     data,
     headers,

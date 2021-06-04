@@ -9,7 +9,7 @@ export type LoginParamsType = {
 };
 
 export async function fakeAccountLogin(params: LoginParamsType) {
-  return request<API.LoginStateType>('/sys/user/login', {
+  return request<SYS.LoginStateType>('/sys/user/login', {
     method: 'POST',
     data: params,
   });

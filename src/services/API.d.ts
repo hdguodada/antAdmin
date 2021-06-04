@@ -1,4 +1,9 @@
-declare namespace API {
+declare namespace SYS {
+  export type SysParams = {
+    useCheck: 0 | 1;
+    useTax: 0 | 1;
+    tax: number;
+  };
   export type Option = {
     type: string;
     id: number;

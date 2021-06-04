@@ -1,40 +1,35 @@
 import { purchaseDtl } from '@/services/Purchase';
 import {
   billDescColumns,
+  dateRangeColumns,
   memoColumns,
+  skuCodeColumns,
+  skuIdColumns,
   spuCodeColumns,
   srcOrderColumns,
   srcOrderSearch,
+  storeColumns,
   suppColumns,
+  TaxColumns,
   unitIdColumns,
 } from '@/utils/columns';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Button, Table, Typography } from 'antd';
-import moment from 'moment';
 import React from 'react';
 import { useModel, useRequest } from 'umi';
-import { SkuSelect, BussTypeComponentUrl, BussTypeEnum } from '../components';
+import { BussTypeComponentUrl, BussTypeEnum } from '../components';
 
 const { Text } = Typography;
 export default () => {
   const { storeEnum } = useModel('store', (model) => ({ storeEnum: model.valueEnum }));
+  const { useTax } = useModel('params', (model) => ({ useTax: model.sysParams?.useTax || false }));
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
-    {
-      title: '采购日期',
+    dateRangeColumns({
       dataIndex: 'dateStr',
-      key: 'dataStr',
-      valueType: 'dateRange',
-      initialValue: [moment().startOf('month'), moment()],
-      render: (_, record) => <div>{record.dateStr}</div>,
-      search: {
-        transform: (value) => ({
-          beginDate: value[0],
-          endDate: value[1],
-        }),
-      },
-    },
+      title: '采购日期',
+    }),
     {
       title: '采购单据号',
       dataIndex: 'billNo',
@@ -48,29 +43,17 @@ export default () => {
     },
     suppColumns(),
     spuCodeColumns,
-    {
-      title: '商品名称',
-      dataIndex: 'skuId',
-      key: 'skuId',
-      renderFormItem: () => <SkuSelect multiple type="input" />,
-      render: (_, record) => <div>{record.skuName}</div>,
-    },
-    {
-      title: '商品条码',
-      dataIndex: 'skuCode',
-      search: false,
-    },
+    skuIdColumns(),
+    skuCodeColumns,
     unitIdColumns,
-    {
-      title: '仓库',
-      dataIndex: 'storeCd',
+    storeColumns({
       editable: false,
       valueType: 'select',
       valueEnum: storeEnum,
       fieldProps: {
         mode: 'multiple',
       },
-    },
+    }),
     {
       title: '数量',
       search: false,
@@ -89,29 +72,12 @@ export default () => {
       valueType: 'percent',
     },
     {
-      title: '含税单价',
-      search: false,
-      dataIndex: 'taxPrice',
-      valueType: 'money',
-    },
-    {
       title: '采购金额',
       search: false,
       dataIndex: 'amount',
       valueType: 'money',
     },
-    {
-      title: '税额',
-      search: false,
-      dataIndex: 'tax',
-      valueType: 'money',
-    },
-    {
-      title: '价税合计',
-      search: false,
-      dataIndex: 'taxAmount',
-      valueType: 'money',
-    },
+    ...TaxColumns(useTax),
     srcOrderColumns(
       {
         title: '源购货订单号',

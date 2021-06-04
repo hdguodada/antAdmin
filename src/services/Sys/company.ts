@@ -4,7 +4,7 @@ import { mapModId } from '@/utils/utils';
 export async function queryCompanyInfo(
   id = 1001,
   headers = { modId: mapModId.company },
-): Promise<MyResponse<API.Company>> {
+): Promise<MyResponse<SYS.Company>> {
   return request('/sys/company/info', {
     params: {
       id,
@@ -14,7 +14,7 @@ export async function queryCompanyInfo(
   });
 }
 
-export async function updCompanyInfo(data: API.Company, headers = { modId: mapModId.company }) {
+export async function updCompanyInfo(data: SYS.Company, headers = { modId: mapModId.company }) {
   return request('/sys/company/save', {
     data,
     headers,

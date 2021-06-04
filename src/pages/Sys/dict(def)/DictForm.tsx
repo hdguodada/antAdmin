@@ -11,13 +11,13 @@ type FormProps = {
   actionRef?: React.MutableRefObject<ActionType | undefined>;
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  initialValues: API.Dict | Record<string, unknown>;
+  initialValues: SYS.Dict | Record<string, unknown>;
 };
 export default (props: FormProps) => {
   const { action, actionRef, visible, setVisible, initialValues } = props;
   const formRef = useRef<FormInstance>();
   return (
-    <ModalForm<API.Dict>
+    <ModalForm<SYS.Dict>
       initialValues={{
         state: 1,
         dictTypeId: initialValues.dictTypeId,

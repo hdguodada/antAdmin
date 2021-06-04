@@ -12,13 +12,13 @@ type UserFormProps = {
   actionRef?: React.MutableRefObject<ActionType | undefined>;
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  initialValues: API.UserRole;
+  initialValues: SYS.UserRole;
 };
 const RoleForm: React.FC<UserFormProps> = (props) => {
   const { action, actionRef, visible, setVisible, initialValues } = props;
   const formRef = useRef<FormInstance>();
   return (
-    <ModalForm<API.UserRole>
+    <ModalForm<SYS.UserRole>
       key="edit"
       initialValues={{
         state: 1,

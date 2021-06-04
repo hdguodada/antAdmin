@@ -32,6 +32,7 @@ import moment from 'moment';
 import { delPurchase } from '@/services/Purchase';
 import { showSysInfo } from '@/components/SysInfo';
 import CustomerSelect from '@/pages/Bas/customer/customerSelect';
+import { SN } from '@/pages/Store/serNum/serNumDetail';
 
 export const checkStatusValueEnum = new Map([
   [1, { text: '未审核', status: 'Processing' }],
@@ -244,6 +245,45 @@ export function qtyColumns(props?: ProColumnType): ProColumns {
   };
 }
 
+export function qtyWithSNColumns(
+  entries: PUR.Entries[],
+  stockType: StockType,
+  checked: boolean,
+  props?: ProColumnType,
+): ProColumns {
+  return {
+    title: () => (
+      <div>
+        <span className="error-color">*</span>数量
+      </div>
+    ),
+    dataIndex: 'qtyMid',
+    valueType: 'digit',
+    width: 155,
+    formItemProps: {
+      required: true,
+    },
+    renderFormItem: ({ index }) => {
+      if (index !== undefined) {
+        const record = entries[index];
+        return (
+          <SN
+            sku={record}
+            disabled={checked}
+            initValue={{
+              qty: record.qty || 0,
+              serNumList: record.serNumList || [],
+            }}
+            stockType={stockType}
+          />
+        );
+      }
+      return <div />;
+    },
+    ...props,
+  };
+}
+
 export function customerColumns(
   { title = '客户', dataIndex = 'custId' } = {},
   props?: ProColumnType,
@@ -268,7 +308,7 @@ export function customerColumns(
 }
 
 export function suppColumns(
-  { title = '供应商', dataIndex = 'suppId', renderName = 'suppName' } = {},
+  { title = '供应商', dataIndex = 'suppId', renderName = 'suppName', multiple = true } = {},
   props?: ProColumnType,
 ): ProColumns {
   return {
@@ -285,11 +325,11 @@ export function suppColumns(
         {record[renderName]}
       </Button>
     ),
-    renderFormItem: () => <SupplierSelect multiple />,
+    renderFormItem: () => <SupplierSelect multiple={multiple} />,
     ...props,
   };
 }
-export function userColumns(props: ProColumnType): ProColumns {
+export function userColumns<T extends unknown>(props: ProColumnType<T>): ProColumns<T> {
   return {
     dataIndex: 'userId',
     title: '用户',
@@ -317,7 +357,7 @@ export function dateRangeColumns(
     title,
     dataIndex,
     valueType: 'dateRange',
-    initialValue: [moment().startOf('month'), moment()],
+    initialValue: [moment().subtract(1, 'month'), moment()],
     render: (_, record) => <div>{moment(record[dataIndex]).format('YYYY-MM-DD')}</div>,
     search: {
       transform: (value) => ({
@@ -369,6 +409,7 @@ export const stateColumns: ProColumns = {
     [1, { text: '正常', status: 'Success' }],
     [0, { text: '禁用', status: 'Error' }],
   ]),
+  index: 300,
 };
 
 export function billNoColumns(props?: ProColumnType & { bussType: BussType }): ProColumns {
@@ -472,14 +513,45 @@ export const totalAmountColumns = (
   };
 };
 
-export function moneyColumns(props: ProColumnType): ProColumnType {
+export function moneyColumns<T = unknown>(props?: ProColumnType<T>): ProColumnType<T> {
   return {
+    title: '金额',
+    dataIndex: 'amount',
     valueType: 'money',
     search: false,
-    align: 'right',
     width: 135,
     ...props,
   };
+}
+
+export function TaxColumns<T extends unknown>(useTax: number): ProColumnType<T>[] {
+  return [
+    moneyColumns({
+      title: '含税单价',
+      dataIndex: 'taxPrice',
+      editable: false,
+      hideInTable: !useTax,
+    }),
+    {
+      title: '税率',
+      dataIndex: 'taxRate',
+      valueType: 'percent',
+      hideInTable: !useTax,
+      width: 105,
+    },
+    moneyColumns({
+      title: '税额',
+      dataIndex: 'tax',
+      editable: false,
+      hideInTable: !useTax,
+    }),
+    moneyColumns({
+      title: '价税合计',
+      dataIndex: 'taxAmount',
+      editable: false,
+      hideInTable: !useTax,
+    }),
+  ];
 }
 
 export const billDescColumns = <T extends unknown>({

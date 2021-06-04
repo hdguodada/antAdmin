@@ -549,6 +549,7 @@ export default () => {
   return (
     <GlobalWrapper type={'list'}>
       <PageContainer
+        title={false}
         content={
           <ProCard
             tabs={{

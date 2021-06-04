@@ -158,6 +158,11 @@ export const Supplier = forwardRef((props: SupplierProps, ref) => {
             total: response.data.total,
           };
         }}
+        onRow={(record) => ({
+          onDoubleClick: () => {
+            onChange?.([record]);
+          },
+        })}
         rowSelection={select && !multiple ? false : {}}
         tableAlertOptionRender={({ selectedRowKeys, selectedRows }) => {
           if (select && multiple) {

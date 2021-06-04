@@ -8,14 +8,14 @@ import { queryModules, updRole } from '@/services/Sys';
 import ProCard from '@ant-design/pro-card';
 
 type FormProps = {
-  initialValues: API.UserRole;
+  initialValues: SYS.UserRole;
   setRoleId: () => void;
 };
 const RoleForm: React.FC<FormProps> = (props) => {
   const actionRef = useRef<ActionType>();
   const { initialValues, setRoleId } = props;
-  const [module, setModule] = useState<API.Module[]>();
-  const setModSelectedMapWithInitialValues = (i: API.UserRole) => {
+  const [module, setModule] = useState<SYS.Module[]>();
+  const setModSelectedMapWithInitialValues = (i: SYS.UserRole) => {
     const entries = {};
     i?.funAuth?.forEach((item) => {
       const v = entries[item.modId];
@@ -38,7 +38,7 @@ const RoleForm: React.FC<FormProps> = (props) => {
       setModSelectedMap(setModSelectedMapWithInitialValues(initialValues));
     }
   }, [initialValues]);
-  const columns: ProColumns<API.Module>[] = [
+  const columns: ProColumns<SYS.Module>[] = [
     {
       dataIndex: 'memo',
       title: '模块名称',
@@ -100,7 +100,7 @@ const RoleForm: React.FC<FormProps> = (props) => {
     },
   ];
   return (
-    <ProTable<API.Module>
+    <ProTable<SYS.Module>
       actionRef={actionRef}
       dataSource={module}
       columns={columns}
@@ -113,7 +113,7 @@ const RoleForm: React.FC<FormProps> = (props) => {
             type="primary"
             key="save"
             onClick={async () => {
-              const funAuth: API.UserRole['funAuth'] = [];
+              const funAuth: SYS.UserRole['funAuth'] = [];
               // eslint-disable-next-line no-restricted-syntax
               for (const [key, value] of Object.entries(modSelectedMap)) {
                 if ((value as number[]).length > 0) {

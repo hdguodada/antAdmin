@@ -44,6 +44,7 @@ export const ImageEdit: React.FC<{
       listType="picture-card"
       showUploadList={false}
       action={`${BASE_URL}/sys/upload/upload?type=prodImage`}
+      headers={{ modId: '92' }}
       onChange={(info) => {
         if (info.file.status === 'uploading') {
           setLoading(true);

@@ -8,29 +8,30 @@ import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import type { RequestOptionsInit, ResponseError } from 'umi-request';
 import { queryCurrent, queryRouters } from './services/Sys/user';
-import {
-  SmileOutlined,
-  HeartOutlined,
-  ShoppingCartOutlined,
-  AppstoreOutlined,
-  SafetyOutlined,
-  GlobalOutlined,
-  SettingFilled,
-  MoneyCollectOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
+// import {
+//   SmileOutlined,
+//   HeartOutlined,
+//   ShoppingCartOutlined,
+//   AppstoreOutlined,
+//   SafetyOutlined,
+//   GlobalOutlined,
+//   SettingFilled,
+//   MoneyCollectOutlined,
+//   SettingOutlined,
+// } from '@ant-design/icons';
+import _ from 'lodash';
 
-const IconMap: any = {
-  smile: <SmileOutlined style={{ fontSize: '16px' }} />,
-  heart: <HeartOutlined style={{ fontSize: '16px' }} />,
-  ShoppingCartOutlined: <ShoppingCartOutlined style={{ fontSize: '16px' }} />,
-  AppstockOutlined: <AppstoreOutlined style={{ fontSize: '16px' }} />,
-  SafetyOutlined: <SafetyOutlined style={{ fontSize: '16px' }} />,
-  GlobalOutlined: <GlobalOutlined style={{ fontSize: '16px' }} />,
-  SettingFilled: <SettingFilled style={{ fontSize: '16px' }} />,
-  MoneyCollectOutlined: <MoneyCollectOutlined style={{ fontSize: '16px' }} />,
-  SettingOutlined: <SettingOutlined style={{ fontSize: '16px' }} />,
-};
+// const IconMap: any = {
+//   smile: <SmileOutlined style={{ fontSize: '16px' }} />,
+//   heart: <HeartOutlined style={{ fontSize: '16px' }} />,
+//   ShoppingCartOutlined: <ShoppingCartOutlined style={{ fontSize: '16px' }} />,
+//   AppstockOutlined: <AppstoreOutlined style={{ fontSize: '16px' }} />,
+//   SafetyOutlined: <SafetyOutlined style={{ fontSize: '16px' }} />,
+//   GlobalOutlined: <GlobalOutlined style={{ fontSize: '16px' }} />,
+//   SettingFilled: <SettingFilled style={{ fontSize: '16px' }} />,
+//   MoneyCollectOutlined: <MoneyCollectOutlined style={{ fontSize: '16px' }} />,
+//   SettingOutlined: <SettingOutlined style={{ fontSize: '16px' }} />,
+// };
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -39,12 +40,12 @@ export const initialStateConfig = {
 
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: API.CurrentUser;
+  currentUser?: SYS.CurrentUser;
   globalData?: globalData;
-  fetchUserInfo?: () => Promise<MyResponse<API.CurrentUser> | undefined>;
-  fetchRouters?: () => Promise<MyResponse<API.Routers> | undefined>;
+  fetchUserInfo?: () => Promise<MyResponse<SYS.CurrentUser> | undefined>;
+  fetchRouters?: () => Promise<MyResponse<SYS.Routers> | undefined>;
   fetchGlobalData?: () => Promise<globalData | undefined>;
-  menuData?: API.Routers;
+  menuData?: SYS.Routers;
   globalDataLoaded?: boolean;
 }> {
   const fetchUserInfo = async () => {
@@ -56,31 +57,13 @@ export async function getInitialState(): Promise<{
     return undefined;
   };
 
-  // const IconBc = (name: string) =>
-  //   React.createElement(Icons && (Icons as any)[name], {
-  //     style: { fontSize: '16px' },
-  //   });
-  const fetchRouters = async () => {
-    try {
-      const r = (await queryRouters())?.data;
-      return r.map((item: any) => ({
-        ...item,
-        icon: IconMap[item.meta.icon] || '',
-      }));
-    } catch (error) {
-      history.push('/user/login');
-    }
-    return undefined;
-  };
   // 如果是登录页面，不执行
   if (history.location.pathname !== '/user/login') {
     const currentUser = (await fetchUserInfo())?.data;
     if (currentUser) {
       currentUser.name = currentUser?.realName;
     }
-    const menuData = (await fetchRouters()) || [];
     return {
-      menuData,
       fetchUserInfo,
       currentUser,
       settings: {},
@@ -89,13 +72,21 @@ export async function getInitialState(): Promise<{
   }
   return {
     fetchUserInfo,
-    fetchRouters,
     settings: {},
   };
 }
 
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
+    menu: {
+      params: initialState?.currentUser,
+      request: async (a, defaultMenuData) => {
+        const fetchRouter = (await queryRouters())?.data;
+        return defaultMenuData.filter((i) => {
+          return fetchRouter.findIndex((j) => j.name === i.name) > -1;
+        });
+      },
+    },
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     footerRender: () => <Footer />,

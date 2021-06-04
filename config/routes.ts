@@ -210,6 +210,13 @@
       { name: 'ori', path: 'ori', component: './Funds/ori' },
       { name: 'ori', path: 'ori/:id', component: './Funds/ori/detail', hideInMenu: true },
       { name: 'opm', path: 'opm', component: './Funds/opm' },
+      {
+        name: 'opm',
+        path: 'opm/:id',
+        component: './Funds/opm/detail',
+        hideInMenu: true,
+        headerRender: false,
+      },
       { name: 'fundTf', path: 'fundTf', component: './Funds/fundTf' },
       { name: 'fundTf', path: 'fundTf/:id', component: './Funds/fundTf/detail', hideInMenu: true },
       { name: 'Reports', path: 'Reports', component: './Funds/Reports' },

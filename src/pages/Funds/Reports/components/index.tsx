@@ -4,19 +4,21 @@ import type { FormInstance } from 'antd';
 import React, { useRef } from 'react';
 import { useRequest } from 'umi';
 import type { FundsReportItem } from '../index';
+import { transProTableParamsToMyRequest } from '@/utils/utils';
 
-const FundReportTable: React.FC<
-  {
-    url: string;
-  } & ProTableProps<FundsReportItem, any>
-> = ({ url, ...rest }) => {
-  const { run, data } = useRequest<RowResponse<FundsReportItem>>(
+type FundReportTableProps = {
+  url: string;
+  dev?: string;
+} & ProTableProps<FundsReportItem, any>;
+export default function FundReportTable({ url, ...rest }: FundReportTableProps) {
+  const { run, error } = useRequest<RowResponse<FundsReportItem>>(
     (params: any) => ({
       url,
       data: {
-        queryFilter: params,
-        dev: 'funds',
+        ...params,
+        dev: rest.dev,
       },
+      method: 'POST',
     }),
     { manual: true },
   );
@@ -27,11 +29,16 @@ const FundReportTable: React.FC<
       options={false}
       formRef={formRef}
       pagination={false}
-      dataSource={data?.rows}
-      onSubmit={(params) => run(params)}
+      request={async (params) => {
+        const res = await run(transProTableParamsToMyRequest(params));
+        return {
+          data: res.rows,
+          success: !error,
+        };
+      }}
+      manualRequest
+      bordered
       {...rest}
     />
   );
-};
-
-export default FundReportTable;
+}
