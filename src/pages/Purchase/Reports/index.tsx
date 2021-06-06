@@ -13,7 +13,7 @@ export default () => {
       <PageContainer
         title={false}
         tabProps={{
-          defaultActiveKey: 'ghdd',
+          defaultActiveKey: 'Sku',
         }}
         tabList={[
           {

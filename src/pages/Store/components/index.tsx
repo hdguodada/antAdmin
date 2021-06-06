@@ -153,9 +153,8 @@ export function StoreTable(props: StoreTableProps) {
     bussType,
   });
   const actionRef = useRef<ActionType>();
-  const [advancedSearchFormValues, setAdvancedSearchFormValues] = useState<
-    AdvancedSearchFormField | undefined
-  >(initSearch);
+  const [advancedSearchFormValues, setAdvancedSearchFormValues] =
+    useState<AdvancedSearchFormField | undefined>(initSearch);
   return (
     <PageContainer
       title={false}
@@ -334,7 +333,6 @@ export const StoreEntries = ({
       dataIndex: 'outStoreCd',
       title: '调出仓库',
       render: (_, record) => <div>{record.outStoreName}</div>,
-      width: 150,
       renderFormItem: ({ index }) => {
         const entries: PUR.Entries[] = formRef.current?.getFieldValue('entries');
         return index !== undefined ? (

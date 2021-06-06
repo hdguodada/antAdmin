@@ -111,7 +111,19 @@ export function skuIdColumns(props?: ProColumnType): ProColumns {
   return {
     title: '商品',
     dataIndex: 'skuId',
-    render: (_, record) => <div>{record.skuName}</div>,
+    render: (_, record) => (
+      <Button
+        type="link"
+        onClick={() => {
+          if (record.spuId) {
+            history.push(`/bas/product/${record.spuId}`);
+          }
+          return false;
+        }}
+      >
+        {record.skuName}
+      </Button>
+    ),
     renderFormItem: () => <SkuSelect type="input" multiple />,
     copyable: true,
     fixed: 'left',
@@ -520,6 +532,7 @@ export function moneyColumns<T = unknown>(props?: ProColumnType<T>): ProColumnTy
     valueType: 'money',
     search: false,
     width: 135,
+    className: Style['error-color'],
     ...props,
   };
 }
@@ -680,7 +693,7 @@ export function optionColumns({
           <DelButton
             onConfirm={async () => {
               await del({ record, _index, action });
-              action.reload();
+              action?.reload();
             }}
           />
         )}

@@ -38,10 +38,10 @@ import ProForm, {
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-form';
-import { PageContainer } from '@ant-design/pro-layout';
+import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
 import ProTable, { EditableProTable } from '@ant-design/pro-table';
 import type { ActionType, ProColumns, ProTableProps } from '@ant-design/pro-table/lib/typing';
-import { Button, message, Modal, Space, Tag, Typography } from 'antd';
+import { Button, message, Modal, Space, Table, Tag, Typography } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { history, request, useModel, useParams, useRequest } from 'umi';
@@ -63,6 +63,7 @@ export enum FundTypeCode {
   核销单 = 'HXD',
   资金转账单 = 'ZJZZD',
 }
+
 export enum HxType {
   预收冲应收 = 1,
   预付冲应付 = 2,
@@ -70,6 +71,7 @@ export enum HxType {
   应收转应收 = 4,
   应付转应付 = 5,
 }
+
 export const HxTypeEnum = new Map([
   [1, { text: '预收冲应收' }],
   [2, { text: '预付冲应付' }],
@@ -84,10 +86,7 @@ export const FundsTable: React.FC<{
     (params) => {
       return {
         url: `${BussTypeApiUrl[BussType[bussType]]}/list`,
-        data: {
-          ...params,
-          quryFilter: params,
-        },
+        data: params,
         method: 'POST',
       };
     },
@@ -99,6 +98,8 @@ export const FundsTable: React.FC<{
   const { settlementIdEnum } = useModel('options', (model) => ({
     settlementIdEnum: model.valueEnum('Settlement'),
   }));
+  const { accountEnum } = useModel('account', (model) => ({ accountEnum: model.valueEnum }));
+
   function FundsColumns(): ProColumns<FUND.fundItem>[] {
     const base: ProColumns<FUND.fundItem>[] = [
       keywordColumns({
@@ -225,68 +226,65 @@ export const FundsTable: React.FC<{
     if (bussType === BussType.资金转账单) {
       return base.concat([
         {
-          title: '转账信息',
-          children: [
-            {
-              title: '转出账户',
-              render: (_, record) => (
-                <ProCard ghost split="horizontal">
-                  {record.accounts?.map((item) => (
-                    <ProCard layout="center" ghost style={{ padding: '3px' }} key={item.autoId}>
-                      {item.payAccountName}
-                    </ProCard>
-                  ))}
+          title: '转出账户',
+          dataIndex: 'payAccountId',
+          valueEnum: accountEnum,
+          render: (_, record) => (
+            <ProCard ghost split="horizontal">
+              {record.accounts?.map((item) => (
+                <ProCard layout="center" ghost style={{ padding: '3px' }} key={item.autoId}>
+                  {item.payAccountName}
                 </ProCard>
-              ),
-            },
-            {
-              title: '转入账户',
-              align: 'center',
-              render: (_, record) => (
-                <ProCard ghost split="horizontal">
-                  {record.accounts?.map((item) => (
-                    <ProCard ghost layout="center" style={{ padding: '3px' }} key={item.autoId}>
-                      {item.recAccountName}
-                    </ProCard>
-                  ))}
-                </ProCard>
-              ),
-            },
-            {
-              title: '金额',
-              render: (_, record) => (
-                <ProCard ghost split="horizontal">
-                  {record.accounts?.map((item) => (
-                    <ProCard ghost layout="center" style={{ padding: '3px' }} key={item.autoId}>
-                      ￥{item.amount}
-                    </ProCard>
-                  ))}
-                </ProCard>
-              ),
-            },
-          ],
+              ))}
+            </ProCard>
+          ),
         },
         {
+          title: '转入账户',
+          valueType: 'select',
+          dataIndex: 'recAccountId',
+          valueEnum: accountEnum,
+          render: (_, record) => (
+            <ProCard ghost split="horizontal">
+              {record.accounts?.map((item) => (
+                <ProCard ghost layout="center" style={{ padding: '3px' }} key={item.autoId}>
+                  {item.recAccountName}
+                </ProCard>
+              ))}
+            </ProCard>
+          ),
+        },
+        moneyColumns({
+          title: '金额',
+          render: (_, record) => (
+            <ProCard ghost split="horizontal">
+              {record.accounts?.map((item) => (
+                <ProCard ghost style={{ padding: '3px' }} key={item.autoId}>
+                  ￥{item.amount}
+                </ProCard>
+              ))}
+            </ProCard>
+          ),
+        }),
+        moneyColumns({
           dataIndex: 'totalAmount',
           title: '合计金额',
-          search: false,
-        },
+        }),
       ]);
     }
     return [];
   }
-  const { accountEnum } = useModel('account', (model) => ({ accountEnum: model.valueEnum }));
+
   return (
     <ProTable<FUND.fundItem>
       loading={loading}
       request={async (params) => {
-        const res = await run(params);
+        const res = await run(transProTableParamsToMyRequest(params));
         return {
           data: res.rows,
           success: !error,
         };
       }}
-      bordered
       actionRef={actionRef}
       rowSelection={{}}
       tableAlertOptionRender={({ selectedRowKeys }) => {
@@ -315,7 +313,7 @@ export const FundsTable: React.FC<{
       }}
       expandable={
         bussType === BussType.资金转账单
-          ? {}
+          ? undefined
           : {
               expandedRowRender: (record) => {
                 return (
@@ -504,6 +502,7 @@ export function FindUnHxListColumns(select = true): ProColumns<FUND.Entries>[] {
     },
   ];
 }
+
 export const FindUnHxList: React.FC<{
   value?: FUND.Entries[];
   onChange?: (value: FUND.Entries[]) => void;
@@ -672,6 +671,7 @@ export function calFundPrice({
   }
   return {};
 }
+
 export const FundsForm: React.FC<{
   bussType: BussType;
 }> = ({ bussType }) => {
@@ -797,7 +797,7 @@ export const FundsForm: React.FC<{
           type="link"
           disabled={checked}
           onClick={() => {
-            action.startEditable?.(record.autoId);
+            action?.startEditable?.(record.autoId);
           }}
         >
           编辑
@@ -840,29 +840,33 @@ export const FundsForm: React.FC<{
         <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }}>
           <ProForm<FUND.fundItem>
             submitter={{
-              render: ({ form }) => [
-                <CheckAudit checkStatus={checked} key={'checkImg'} />,
-                <Space key="action">
-                  {id !== 'new' && (
-                    <CheckTwoButton
-                      key="check"
-                      url={`${BussTypeApiUrl[BussType[bussType]]}/check`}
-                      selectedRowKeys={[id]}
-                      refresh={refresh}
-                      checkStatus={checked ? 1 : 2}
-                    />
-                  )}
-                </Space>,
-                <Button
-                  key="save"
-                  type={'primary'}
-                  onClick={async () => {
-                    form?.submit();
-                  }}
-                  children={'保存'}
-                />,
-                <Button key="refresh" type={'dashed'} onClick={refresh} children={'刷新'} />,
-              ],
+              render: ({ form }) => (
+                <FooterToolbar>
+                  {[
+                    <CheckAudit checkStatus={checked} key={'checkImg'} />,
+                    <Space key="action">
+                      {id !== 'new' && (
+                        <CheckTwoButton
+                          key="check"
+                          url={`${BussTypeApiUrl[BussType[bussType]]}/check`}
+                          selectedRowKeys={[id]}
+                          refresh={refresh}
+                          checkStatus={checked ? 1 : 2}
+                        />
+                      )}
+                    </Space>,
+                    <Button
+                      key="save"
+                      type={'primary'}
+                      onClick={async () => {
+                        form?.submit();
+                      }}
+                      children={'保存'}
+                    />,
+                    <Button key="refresh" type={'dashed'} onClick={refresh} children={'刷新'} />,
+                  ]}
+                </FooterToolbar>
+              ),
             }}
             formRef={formRef}
             onValuesChange={(values: FUND.fundItem) => {
@@ -1165,15 +1169,30 @@ export const FundsForm: React.FC<{
                       },
                       {
                         dataIndex: 'remark',
-                        title: '备注',
+                        title: '分单备注',
                       },
                     ]}
+                    summary={(d) => {
+                      return (
+                        <Table.Summary.Row>
+                          <Table.Summary.Cell index={0} colSpan={3}>
+                            合计
+                          </Table.Summary.Cell>
+                          <Table.Summary.Cell index={1} colSpan={1}>
+                            <Text type="danger">
+                              ￥{d.reduce((a, b) => a + (b?.amount || 0), 0)}
+                            </Text>
+                          </Table.Summary.Cell>
+                          <Table.Summary.Cell index={2} colSpan={3}></Table.Summary.Cell>
+                        </Table.Summary.Row>
+                      );
+                    }}
                   />
                 </ProForm.Item>
-                <ProFormDigit width="sm" name="totalAmount" label="合计" disabled />
+                <ProFormDigit width="sm" name="totalAmount" label="合计" disabled hidden />
               </>
             )}
-            <ProFormTextArea name="memo" label="备注" />
+            <ProFormTextArea name="memo" label="整单备注" />
           </ProForm>
         </ProCard>
       }

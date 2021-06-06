@@ -192,9 +192,8 @@ export function XhTable(props: XhTableProps) {
     userEnum,
   });
   const actionRef = useRef<ActionType>();
-  const [advancedSearchFormValues, setAdvancedSearchFormValues] = useState<
-    AdvancedSearchFormField | undefined
-  >(initSearch);
+  const [advancedSearchFormValues, setAdvancedSearchFormValues] =
+    useState<AdvancedSearchFormField | undefined>(initSearch);
   return (
     <PageContainer
       title={false}
@@ -209,7 +208,6 @@ export function XhTable(props: XhTableProps) {
             }
             return '';
           }}
-          bordered
           scroll={{ x: 2500 }}
           params={advancedSearchFormValues}
           actionRef={actionRef}
@@ -617,7 +615,9 @@ export const XhForm = (props: XhFormProps) => {
         })
       ).data;
       setAddressOptions(
-        await (await queryCustomerAddress({ queryFilter: { custId: info.custId } })).data.rows,
+        await (
+          await queryCustomerAddress({ queryFilter: { custId: info.custId } })
+        ).data.rows,
       );
       setChecked(info.checkStatus === 2);
       const entries = info.entries?.map((en) => ({
@@ -725,8 +725,9 @@ export const XhForm = (props: XhFormProps) => {
             if (values.cust) {
               const { cust } = values;
               setAddressOptions(
-                await (await queryCustomerAddress({ queryFilter: { custId: cust.custId } })).data
-                  .rows,
+                await (
+                  await queryCustomerAddress({ queryFilter: { custId: cust.custId } })
+                ).data.rows,
               );
               formRef.current?.setFieldsValue({
                 addressId: undefined,

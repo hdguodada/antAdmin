@@ -1,67 +1,39 @@
 import { purcSumBySku } from '@/services/Purchase';
-import { cateIdColumns, memoColumns, spuCodeColumns } from '@/utils/columns';
+import {
+  cateIdColumns,
+  dateRangeColumns,
+  indexColumns,
+  memoColumns,
+  moneyColumns,
+  skuIdColumns,
+  spuCodeColumns,
+  storeColumns,
+} from '@/utils/columns';
+import { transProTableParamsToMyRequest } from '@/utils/utils';
+import { StatisticCard } from '@ant-design/pro-card';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Table, Typography } from 'antd';
-import moment from 'moment';
 import React from 'react';
 import { useModel, useRequest } from 'umi';
-import { SupplierSelect, SkuSelect } from '../components';
-
-const { Text } = Typography;
 
 export default () => {
   const { storeEnum } = useModel('store', (model) => ({ storeEnum: model.valueEnum }));
-
+  const { useTax } = useModel('params', (model) => ({ useTax: model.sysParams?.useTax || 0 }));
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
-    {
-      title: '单据日期',
-      dataIndex: 'dateStr',
-      key: 'dataStr',
-      hideInTable: true,
-      valueType: 'dateRange',
-      initialValue: [moment().startOf('month'), moment()],
-      render: (_, record) => <div>{record.dateStr}</div>,
-      search: {
-        transform: (value) => ({
-          beginDate: value[0],
-          endDate: value[1],
-        }),
-      },
-    },
+    indexColumns,
+    dateRangeColumns(),
     cateIdColumns(),
-    {
-      title: '供应商',
-      dataIndex: 'suppId',
-      hideInTable: true,
-      valueType: 'select',
-      renderFormItem: () => <SupplierSelect />,
-    },
     spuCodeColumns,
-    {
-      title: '商品名称',
-      dataIndex: 'skuId',
-      hideInTable: true,
-      renderFormItem: () => <SkuSelect multiple type="input" />,
-      render: (_, record) => <div>{record.skuName}</div>,
-    },
-    {
-      title: '仓库',
-      dataIndex: 'storeName',
-      editable: false,
-      search: false,
-    },
-    {
-      title: '仓库',
-      dataIndex: 'storeCd',
-      editable: false,
-      hideInTable: true,
+    skuIdColumns({
+      fixed: false,
+    }),
+    storeColumns({
       valueType: 'select',
       valueEnum: storeEnum,
       fieldProps: {
         mode: 'multiple',
       },
-    },
+    }),
     {
       title: '副单位',
       dataIndex: 'secondUnit',
@@ -83,34 +55,29 @@ export default () => {
       search: false,
       dataIndex: 'baseQty',
     },
-    {
+    moneyColumns({
       title: '单价',
-      search: false,
       dataIndex: 'price',
-    },
-    {
+    }),
+    moneyColumns({
       title: '采购金额',
-      search: false,
       dataIndex: 'amount',
-    },
-    {
+    }),
+    moneyColumns({
       title: '税额',
-      search: false,
       dataIndex: 'tax',
-    },
-    {
+      hideInTable: !!useTax,
+    }),
+    moneyColumns({
       title: '价税合计',
-      search: false,
       dataIndex: 'taxAmount',
-    },
+      hideInTable: !!useTax,
+    }),
     memoColumns(),
   ];
   const { run, data } = useRequest(
     async (params) => {
-      const response = await purcSumBySku({
-        ...params,
-        queryFilter: params,
-      });
+      const response = await purcSumBySku(transProTableParamsToMyRequest(params));
       return {
         data: {
           data: response.data.rows,
@@ -127,38 +94,83 @@ export default () => {
     <ProTable
       rowKey="autoId"
       bordered
-      scroll={{ y: 600 }}
+      scroll={{ x: 2000, y: 600 }}
       options={false}
       pagination={false}
       columns={columns}
       request={async (params) => {
         return run(params);
       }}
-      summary={() =>
-        !(data?.summary instanceof Array) && (
-          <Table.Summary.Row>
-            <Table.Summary.Cell index={0} colSpan={6}>
-              合计
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={2}>
-              <Text type="danger">{data?.summary?.baseQty}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={3}>
-              <Text type="danger">¥{data?.summary?.price}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={4}>
-              <Text type="danger">¥{data?.summary?.amount}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={5}>
-              <Text type="danger">¥{data?.summary?.tax}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={6}>
-              <Text type="danger">¥{data?.summary?.taxAmount}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={7} />
-          </Table.Summary.Row>
-        )
-      }
+      // summary={() =>
+      //   !(data?.summary instanceof Array) && (
+      //     <Table.Summary.Row>
+      //       <Table.Summary.Cell index={0} colSpan={6}>
+      //         合计
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={2}>
+      //         <Text type="danger">{data?.summary?.baseQty}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={3}>
+      //         <Text type="danger">¥{data?.summary?.price}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={4}>
+      //         <Text type="danger">¥{data?.summary?.amount}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={5}>
+      //         <Text type="danger">¥{data?.summary?.tax}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={6}>
+      //         <Text type="danger">¥{data?.summary?.taxAmount}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={7} />
+      //     </Table.Summary.Row>
+      //   )
+      // }
+      footer={() => {
+        return (
+          !(data?.summary instanceof Array) && (
+            <StatisticCard.Group>
+              <StatisticCard
+                statistic={{
+                  title: '总基本数量',
+                  value: data?.summary?.baseQty,
+                }}
+              />
+              <StatisticCard.Divider />
+              <StatisticCard
+                statistic={{
+                  title: '均价',
+                  value: data?.summary?.price,
+                  suffix: '元',
+                }}
+              />
+              <StatisticCard.Divider />
+              <StatisticCard
+                statistic={{
+                  title: '采购总金额',
+                  value: data?.summary?.amount,
+                  suffix: '元',
+                }}
+              />
+              <StatisticCard.Divider />
+              <StatisticCard
+                statistic={{
+                  title: '总税额',
+                  value: data?.summary?.tax,
+                  suffix: '元',
+                }}
+              />
+              <StatisticCard
+                statistic={{
+                  title: '总价税合计',
+                  value: data?.summary?.taxAmount,
+                  suffix: '元',
+                }}
+              />
+            </StatisticCard.Group>
+          )
+        );
+      }}
     />
   );
 };

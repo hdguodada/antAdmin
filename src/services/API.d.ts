@@ -155,6 +155,7 @@ declare namespace SYS {
     pageNumber: number;
   };
   export type CurrentUser = {
+    access: string;
     userName: string;
     realName: string;
     mobile: string;

@@ -2,9 +2,12 @@ import { purchaseOrderListByGhdd } from '@/services/Purchase';
 import {
   billNoColumns,
   dateRangeColumns,
+  indexColumns,
   memoColumns,
+  moneyColumns,
   skuIdColumns,
   spuCodeColumns,
+  storeColumns,
   suppColumns,
   suppTypeColumns,
   unitIdColumns,
@@ -12,63 +15,59 @@ import {
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, Table, Typography } from 'antd';
-import moment from 'moment';
+import { Button } from 'antd';
 import React from 'react';
 import { BussType } from '../components';
 import { useModel, useRequest } from 'umi';
 import { StatisticCard } from '@ant-design/pro-card';
-
-const { Text } = Typography;
+import { transProTableParamsToMyRequest } from '@/utils/utils';
+import Style from '@/global.less';
 
 export default function PurcOrderTrack() {
   const { suppTypeEnum } = useModel('suppType', (model) => ({ suppTypeEnum: model.valueEnum }));
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
+    indexColumns,
     dateRangeColumns(),
     spuCodeColumns,
-    skuIdColumns(),
+    skuIdColumns({
+      fixed: false,
+    }),
     unitIdColumns,
     billNoColumns({
       bussType: BussType.采购订单,
     }),
     suppTypeColumns(suppTypeEnum),
     suppColumns(),
-    {
-      title: '仓库',
-      dataIndex: 'storeName',
-      search: false,
-    },
-
+    storeColumns({ search: false }),
     {
       title: '数量',
       search: false,
       dataIndex: 'qty',
     },
-    {
+    moneyColumns({
       title: '单价',
       search: false,
       dataIndex: 'price',
-    },
-    {
+    }),
+    moneyColumns({
       title: '采购额',
       search: false,
       dataIndex: 'amount',
-    },
+    }),
     {
       title: '未入库数量',
       search: false,
       dataIndex: 'unQty',
     },
-    {
+    moneyColumns({
       title: '未入库金额',
       search: false,
       dataIndex: 'unAmount',
-    },
+    }),
     {
       title: '预计交货日期',
       dataIndex: 'deliveryDateStr',
       valueType: 'dateRange',
-      initialValue: [moment().startOf('month'), moment()],
       render: (_, record) => <div>{record.deliveryDateStr}</div>,
       search: {
         transform: (value) => ({
@@ -116,11 +115,7 @@ export default function PurcOrderTrack() {
   ];
   const { run, data } = useRequest(
     async (params) => {
-      const response = await purchaseOrderListByGhdd({
-        ...params,
-        pageNumber: params.current,
-        queryFilter: params,
-      });
+      const response = await purchaseOrderListByGhdd(transProTableParamsToMyRequest(params));
       return {
         data: {
           data: response.data.rows,
@@ -147,7 +142,7 @@ export default function PurcOrderTrack() {
                 statistic={{
                   title: '入库数量',
                   value: data?.summary?.qty,
-                  status: 'success',
+                  className: Style['error-color'],
                 }}
               />
               <StatisticCard.Divider />
@@ -155,7 +150,8 @@ export default function PurcOrderTrack() {
                 statistic={{
                   title: '入库金额',
                   value: data?.summary?.amount,
-                  status: 'success',
+                  suffix: '元',
+                  className: Style['error-color'],
                 }}
               />
               <StatisticCard.Divider />
@@ -163,7 +159,7 @@ export default function PurcOrderTrack() {
                 statistic={{
                   title: '未入库数量',
                   value: data?.summary?.unQty,
-                  status: 'error',
+                  className: Style['error-color'],
                 }}
               />
               <StatisticCard.Divider />
@@ -171,39 +167,40 @@ export default function PurcOrderTrack() {
                 statistic={{
                   title: '未入库金额',
                   value: data?.summary?.unAmount,
-                  status: 'error',
+                  suffix: '元',
+                  className: Style['error-color'],
                 }}
               />
             </StatisticCard.Group>
           )
         );
       }}
-      summary={() =>
-        !(data?.summary instanceof Array) && (
-          <Table.Summary.Row>
-            <Table.Summary.Cell index={0} />
-            <Table.Summary.Cell index={0} colSpan={6}>
-              合计
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={2}>
-              <Text type="danger">¥{data?.summary?.qty}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={3} />
-            <Table.Summary.Cell index={4}>
-              <Text type="danger">¥{data?.summary?.amount}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={5}>
-              <Text type="danger">¥{data?.summary?.unQty}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={6}>
-              <Text type="danger"> ¥{data?.summary?.unAmount}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={7} colSpan={4} />
-          </Table.Summary.Row>
-        )
-      }
+      // summary={() =>
+      //   !(data?.summary instanceof Array) && (
+      //     <Table.Summary.Row>
+      //       <Table.Summary.Cell index={0} />
+      //       <Table.Summary.Cell index={0} colSpan={6}>
+      //         合计
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={2}>
+      //         <Text type="danger">¥{data?.summary?.qty}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={3} />
+      //       <Table.Summary.Cell index={4}>
+      //         <Text type="danger">¥{data?.summary?.amount}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={5}>
+      //         <Text type="danger">¥{data?.summary?.unQty}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={6}>
+      //         <Text type="danger"> ¥{data?.summary?.unAmount}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={7} colSpan={4} />
+      //     </Table.Summary.Row>
+      //   )
+      // }
       columns={columns}
-      scroll={{ x: 2000 }}
+      scroll={{ x: 2500 }}
       pagination={{
         pageSize: 10,
       }}

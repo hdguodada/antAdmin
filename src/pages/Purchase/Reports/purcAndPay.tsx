@@ -1,19 +1,17 @@
 import { purcAndPay } from '@/services/Purchase';
-import { dateRangeColumns, suppColumns, suppTypeColumns } from '@/utils/columns';
+import { dateRangeColumns, indexColumns, moneyColumns, suppColumns } from '@/utils/columns';
+import { transProTableParamsToMyRequest } from '@/utils/utils';
+import { StatisticCard } from '@ant-design/pro-card';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Table, Typography } from 'antd';
 import React from 'react';
-import { useModel, useRequest } from 'umi';
+import { useRequest } from 'umi';
 import { BussTypeEnum } from '../components';
 
-const { Text } = Typography;
-
 export default () => {
-  const { suppEnum } = useModel('suppType', (model) => ({ suppEnum: model.valueEnum }));
-
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
-    suppTypeColumns(suppEnum),
+    indexColumns,
+    dateRangeColumns(),
     suppColumns(),
     {
       title: '业务类别',
@@ -22,41 +20,31 @@ export default () => {
       valueType: 'select',
       search: false,
     },
-    dateRangeColumns(),
-    {
+    moneyColumns({
       title: '采购金额',
-      search: false,
       dataIndex: 'totalAmount',
-      valueType: 'money',
-    },
-    {
+    }),
+    moneyColumns({
       title: '优惠金额',
-      search: false,
       dataIndex: 'reducedAmount',
-      valueType: 'money',
-    },
-    {
+    }),
+    moneyColumns({
       title: '优惠后金额',
-      search: false,
       dataIndex: 'amount',
-      valueType: 'money',
-    },
-    {
+    }),
+    moneyColumns({
       title: '本次付款',
-      search: false,
       dataIndex: 'payedAmount',
-      valueType: 'money',
-    },
-    {
+    }),
+    moneyColumns({
       title: '应付款余额',
-      search: false,
       dataIndex: 'payableAmount',
-      valueType: 'money',
-    },
+    }),
     {
       title: '付款率',
       search: false,
       dataIndex: 'backRateStr',
+      valueType: 'percent',
     },
     {
       title: '备注',
@@ -67,10 +55,7 @@ export default () => {
   ];
   const { run, data } = useRequest(
     async (params) => {
-      const response = await purcAndPay({
-        ...params,
-        queryFilter: params,
-      });
+      const response = await purcAndPay(transProTableParamsToMyRequest(params));
       return {
         data: {
           data: response.data.rows,
@@ -87,40 +72,86 @@ export default () => {
     <ProTable
       rowKey="autoId"
       bordered
-      scroll={{ x: 2000, y: 500 }}
+      scroll={{ x: 1800, y: 600 }}
       options={false}
       pagination={false}
       columns={columns}
       request={async (params) => {
         return run(params);
       }}
-      summary={() =>
-        !(data?.summary instanceof Array) && (
-          <Table.Summary.Row>
-            <Table.Summary.Cell index={0} colSpan={4}>
-              合计
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={2}>
-              <Text type="danger">¥{data?.summary?.totalAmount}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={3}>
-              <Text type="danger">¥{data?.summary?.reducedAmount}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={4}>
-              <Text type="danger">¥{data?.summary?.amount}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={5}>
-              <Text type="danger">¥{data?.summary?.payedAmount}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={6}>
-              <Text type="danger">¥{data?.summary?.payableAmount}</Text>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={7}>
-              <Text type="danger">{data?.summary?.backRateStr}</Text>
-            </Table.Summary.Cell>
-          </Table.Summary.Row>
-        )
-      }
+      // summary={() =>
+      //   !(data?.summary instanceof Array) && (
+      //     <Table.Summary.Row>
+      //       <Table.Summary.Cell index={0} colSpan={4}>
+      //         合计
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={2}>
+      //         <Text type="danger">¥{data?.summary?.totalAmount}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={3}>
+      //         <Text type="danger">¥{data?.summary?.reducedAmount}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={4}>
+      //         <Text type="danger">¥{data?.summary?.amount}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={5}>
+      //         <Text type="danger">¥{data?.summary?.payedAmount}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={6}>
+      //         <Text type="danger">¥{data?.summary?.payableAmount}</Text>
+      //       </Table.Summary.Cell>
+      //       <Table.Summary.Cell index={7}>
+      //         <Text type="danger">{data?.summary?.backRateStr}</Text>
+      //       </Table.Summary.Cell>
+      //     </Table.Summary.Row>
+      //   )
+      // }
+      footer={() => {
+        return (
+          !(data?.summary instanceof Array) && (
+            <StatisticCard.Group>
+              <StatisticCard
+                statistic={{
+                  title: '采购金额',
+                  value: data?.summary?.totalAmount,
+                  suffix: '元',
+                }}
+              />
+              <StatisticCard.Divider />
+              <StatisticCard
+                statistic={{
+                  title: '优惠金额',
+                  value: data?.summary?.reducedAmount,
+                  suffix: '元',
+                }}
+              />
+              <StatisticCard.Divider />
+              <StatisticCard
+                statistic={{
+                  title: '优惠后金额',
+                  value: data?.summary?.amount,
+                  suffix: '元',
+                }}
+              />
+              <StatisticCard.Divider />
+              <StatisticCard
+                statistic={{
+                  title: '本次付款',
+                  value: data?.summary?.payedAmount,
+                  suffix: '元',
+                }}
+              />
+              <StatisticCard
+                statistic={{
+                  title: '应付款余额',
+                  value: data?.summary?.payableAmount,
+                  suffix: '元',
+                }}
+              />
+            </StatisticCard.Group>
+          )
+        );
+      }}
     />
   );
 };

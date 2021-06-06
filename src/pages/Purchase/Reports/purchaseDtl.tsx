@@ -24,7 +24,7 @@ import { BussTypeComponentUrl, BussTypeEnum } from '../components';
 const { Text } = Typography;
 export default () => {
   const { storeEnum } = useModel('store', (model) => ({ storeEnum: model.valueEnum }));
-  const { useTax } = useModel('params', (model) => ({ useTax: model.sysParams?.useTax || false }));
+  const { useTax } = useModel('params', (model) => ({ useTax: model.sysParams?.useTax || 0 }));
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
     dateRangeColumns({
       dataIndex: 'dateStr',
