@@ -105,368 +105,370 @@ const imgStyle = {
   height: 42,
 };
 
-export default () => {
+export function SupplierDetail() {
   const { id } = useParams<{ id: string }>();
   const actionRef = useRef<ActionType>();
   const { data, loading, refresh } = useRequest(async () => {
     const supplier = await querySuppliersInfo(id);
     const supplierFinance = await querySuppFinanceInfo(id);
-    return Promise.resolve({
+    return {
       data: {
         supplier: supplier.data,
         finance: supplierFinance.data,
       },
       success: supplier.code === 0,
-    });
+    };
   });
   const [visible, setVisible] = useState<boolean>(false);
   const [visible1, setVisible1] = useState<boolean>(false);
   const [responsive, setResponsive] = useState(false);
   const [collapsed, setCollapsed] = useState<boolean>(true);
   return (
-    <GlobalWrapper type="descriptions">
-      <PageContainer
-        title={false}
-        loading={loading}
-        extra={[
-          <Button
-            loading={loading}
-            type="dashed"
-            key="new"
-            onClick={() => {
-              refresh();
-            }}
-          >
-            刷新
-          </Button>,
-          <Button
-            key={'collapse'}
-            type={'dashed'}
-            onClick={() => {
-              setCollapsed((i) => !i);
-            }}
-          >
-            {collapsed ? '展开基本信息' : '折叠基本信息'}
-          </Button>,
-        ]}
-        content={
-          <>
-            <SaveSuppForm
-              action="upd"
-              visible={visible}
-              setVisible={setVisible}
-              initialValues={data?.supplier as BAS.Supplier}
-              refresh={refresh}
-            />
-            <SaveSuppFinanceForm
-              action="upd"
-              visible={visible1}
-              setVisible={setVisible1}
-              initialValues={data?.finance}
-              refresh={refresh}
-            />
-            <ProCard direction="column" ghost>
-              {/* 头部 */}
-              <ProCard ghost>
-                <RcResizeObserver
-                  key="resize-observer"
-                  onResize={(offset) => {
-                    setResponsive(offset.width < 596);
-                  }}
-                >
-                  <StatisticCard.Group direction={responsive ? 'column' : 'row'}>
-                    <StatisticCard
-                      statistic={{
-                        title: '待审核采购订单',
-                        value: 2176,
-                        icon: (
-                          <img
-                            style={imgStyle}
-                            src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
-                            alt="icon"
-                          />
-                        ),
-                      }}
-                    />
-                    <StatisticCard
-                      statistic={{
-                        title: '待审核采购单',
-                        value: 475,
-                        icon: (
-                          <img
-                            style={imgStyle}
-                            src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*-jVKQJgA1UgAAAAAAAAAAABkARQnAQ"
-                            alt="icon"
-                          />
-                        ),
-                      }}
-                    />
-                    <StatisticCard
-                      statistic={{
-                        title: '待审核采购退货单',
-                        value: 87,
-                        icon: (
-                          <img
-                            style={imgStyle}
-                            src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*FPlYQoTNlBEAAAAAAAAAAABkARQnAQ"
-                            alt="icon"
-                          />
-                        ),
-                      }}
-                    />
-                    <StatisticCard
-                      statistic={{
-                        title: '待审核其他入库单',
-                        value: 1754,
-                        icon: (
-                          <img
-                            style={imgStyle}
-                            src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*pUkAQpefcx8AAAAAAAAAAABkARQnAQ"
-                            alt="icon"
-                          />
-                        ),
-                      }}
-                    />
-                  </StatisticCard.Group>
-                </RcResizeObserver>
-              </ProCard>
-              <ProCard ghost split="vertical">
-                <ProCard colSpan={collapsed ? 24 : 16} direction="column" ghost>
-                  {/* 供应商关联的表单 Start */}
-                  <ProCard collapsible title={<span>关联单据</span>} tabs={{ type: 'card' }}>
-                    <ProCard.TabPane key="采购订单" tab="采购订单">
-                      <OrderTable<PUR.Purchase>
-                        url={BussTypeApiUrl.采购订单}
-                        checkUrl={`${BussTypeApiUrl.采购订单}/check`}
-                        componentUrl={BussTypeComponentUrl.采购订单}
-                        openCloseFn={openClosePurchase}
-                        del={delPurchase}
-                        queryList={queryPurchase}
-                        bussType={BussType.采购订单}
-                        initSearch={{
-                          suppId: [id],
-                          contactName: data?.supplier.suppName,
-                        }}
-                      />
-                    </ProCard.TabPane>
-                    <ProCard.TabPane key="采购单" tab="采购单">
-                      <OrderTable<PUR.Purchase>
-                        url={BussTypeApiUrl.采购单}
-                        checkUrl={`${BussTypeApiUrl.采购单}/check`}
-                        componentUrl={BussTypeComponentUrl.采购单}
-                        openCloseFn={openClosePurchase}
-                        del={delPurchase}
-                        queryList={queryPurchase}
-                        bussType={BussType.采购单}
-                        initSearch={{
-                          suppId: [id],
-                          contactName: data?.supplier.suppName,
-                        }}
-                      />
-                    </ProCard.TabPane>
-                    <ProCard.TabPane key="采购退货单" tab="采购退货单">
-                      <OrderTable<PUR.Purchase>
-                        url={BussTypeApiUrl.采购退货单}
-                        checkUrl={`${BussTypeApiUrl.采购退货单}/check`}
-                        componentUrl={BussTypeComponentUrl.采购退货单}
-                        openCloseFn={openClosePurchase}
-                        del={delPurchase}
-                        queryList={queryPurchase}
-                        bussType={BussType.采购退货单}
-                        initSearch={{
-                          suppId: [id],
-                          contactName: data?.supplier.suppName,
-                        }}
-                      />
-                    </ProCard.TabPane>
-                    <ProCard.TabPane key="其他入库单" tab="其他入库单">
-                      <OrderTable<PUR.Purchase>
-                        url={BussTypeApiUrl.其他入库单}
-                        checkUrl={`${BussTypeApiUrl.其他入库单}/check`}
-                        componentUrl={BussTypeComponentUrl.其他入库单}
-                        openCloseFn={openClosePurchase}
-                        del={delPurchase}
-                        queryList={queryPurchase}
-                        bussType={BussType.其他入库单}
-                        initSearch={{
-                          suppId: [id],
-                          contactName: data?.supplier.suppName,
-                        }}
-                      />
-                    </ProCard.TabPane>
-                  </ProCard>
-                  {/* 供应商关联的表单 End */}
-                  {/* 供应商联系人 Start */}
-                  <ProCard
-                    collapsible
-                    title={
-                      <span>
-                        <Avatar
-                          shape="square"
-                          style={{ backgroundColor: '#7766CC', marginRight: '12px' }}
-                          icon={<UserOutlined />}
+    <PageContainer
+      title={false}
+      loading={loading}
+      extra={[
+        <Button
+          loading={loading}
+          type="dashed"
+          key="new"
+          onClick={() => {
+            refresh();
+          }}
+        >
+          刷新
+        </Button>,
+        <Button
+          key={'collapse'}
+          type={'dashed'}
+          onClick={() => {
+            setCollapsed((i) => !i);
+          }}
+        >
+          {collapsed ? '展开基本信息' : '折叠基本信息'}
+        </Button>,
+      ]}
+      content={
+        <>
+          <SaveSuppForm
+            action="upd"
+            visible={visible}
+            setVisible={setVisible}
+            initialValues={data?.supplier as BAS.Supplier}
+            refresh={refresh}
+          />
+          <SaveSuppFinanceForm
+            action="upd"
+            visible={visible1}
+            setVisible={setVisible1}
+            initialValues={data?.finance}
+            refresh={refresh}
+          />
+          <ProCard direction="column" ghost>
+            {/* 头部 */}
+            <ProCard ghost>
+              <RcResizeObserver
+                key="resize-observer"
+                onResize={(offset) => {
+                  setResponsive(offset.width < 596);
+                }}
+              >
+                <StatisticCard.Group direction={responsive ? 'column' : 'row'}>
+                  <StatisticCard
+                    statistic={{
+                      title: '待审核采购订单',
+                      value: 2176,
+                      icon: (
+                        <img
+                          style={imgStyle}
+                          src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                          alt="icon"
                         />
-                        联系人
-                      </span>
-                    }
-                  >
-                    <EditableProTable<BAS.Rel>
-                      rowKey="relId"
-                      bordered
-                      columns={relColumns}
-                      actionRef={actionRef}
-                      params={{ suppId: id }}
-                      recordCreatorProps={{
-                        record: {
-                          relId: (Math.random() * 1000000).toFixed(0),
-                          action: 'add',
-                        } as BAS.Rel,
+                      ),
+                    }}
+                  />
+                  <StatisticCard
+                    statistic={{
+                      title: '待审核采购单',
+                      value: 475,
+                      icon: (
+                        <img
+                          style={imgStyle}
+                          src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*-jVKQJgA1UgAAAAAAAAAAABkARQnAQ"
+                          alt="icon"
+                        />
+                      ),
+                    }}
+                  />
+                  <StatisticCard
+                    statistic={{
+                      title: '待审核采购退货单',
+                      value: 87,
+                      icon: (
+                        <img
+                          style={imgStyle}
+                          src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*FPlYQoTNlBEAAAAAAAAAAABkARQnAQ"
+                          alt="icon"
+                        />
+                      ),
+                    }}
+                  />
+                  <StatisticCard
+                    statistic={{
+                      title: '待审核其他入库单',
+                      value: 1754,
+                      icon: (
+                        <img
+                          style={imgStyle}
+                          src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*pUkAQpefcx8AAAAAAAAAAABkARQnAQ"
+                          alt="icon"
+                        />
+                      ),
+                    }}
+                  />
+                </StatisticCard.Group>
+              </RcResizeObserver>
+            </ProCard>
+            <ProCard ghost split="vertical">
+              <ProCard colSpan={collapsed ? 24 : 16} direction="column" ghost>
+                {/* 供应商关联的表单 Start */}
+                <ProCard collapsible title={<span>关联单据</span>} tabs={{ type: 'card' }}>
+                  <ProCard.TabPane key="采购订单" tab="采购订单">
+                    <OrderTable<PUR.Purchase>
+                      url={BussTypeApiUrl.采购订单}
+                      checkUrl={`${BussTypeApiUrl.采购订单}/check`}
+                      componentUrl={BussTypeComponentUrl.采购订单}
+                      openCloseFn={openClosePurchase}
+                      del={delPurchase}
+                      queryList={queryPurchase}
+                      bussType={BussType.采购订单}
+                      initSearch={{
+                        suppId: [id],
                       }}
-                      editable={{
-                        onSave: async (key, values) => {
-                          await saveSuppRel({
-                            ...values,
-                            suppId: id,
-                            action: values.action || 'upd',
-                          });
-                          actionRef?.current?.reload();
-                        },
-                        onDelete: async (key) => {
-                          await delSuppRel([+key]);
-                          actionRef?.current?.reload();
-                        },
+                    />
+                  </ProCard.TabPane>
+                  <ProCard.TabPane key="采购单" tab="采购单">
+                    <OrderTable<PUR.Purchase>
+                      url={BussTypeApiUrl.采购单}
+                      checkUrl={`${BussTypeApiUrl.采购单}/check`}
+                      componentUrl={BussTypeComponentUrl.采购单}
+                      openCloseFn={openClosePurchase}
+                      del={delPurchase}
+                      queryList={queryPurchase}
+                      bussType={BussType.采购单}
+                      initSearch={{
+                        suppId: [id],
                       }}
-                      request={async (params) => {
-                        const response = await querySuppRel({
-                          ...params,
-                          pageNumber: -1,
-                          queryFilter: {
-                            ...params,
-                          },
+                    />
+                  </ProCard.TabPane>
+                  <ProCard.TabPane key="采购退货单" tab="采购退货单">
+                    <OrderTable<PUR.Purchase>
+                      url={BussTypeApiUrl.采购退货单}
+                      checkUrl={`${BussTypeApiUrl.采购退货单}/check`}
+                      componentUrl={BussTypeComponentUrl.采购退货单}
+                      openCloseFn={openClosePurchase}
+                      del={delPurchase}
+                      queryList={queryPurchase}
+                      bussType={BussType.采购退货单}
+                      initSearch={{
+                        suppId: [id],
+                      }}
+                    />
+                  </ProCard.TabPane>
+                  <ProCard.TabPane key="其他入库单" tab="其他入库单">
+                    <OrderTable<PUR.Purchase>
+                      url={BussTypeApiUrl.其他入库单}
+                      checkUrl={`${BussTypeApiUrl.其他入库单}/check`}
+                      componentUrl={BussTypeComponentUrl.其他入库单}
+                      openCloseFn={openClosePurchase}
+                      del={delPurchase}
+                      queryList={queryPurchase}
+                      bussType={BussType.其他入库单}
+                      initSearch={{
+                        suppId: [id],
+                      }}
+                    />
+                  </ProCard.TabPane>
+                </ProCard>
+                {/* 供应商关联的表单 End */}
+                {/* 供应商联系人 Start */}
+                <ProCard
+                  collapsible
+                  title={
+                    <span>
+                      <Avatar
+                        shape="square"
+                        style={{ backgroundColor: '#7766CC', marginRight: '12px' }}
+                        icon={<UserOutlined />}
+                      />
+                      联系人
+                    </span>
+                  }
+                >
+                  <EditableProTable<BAS.Rel>
+                    rowKey="relId"
+                    bordered
+                    columns={relColumns}
+                    actionRef={actionRef}
+                    params={{ suppId: id }}
+                    recordCreatorProps={{
+                      record: {
+                        relId: (Math.random() * 1000000).toFixed(0),
+                        action: 'add',
+                      } as BAS.Rel,
+                    }}
+                    editable={{
+                      onSave: async (key, values) => {
+                        await saveSuppRel({
+                          ...values,
+                          suppId: id,
+                          action: values.action || 'upd',
                         });
-                        return {
-                          data: response.data.rows,
-                          success: response.code === 0,
-                          total: response.data.total,
-                        };
+                        actionRef?.current?.reload();
+                      },
+                      onDelete: async (key) => {
+                        await delSuppRel([+key]);
+                        actionRef?.current?.reload();
+                      },
+                    }}
+                    request={async (params) => {
+                      const response = await querySuppRel({
+                        ...params,
+                        pageNumber: -1,
+                        queryFilter: {
+                          ...params,
+                        },
+                      });
+                      return {
+                        data: response.data.rows,
+                        success: response.code === 0,
+                        total: response.data.total,
+                      };
+                    }}
+                  />
+                </ProCard>
+                {/* 供应商联系人 End */}
+              </ProCard>
+              <ProCard colSpan={collapsed ? 0 : 8} direction="column">
+                {/* 供应商基本信息 */}
+                <ProCard
+                  collapsible
+                  title="基本信息"
+                  extra={
+                    <Button
+                      onClick={() => {
+                        setVisible(true);
                       }}
-                    />
-                  </ProCard>
-                  {/* 供应商联系人 End */}
+                    >
+                      修改
+                    </Button>
+                  }
+                >
+                  <ProDescriptions<BAS.Supplier>
+                    column={2}
+                    columns={[
+                      {
+                        dataIndex: 'suppTypeName',
+                        title: '供应商类别',
+                      },
+                      {
+                        dataIndex: 'suppCd',
+                        title: '供应商编号',
+                        copyable: true,
+                      },
+                      {
+                        dataIndex: 'suppName',
+                        title: '供应商名称',
+                      },
+                      {
+                        dataIndex: 'address',
+                        title: '联系地址',
+                      },
+                      {
+                        dataIndex: 'memo',
+                        title: '备注',
+                      },
+                      checkStatusColumns(undefined),
+                    ]}
+                    dataSource={data?.supplier}
+                  />
                 </ProCard>
-                <ProCard colSpan={collapsed ? 0 : 8} direction="column">
-                  {/* 供应商基本信息 */}
-                  <ProCard
-                    collapsible
-                    title="基本信息"
-                    extra={
-                      <Button
-                        onClick={() => {
-                          setVisible(true);
-                        }}
-                      >
-                        修改
-                      </Button>
-                    }
-                  >
-                    <ProDescriptions<BAS.Supplier>
-                      column={2}
-                      columns={[
-                        {
-                          dataIndex: 'suppTypeName',
-                          title: '供应商类别',
-                        },
-                        {
-                          dataIndex: 'suppCd',
-                          title: '供应商编号',
-                          copyable: true,
-                        },
-                        {
-                          dataIndex: 'suppName',
-                          title: '供应商名称',
-                        },
-                        {
-                          dataIndex: 'address',
-                          title: '联系地址',
-                        },
-                        {
-                          dataIndex: 'memo',
-                          title: '备注',
-                        },
-                        checkStatusColumns(undefined),
-                      ]}
-                      dataSource={data?.supplier}
-                    />
-                  </ProCard>
-                  <Divider />
-                  {/* 工商应财务信息 */}
-                  <ProCard
-                    collapsible
-                    title="财务信息"
-                    extra={
-                      <Button
-                        onClick={() => {
-                          setVisible1(true);
-                        }}
-                      >
-                        修改
-                      </Button>
-                    }
-                  >
-                    <ProDescriptions<BAS.Finance>
-                      column={2}
-                      columns={[
-                        {
-                          dataIndex: 'taxInvoice',
-                          title: '开票名称',
-                        },
-                        {
-                          dataIndex: 'taxPayerNo',
-                          title: '开票税号',
-                        },
-                        {
-                          dataIndex: 'taxBank',
-                          title: '开户银行',
-                        },
-                        {
-                          dataIndex: 'taxBankAccount',
-                          title: '银行账号',
-                        },
-                        {
-                          dataIndex: 'taxAddress',
-                          title: '开户地址',
-                        },
-                        {
-                          dataIndex: 'taxTel',
-                          title: '开户电话',
-                        },
-                        {
-                          dataIndex: 'taxEmail',
-                          title: '发票邮箱',
-                        },
-                        {
-                          dataIndex: 'debtTypeId',
-                          title: '账期类型',
-                        },
-                        {
-                          dataIndex: 'initPayable',
-                          title: '期初应付款',
-                        },
-                        {
-                          dataIndex: 'initPerPayable',
-                          title: '期初预付款',
-                        },
-                      ]}
-                      dataSource={data?.finance}
-                    />
-                  </ProCard>
-                  <Divider />
+                <Divider />
+                {/* 工商应财务信息 */}
+                <ProCard
+                  collapsible
+                  title="财务信息"
+                  extra={
+                    <Button
+                      onClick={() => {
+                        setVisible1(true);
+                      }}
+                    >
+                      修改
+                    </Button>
+                  }
+                >
+                  <ProDescriptions<BAS.Finance>
+                    column={2}
+                    columns={[
+                      {
+                        dataIndex: 'taxInvoice',
+                        title: '开票名称',
+                      },
+                      {
+                        dataIndex: 'taxPayerNo',
+                        title: '开票税号',
+                      },
+                      {
+                        dataIndex: 'taxBank',
+                        title: '开户银行',
+                      },
+                      {
+                        dataIndex: 'taxBankAccount',
+                        title: '银行账号',
+                      },
+                      {
+                        dataIndex: 'taxAddress',
+                        title: '开户地址',
+                      },
+                      {
+                        dataIndex: 'taxTel',
+                        title: '开户电话',
+                      },
+                      {
+                        dataIndex: 'taxEmail',
+                        title: '发票邮箱',
+                      },
+                      {
+                        dataIndex: 'debtTypeId',
+                        title: '账期类型',
+                      },
+                      {
+                        dataIndex: 'initPayable',
+                        title: '期初应付款',
+                      },
+                      {
+                        dataIndex: 'initPerPayable',
+                        title: '期初预付款',
+                      },
+                    ]}
+                    dataSource={data?.finance}
+                  />
                 </ProCard>
+                <Divider />
               </ProCard>
             </ProCard>
-          </>
-        }
-      />
+          </ProCard>
+        </>
+      }
+    />
+  );
+}
+
+export default () => {
+  return (
+    <GlobalWrapper type="descriptions">
+      <SupplierDetail />
     </GlobalWrapper>
   );
 };

@@ -14,9 +14,10 @@ type UserFormProps = {
   setVisible: (visible: boolean) => void;
   initialValues?: SYS.CurrentUser | Record<string, unknown>;
   refresh?: () => void;
+  depId?: K;
 };
 const UserForm: React.FC<UserFormProps> = (props) => {
-  const { action, actionRef, visible, setVisible, initialValues, refresh } = props;
+  const { action, actionRef, visible, setVisible, initialValues, refresh, depId } = props;
   const formRef = useRef<FormInstance>();
   const { userRoleOptions } = useModel('userRole');
   const { userType } = useModel('options', (model) => ({
@@ -74,7 +75,7 @@ const UserForm: React.FC<UserFormProps> = (props) => {
         </ProForm.Group>
       )}
       <ProForm.Group>
-        <ProForm.Item name="depId" label="所属部门">
+        <ProForm.Item name="depId" label="所属部门" initialValue={depId} style={{ width: '328px' }}>
           <DepSelect showNew={true} />
         </ProForm.Item>
         <ProFormSelect

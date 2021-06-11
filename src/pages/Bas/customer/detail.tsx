@@ -26,6 +26,7 @@ import { BussType, BussTypeApiUrl, BussTypeComponentUrl } from '@/pages/Purchase
 import { delPurchase, openClosePurchase, queryPurchase } from '@/services/Purchase';
 import { CustAddressTable } from './cusAddress';
 import { Button } from 'antd';
+import { XhTable } from '@/pages/Sales/components';
 
 const imgStyle = {
   display: 'block',
@@ -203,46 +204,28 @@ export default (): React.ReactNode => {
                 {/* 客户关联的表单 Start */}
                 <ProCard collapsible title={<span>关联单据</span>} tabs={{}}>
                   <ProCard.TabPane key="销售订单" tab="销售订单">
-                    <OrderTable<PUR.Purchase>
-                      url={BussTypeApiUrl.采购订单}
-                      checkUrl={`${BussTypeApiUrl.采购订单}/check`}
-                      componentUrl={BussTypeComponentUrl.采购订单}
-                      openCloseFn={openClosePurchase}
-                      del={delPurchase}
-                      queryList={queryPurchase}
+                    <XhTable
                       bussType={BussType.采购订单}
                       initSearch={{
-                        suppId: [id],
+                        custId: [+id],
                         contactName: data?.customerInfo.custName,
                       }}
                     />
                   </ProCard.TabPane>
                   <ProCard.TabPane key="销售单" tab="销售单">
-                    <OrderTable<PUR.Purchase>
-                      url={BussTypeApiUrl.采购单}
-                      checkUrl={`${BussTypeApiUrl.采购单}/check`}
-                      componentUrl={BussTypeComponentUrl.采购单}
-                      openCloseFn={openClosePurchase}
-                      del={delPurchase}
-                      queryList={queryPurchase}
+                    <XhTable
                       bussType={BussType.采购单}
                       initSearch={{
-                        suppId: [id],
+                        custId: [+id],
                         contactName: data?.customerInfo.custName,
                       }}
                     />
                   </ProCard.TabPane>
                   <ProCard.TabPane key="销售退货单" tab="销售退货单">
-                    <OrderTable<PUR.Purchase>
-                      url={BussTypeApiUrl.采购退货单}
-                      checkUrl={`${BussTypeApiUrl.采购退货单}/check`}
-                      componentUrl={BussTypeComponentUrl.采购退货单}
-                      openCloseFn={openClosePurchase}
-                      del={delPurchase}
-                      queryList={queryPurchase}
+                    <XhTable
                       bussType={BussType.采购退货单}
                       initSearch={{
-                        suppId: [id],
+                        custId: [+id],
                         contactName: data?.customerInfo.custName,
                       }}
                     />

@@ -1,6 +1,7 @@
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 import type { DataNode } from 'antd/lib/tree';
 import type { MenuDataItem } from '@@/plugin-layout/runtime';
+import { useLocation } from 'umi';
 
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
@@ -137,7 +138,6 @@ export const calPrice = (values: Partial<PUR.Purchase>, formRef: any, calRpAmoun
       const taxPrice = toDecimal2((record.price || 0) * (1 + (record.taxRate || 0) / 100));
       const taxAmount = toDecimal2(tax + amount);
       const rate = calRate(record);
-      console.log(record.qty);
       return {
         ...record,
         rate,
@@ -150,6 +150,7 @@ export const calPrice = (values: Partial<PUR.Purchase>, formRef: any, calRpAmoun
         taxAmount,
       };
     });
+
     entries.forEach((item) => {
       totalQty += item.qty || 0;
       totalAmount += item.taxAmount || 0;
@@ -226,6 +227,6 @@ export const filterRoutes = (sysRoutes: any[], apiRoutes: any[]) => {
   return res;
 };
 
-export function useQuery(search: string) {
-  return new URLSearchParams(search);
+export function useQuery() {
+  return new URLSearchParams(useLocation().search);
 }

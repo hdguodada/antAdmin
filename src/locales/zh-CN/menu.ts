@@ -154,4 +154,6 @@ export default {
   'menu.init.dictType': '数据字典分类',
   'menu.init.fun': '操作功能设置',
   'menu.init.module': '功能模块设置',
+  'menu.produce': '生产',
+  'menu.produce.produceInStore': '生产入库',
 };

@@ -3,14 +3,24 @@ import { ClearOutlined } from '@ant-design/icons';
 import { Input, Modal } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
-const CustomerSelect: React.FC<{
+export type CustomerSelectProps = {
   value?: BAS.Customer[] | BAS.Customer | K[] | K;
   custName?: string;
   disabled?: boolean;
   onChange?: (value: BAS.Customer[] | BAS.Customer | K[] | K | undefined) => void;
   multiple?: boolean;
   labelInValue?: boolean;
-}> = ({ value, onChange, disabled, custName, labelInValue, multiple }) => {
+  renderName?: 'custName' | 'custCd';
+};
+const CustomerSelect: React.FC<CustomerSelectProps> = ({
+  value,
+  onChange,
+  disabled,
+  custName,
+  labelInValue,
+  multiple = true,
+  renderName = 'custName',
+}) => {
   const [visible, setVisible] = useState<boolean>(false);
   const customerTableRef = useRef();
   const handleOk = () => {
@@ -45,11 +55,11 @@ const CustomerSelect: React.FC<{
         onChange?.(ttt?.[0]);
       }
     } else if (multiple) {
-      onChange?.(ttt?.map((i) => i.custName));
+      onChange?.(ttt?.map((i) => i.custId));
     } else {
       onChange?.(ttt?.[0].custId);
     }
-    setInputValue(ttt?.map((i) => i.custName).join(','));
+    setInputValue(ttt?.map((i) => i[renderName]).join(','));
     handleCancel();
   };
   useEffect(() => {
@@ -63,7 +73,7 @@ const CustomerSelect: React.FC<{
         onClick={() => {
           setVisible(true);
         }}
-        placeholder={'(空)'}
+        placeholder={`请选择客户${multiple ? '(多选)' : ''}`}
         disabled={disabled}
         suffix={
           <ClearOutlined

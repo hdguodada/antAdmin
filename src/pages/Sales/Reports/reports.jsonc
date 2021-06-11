@@ -39,5 +39,69 @@
     },
     "msg": "success",
     "status": 200
+  },
+  "xhddPay": {
+    "status": 200,
+    "msg": "success",
+    "data": {
+      "rows|5": [
+        {
+          "bussType|1": [21, 22, 23],
+          "rpAmount": 6288, // 本次收款
+          "postFee": 0, // 客户承担费用
+          "custId": "@id", // 客户id
+          "date": "@date",
+          "custTypeId": "@id",
+          "billId": "@id",
+          "billNo": "@id",
+          "custName": "零售客户",
+          "totalAmount": 6293, // 销售金额
+          "disamount": 0, //优惠金额
+          "amount": 6293, //优惠后金额
+          "ysAmount": 5, // 应收款余额
+          "memo": "备注",
+          "backRate": 50 // 回款率
+        }
+      ]
+    }
+  },
+  "XhBySku": {
+    "code": 0,
+    "msg": "success",
+    "queryFilter": {
+      "skuId": [],
+      "custId": [],
+      "producTypeId": 1,
+      "storeCd": [],
+      "profit": 0 // 计算毛利
+    },
+    "data": {
+      "rows|5": [
+        {
+          "billId": "@id",
+          "bussType|1": [20, 21, 22, 23],
+          "skuCode": "@id",
+          "skuId": "@id",
+          "skuName": "示例(笔记本)",
+          "unitName": "件",
+          "unitId": "@id", // 基本单位
+          "secondUnit": "", // 副单位
+          "storeName": "默认仓库",
+          "storeCd": "CK001",
+          "qty": 1, //基本数量
+          "secondQty": 0, // 副单位数
+          "unitPrice": 5420, // 单价 成本价
+          "amount": 5420, // 销售价格
+          "cost": 4971, // 销售成本
+          "unitCost": 4971, // 单位成本
+          "saleProfit": 449, // 销售毛利
+          "salepPofitRate": 8.29, // 毛利率
+          "cateTypeId": "@id",
+          "tax": 867, // 税额
+          "taxAmount": "6,288.00", // 价税合计
+          "taxPrice": "6,288.00" // 含税单位
+        }
+      ]
+    }
   }
 }

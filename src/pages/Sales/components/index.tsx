@@ -1,8 +1,22 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
-import type { FormInstance } from 'antd';
-import { Button, message, Select, Space } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
-import { useRequest, history, useParams, useLocation, useModel } from 'umi';
+import { CheckButton, CheckTwoButton, OpenButton } from '@/components/CheckButton';
+import { showSysInfo } from '@/components/SysInfo';
+import Style from '@/global.less';
+import CustomerSelect from '@/pages/Bas/customer/customerSelect';
+import {
+  BussType,
+  BussTypeApiUrl,
+  BussTypeComponentUrl,
+  calAmountTitle,
+  calPriceTitle,
+  CheckAudit,
+  GenerateButton,
+  getOrderType,
+  OrderType,
+  SkuSelect,
+  StockType,
+  StoreSelectChangeCurrentQty,
+} from '@/pages/Purchase/components';
+import { queryCustomerAddress, queryCustomerInfo } from '@/services/Bas';
 import {
   addPurchase,
   delPurchase,
@@ -12,58 +26,34 @@ import {
   queryPurchaseUnStockIn,
   updPurchase,
 } from '@/services/Purchase';
-import {
-  AdvancedSearchFormField,
-  bussTypeColumns,
-  customerColumns,
-  dateRangeColumns,
-  qtyWithSNColumns,
-  TaxColumns,
-  userColumns,
-} from '@/utils/columns';
+import { getCode } from '@/services/Sys';
+import type { AdvancedSearchFormField } from '@/utils/columns';
+import { qtyColumns, srcOrderColumns } from '@/utils/columns';
 import {
   AdvancedSearch,
   AdvancedSearchForm,
   billNoColumns,
   billStatusColumns,
+  bussTypeColumns,
   checkName,
   checkStatusColumns,
   crtNameColumns,
   currentQtyColumns,
+  customerColumns,
+  dateRangeColumns,
   indexColumns,
   keywordColumns,
   memoColumns,
   optionColumns,
+  qtyWithSNColumns,
   skuIdColumns,
+  TaxColumns,
   totalAmountColumns,
+  userColumns,
 } from '@/utils/columns';
-import type { ActionType, ProColumns } from '@ant-design/pro-table';
-import { EditableProTable } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
-import {
-  calAmountTitle,
-  calPriceTitle,
-  CheckAudit,
-  GenerateButton,
-  SkuSelect,
-  StockType,
-  StoreSelectChangeCurrentQty,
-} from '@/pages/Purchase/components';
-import {
-  BussType,
-  BussTypeApiUrl,
-  BussTypeComponentUrl,
-  getOrderType,
-  OrderType,
-} from '@/pages/Purchase/components';
-import Style from '@/global.less';
-import { CheckButton, CheckTwoButton, OpenButton } from '@/components/CheckButton';
-import { showSysInfo } from '@/components/SysInfo';
-import moment from 'moment';
-import { queryCustomerAddress } from '@/services/Bas';
-import { getCode } from '@/services/Sys';
+import { AccountSelect, DepSelect, MyProFormUpload, UserSelect } from '@/utils/form';
 import { calPrice, transProTableParamsToMyRequest } from '@/utils/utils';
-import { PageContainer } from '@ant-design/pro-layout';
+import { patternMsg } from '@/utils/validator';
 import ProCard from '@ant-design/pro-card';
 import ProForm, {
   ProFormDatePicker,
@@ -74,10 +64,17 @@ import ProForm, {
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-form';
-import { patternMsg } from '@/utils/validator';
-import CustomerSelect from '@/pages/Bas/customer/customerSelect';
-import { AccountSelect, DepSelect, UserSelect } from '@/utils/form';
-import { EditableProTableProps } from '@ant-design/pro-table/lib/components/EditableTable';
+import { PageContainer } from '@ant-design/pro-layout';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
+import ProTable, { EditableProTable } from '@ant-design/pro-table';
+import type { EditableProTableProps } from '@ant-design/pro-table/lib/components/EditableTable';
+import type { FormInstance } from 'antd';
+import { Button, message, Select, Space } from 'antd';
+import moment from 'moment';
+import React, { useEffect, useRef, useState } from 'react';
+import { history, useLocation, useModel, useParams, useRequest } from 'umi';
+import lodash from 'lodash';
+import { EntriesSummary } from '@/components';
 
 export type SnapshotQtyProps = {
   skuId: React.Key;
@@ -118,6 +115,30 @@ export const XhTableColumns = ({
       valueType: 'date',
       width: 105,
     },
+    srcOrderColumns(
+      {
+        title: '关联销售订单',
+        hideInTable: [BussType.销售订单].indexOf(bussType) > -1,
+      },
+      'srcXhddBillNo',
+      BussTypeComponentUrl[BussType[bussType]],
+    ),
+    srcOrderColumns(
+      {
+        title: '关联销售单',
+        hideInTable: bussType === BussType.销售单,
+      },
+      'srcXhdBillNo',
+      BussTypeComponentUrl[BussType[bussType]],
+    ),
+    srcOrderColumns(
+      {
+        title: '关联退货单',
+        hideInTable: [BussType.销售退货单].indexOf(bussType) > -1,
+      },
+      'srcThdBillNo',
+      BussTypeComponentUrl[BussType[bussType]],
+    ),
     bussTypeColumns({
       hideInTable: bussType !== BussType.销售订单,
     }),
@@ -129,8 +150,9 @@ export const XhTableColumns = ({
       valueEnum: userEnum,
     }),
     customerColumns(undefined, { search: false }),
+    qtyColumns(),
     totalAmountColumns({
-      title: '销售金额',
+      title: [BussType.销售单, BussType.销售订单].indexOf(bussType) > -1 ? '销售金额' : '退款金额',
     }),
     {
       title: bussType === BussType.销售单 ? '收款状态' : '退款状态',
@@ -186,14 +208,15 @@ export type XhTableProps = {
 };
 export function XhTable(props: XhTableProps) {
   const { userEnum } = useModel('user', (model) => ({ userEnum: model.valueEnum }));
-  const { openCloseFn, initSearch, dev, bussType } = props;
+  const { openCloseFn, initSearch, bussType } = props;
   const columns = XhTableColumns({
     bussType,
     userEnum,
   });
   const actionRef = useRef<ActionType>();
-  const [advancedSearchFormValues, setAdvancedSearchFormValues] =
-    useState<AdvancedSearchFormField | undefined>(initSearch);
+  const [advancedSearchFormValues, setAdvancedSearchFormValues] = useState<
+    AdvancedSearchFormField | undefined
+  >(initSearch);
   return (
     <PageContainer
       title={false}
@@ -203,7 +226,7 @@ export function XhTable(props: XhTableProps) {
           rowSelection={{}}
           options={false}
           rowClassName={(record) => {
-            if (record.bussType === BussType.采购退货订单) {
+            if (record.bussType === BussType.销售退货订单) {
               return Style['error-color'];
             }
             return '';
@@ -275,18 +298,13 @@ export function XhTable(props: XhTableProps) {
           beforeSearchSubmit={(params) => {
             return {
               ...params,
-              beginDate: params.date?.[0] ?? moment().startOf('month').format('YYYY-MM-DD'),
-              endDate: params.date?.[1] ?? moment().format('YYYY-MM-DD'),
               status: params.billStatus ?? [],
             };
           }}
           columns={columns}
           request={async (params) => {
             const response = await queryPurchase(
-              transProTableParamsToMyRequest({
-                ...params,
-                dev,
-              }),
+              transProTableParamsToMyRequest(params),
               `${BussTypeApiUrl[BussType[bussType]]}/list`,
             );
             return {
@@ -305,6 +323,7 @@ export enum BussCodeId {
   销售订单 = 'XHDD',
   销售单 = 'XHD',
   销售退货单 = 'XHT',
+  生产入库 = 'SCRK',
 }
 
 export type XhddEntriesProps = {
@@ -454,16 +473,16 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
     ...TaxColumns<PUR.Entries>(useTax),
     memoColumns(),
     {
-      title: '关联销货订单号',
-      dataIndex: 'srcGhddBillNo',
-      render: (_, record) => <a>{record.srcGhddBillNo?.[0]?.billNo}</a>,
+      title: '关联销售订单号',
+      dataIndex: 'srcXhddBillNo',
+      render: (_, record) => <a>{record.srcXhddBillNo?.[0]?.billNo}</a>,
       editable: false,
       hideInTable: [BussType.销售订单].indexOf(bussType) > -1,
     },
     {
-      title: '原销货单号',
-      dataIndex: 'srcGhdBillNo',
-      render: (_, record) => <a>{record.srcGhdBillNo?.[0]?.billNo}</a>,
+      title: '关联销售单号',
+      dataIndex: 'srcXhdBillNo',
+      render: (_, record) => <a>{record.srcXhdBillNo?.[0]?.billNo}</a>,
       editable: false,
       hideInTable: [BussType.销售单, BussType.销售订单].indexOf(bussType) > -1,
     },
@@ -485,15 +504,6 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
       }
       recordCreatorProps={false}
       columns={columns}
-      postData={(v) =>
-        v.map((i) => ({
-          ...i,
-          qtyMid: {
-            qty: i.qty,
-            serNumList: i.serNumList,
-          },
-        }))
-      }
       editable={{
         type: 'multiple',
         editableKeys,
@@ -513,7 +523,28 @@ export const XhddEntries: React.FC<XhddEntriesProps> = ({
           );
         },
       }}
-      value={value}
+      value={value?.map((i: any) => ({
+        ...i,
+        qtyMid: {
+          qty: i.qty,
+          serNumList: i.serNumList,
+        },
+      }))}
+      summary={(recordList) => (
+        <EntriesSummary
+          columns={columns}
+          calFields={[
+            'amount',
+            'deduction',
+            'beforeDisAmount',
+            'rate',
+            'taxAmount',
+            'basQty',
+            'qtyMid',
+          ]}
+          data={recordList}
+        />
+      )}
       {...rest}
     />
   );
@@ -530,6 +561,12 @@ export const XhForm = (props: XhFormProps) => {
   const [checked, setChecked] = useState<boolean>(false);
   const [isInfo, setIsInfo] = useState<boolean>(false);
   const [addressOptions, setAddressOptions] = useState<BAS.CustAddress[]>([]);
+  const getCustAccountPayableSum = async (custId: K) => {
+    const cust = (await queryCustomerInfo(custId)).data;
+    formRef.current?.setFieldsValue({
+      accountPayableSum: cust.accountPayableSum,
+    });
+  };
   const { run, refresh, data } = useRequest(
     async () => {
       setIsInfo(id !== 'new');
@@ -560,6 +597,9 @@ export const XhForm = (props: XhFormProps) => {
             const srcXhdd = (
               await queryPurchaseUnStockIn(srcXhddBillId || srcXhdBillId, undefined, ttt)
             ).data;
+            setAddressOptions(
+              (await queryCustomerAddress({ queryFilter: { custId: srcXhdd.custId } })).data.rows,
+            );
             const entries = srcXhdd.entries?.map((i) => ({
               ...i,
               autoId: +(Math.random() * 1000000).toFixed(0),
@@ -584,10 +624,13 @@ export const XhForm = (props: XhFormProps) => {
             const srcXHD = (
               await queryPurchaseUnStockIn(srcXhddBillId || srcXhdBillId, undefined, ttt)
             ).data;
+            setAddressOptions(
+              (await queryCustomerAddress({ queryFilter: { custId: srcXHD.custId } })).data.rows,
+            );
             const entries = srcXHD.entries?.map((i) => ({
               ...i,
               autoId: +(Math.random() * 1000000).toFixed(0),
-              srcGhdBillNo: [
+              srcXhdBillNo: [
                 {
                   billId: srcXhdBillId,
                   billNo: srcXHD.billNo,
@@ -610,14 +653,12 @@ export const XhForm = (props: XhFormProps) => {
         };
       }
       const info = (
-        await queryPurchaseInfo(id, `${BussTypeComponentUrl[BussType[bussType]]}/info`, undefined, {
+        await queryPurchaseInfo(id, `${BussTypeApiUrl[BussType[bussType]]}/info`, undefined, {
           dev,
         })
       ).data;
       setAddressOptions(
-        await (
-          await queryCustomerAddress({ queryFilter: { custId: info.custId } })
-        ).data.rows,
+        await (await queryCustomerAddress({ queryFilter: { custId: info.custId } })).data.rows,
       );
       setChecked(info.checkStatus === 2);
       const entries = info.entries?.map((en) => ({
@@ -633,8 +674,11 @@ export const XhForm = (props: XhFormProps) => {
     },
     {
       onSuccess: async (values: any) => {
+        if (values.custId) {
+          await getCustAccountPayableSum(values.custId);
+        }
         formRef.current?.setFieldsValue(values);
-        if (bussType === BussType.采购单) {
+        if ([BussType.销售单, BussType.销售退货单].indexOf(bussType) > -1) {
           calPrice(values as any, formRef, true);
         }
       },
@@ -689,7 +733,7 @@ export const XhForm = (props: XhFormProps) => {
         />,
       ]}
     >
-      <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }}>
+      <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }} title={data?.billNo}>
         <ProForm<PUR.Purchase>
           onFinish={async (values) => {
             // 新增或修改时,对序列号商品进行基本单位判断.购货订单无需序列号
@@ -722,41 +766,52 @@ export const XhForm = (props: XhFormProps) => {
             return false;
           }}
           onValuesChange={async (values) => {
-            if (values.cust) {
-              const { cust } = values;
+            if (values.custId) {
+              const { custId } = values;
               setAddressOptions(
-                await (
-                  await queryCustomerAddress({ queryFilter: { custId: cust.custId } })
-                ).data.rows,
+                (await queryCustomerAddress({ queryFilter: { custId } })).data.rows,
               );
-              formRef.current?.setFieldsValue({
-                addressId: undefined,
-                custId: cust.custId,
-                accountPayableSum: cust.accountPayableSum,
-              });
+
+              await getCustAccountPayableSum(custId);
             }
-            if ([BussType.销售单, BussType.销售退货单].indexOf(bussType) > -1) {
-              calPrice(values, formRef, true);
-              return;
+            if (
+              !lodash.isEmpty(
+                lodash.pick(values, [
+                  'entries',
+                  'customerFree',
+                  'rpAmount',
+                  'bussType',
+                  'discount',
+                  'disRate',
+                  'disAmount',
+                ]),
+              )
+            ) {
+              if ([BussType.销售单, BussType.销售退货单].indexOf(bussType) > -1) {
+                calPrice(values, formRef, true);
+                return;
+              }
+              calPrice(values, formRef);
             }
-            calPrice(values, formRef);
           }}
           formRef={formRef}
           submitter={false}
         >
           <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
-          <ProFormText hidden width="md" name="custId" label="客户Id" disabled />
+          <ProFormText hidden width="md" name="billNo" label="单据编号" disabled />
+          <ProFormDigit hidden width="sm" name="totalQty" label="单据数量" disabled />
+          <ProFormDigit hidden width="sm" name="totalAmount" label="单据总额" disabled />
           <ProForm.Group>
             <ProFormDependency name={['custName']}>
               {({ custName }) => {
                 return (
                   <ProForm.Item
-                    name="cust"
+                    name="custId"
                     label="客户"
                     rules={patternMsg.text('客户')}
                     style={{ width: '328px' }}
                   >
-                    <CustomerSelect custName={custName} disabled={checked} labelInValue />
+                    <CustomerSelect custName={custName} disabled={checked} multiple={false} />
                   </ProForm.Item>
                 );
               }}
@@ -772,6 +827,7 @@ export const XhForm = (props: XhFormProps) => {
                       label: i.linkman + i.mobile + i.fullAddress,
                       value: i.addressId,
                     }))}
+                    disabled={checked}
                   />
                 ) : (
                   ''
@@ -789,13 +845,7 @@ export const XhForm = (props: XhFormProps) => {
                 disabled={checked}
               />
             )}
-            <ProFormText
-              width="md"
-              name="billNo"
-              label="单据编号"
-              disabled
-              rules={patternMsg.text('单据编号')}
-            />
+
             <ProForm.Item name="depId" label="销售部门" style={{ width: '328px' }}>
               <DepSelect
                 isLeaf
@@ -805,7 +855,21 @@ export const XhForm = (props: XhFormProps) => {
                 }}
               />
             </ProForm.Item>
-            <UserSelect showNew name="operId" label="销售员" disabled={checked} />
+            <ProFormDependency name={['depId']}>
+              {({ depId }) =>
+                depId ? (
+                  <UserSelect
+                    showNew
+                    name="operId"
+                    label="销售员"
+                    disabled={checked}
+                    depId={depId}
+                  />
+                ) : (
+                  <></>
+                )
+              }
+            </ProFormDependency>
           </ProForm.Group>
           <ProForm.Group>
             <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
@@ -837,18 +901,6 @@ export const XhForm = (props: XhFormProps) => {
             <XhddEntries bussType={bussType} checked={checked} formRef={formRef} />
           </ProForm.Item>
           <ProFormTextArea name="memo" label="备注" disabled={checked} />
-          <ProFormDependency name={['totalQty', 'totalAmount']}>
-            {({ totalQty, totalAmount }) => (
-              <Space size={32}>
-                {totalQty > 0 && (
-                  <ProFormDigit width="sm" name="totalQty" label="单据数量" disabled />
-                )}
-                {totalAmount > 0 && (
-                  <ProFormDigit width="sm" name="totalAmount" label="单据总额" disabled />
-                )}
-              </Space>
-            )}
-          </ProFormDependency>
           <ProForm.Group>
             <ProFormText
               width="sm"
@@ -871,12 +923,18 @@ export const XhForm = (props: XhFormProps) => {
               // 销售单下的表单
               bussType === BussType.销售单 && (
                 <>
-                  <ProFormDigit width="sm" name="customerFree" label="客户承担费用" />
+                  <ProFormDigit
+                    width="sm"
+                    name="customerFree"
+                    label="客户承担费用"
+                    initialValue={0}
+                    disabled={checked}
+                  />
                   <ProFormDigit width="sm" name="arrears" label="本次欠款" disabled />
                   <ProFormDigit width="sm" name="accountPayableSum" label="客户欠款" disabled />
                   <ProFormDigit width="sm" name="totalArrears" label="总欠款" disabled />
-                  <AccountSelect name="accountId" label="结算账户" />
-                  <ProFormDigit width="sm" name="rpAmount" label="本次收款" />
+                  <AccountSelect name="accountId" label="结算账户" disabled={checked} />
+                  <ProFormDigit width="sm" name="rpAmount" label="本次收款" disabled={checked} />
                 </>
               )
             }
@@ -885,12 +943,15 @@ export const XhForm = (props: XhFormProps) => {
               bussType === BussType.销售退货单 && (
                 <>
                   <ProFormDigit width="sm" name="arrears" label="本次欠款" disabled />
-                  <AccountSelect name="customerFree" label="结算账户" />
+                  <AccountSelect name="accountId" label="结算账户" />
                   <ProFormDigit width="sm" name="rpAmount" label="本次退款" />
                 </>
               )
             }
           </ProForm.Group>
+          <ProForm.Item label="附件" name="attachment">
+            <MyProFormUpload />
+          </ProForm.Item>
         </ProForm>
       </ProCard>
     </PageContainer>

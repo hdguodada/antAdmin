@@ -1,13 +1,12 @@
-/* eslint-disable no-console */
 import React from 'react';
 import { BussType } from '@/pages/Purchase/components';
-import { XhForm } from '../components';
+import { ProduceTable } from '../components';
 import GlobalWrapper from '@/components/GlobalWrapper';
 
 export default () => {
   return (
-    <GlobalWrapper type="descriptions">
-      <XhForm bussType={BussType.销售退货单} />
+    <GlobalWrapper type="list">
+      <ProduceTable bussType={BussType.生产入库} dev="bas" />
     </GlobalWrapper>
   );
 };

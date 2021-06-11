@@ -12,21 +12,24 @@ import {
   suppColumns,
   tableAlertOptionRenderDom,
 } from '@/utils/columns';
-import { history } from 'umi';
+import { history, useModel } from 'umi';
 import BatchDel from '@/components/DelPopconfirm';
 import { useState } from 'react';
 import AddSuppForm from './addForm';
 import { Button, message } from 'antd';
 import { check } from '@/services';
-import { mapModId } from '@/utils/utils';
+import { mapModId, transProTableParamsToMyRequest } from '@/utils/utils';
 import GlobalWrapper from '@/components/GlobalWrapper';
+import ProCard from '@ant-design/pro-card';
+import SearchTreeList from '@/components/SearchTreeList';
+import { BasOtherButton } from '@/components/CheckButton';
 
 export type SupplierProps = {
   select: boolean;
   value?: any;
   onChange?: (value: BAS.Supplier[]) => void;
   multiple?: boolean;
-  selectParams?: { state: number; checkStatus: number };
+  selectParams?: { state?: number; checkStatus?: number; suppTypeId?: K };
 };
 export const Supplier = forwardRef((props: SupplierProps, ref) => {
   const actionRef = useRef<ActionType>();
@@ -132,7 +135,7 @@ export const Supplier = forwardRef((props: SupplierProps, ref) => {
         action={formAction}
         setVisible={setModalVisit}
       />
-      <ProTable<BAS.Supplier, { state: number; checkStatus?: number }>
+      <ProTable<BAS.Supplier, { state?: number; checkStatus?: number }>
         rowKey="suppId"
         actionRef={actionRef}
         options={false}
@@ -142,16 +145,13 @@ export const Supplier = forwardRef((props: SupplierProps, ref) => {
             setModalFormInit(undefined);
             setModalVisit(true);
           },
+          jsxList: [<BasOtherButton url="/bas/basOthers?tab=supplier" key="basOther" />],
         })}
         pagination={{ pageSize: 10 }}
         columns={columns}
         params={selectParams}
         request={async (params) => {
-          const response = await querySuppliers({
-            ...params,
-            pageNumber: params.current,
-            queryFilter: params,
-          });
+          const response = await querySuppliers(transProTableParamsToMyRequest(params));
           return {
             data: response.data.rows,
             success: response.code === 0,
@@ -236,9 +236,33 @@ export const Supplier = forwardRef((props: SupplierProps, ref) => {
 });
 
 export default () => {
+  const { suppType } = useModel('suppType', (model) => ({ suppType: model.leafCanClickTreeData }));
+  const [suppTypeId, setSuppTypeId] = useState<K>();
   return (
     <GlobalWrapper type="list">
-      <PageContainer content={<Supplier select={false} />} />;
+      <PageContainer
+        title={false}
+        content={
+          <ProCard split="vertical">
+            <ProCard colSpan="328px">
+              <SearchTreeList
+                t={{
+                  treeData: suppType,
+                  defaultExpandAll: true,
+                  showLine: true,
+                  showIcon: true,
+                  onSelect: (selectedKes) => {
+                    setSuppTypeId(selectedKes[0]);
+                  },
+                }}
+              />
+            </ProCard>
+            <ProCard>
+              <Supplier select={false} selectParams={{ suppTypeId }} />
+            </ProCard>
+          </ProCard>
+        }
+      />
     </GlobalWrapper>
   );
 };

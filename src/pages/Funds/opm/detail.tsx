@@ -6,7 +6,7 @@ import { FundsForm } from '../components';
 export default function OriDetail() {
   return (
     <GlobalWrapper type="list">
-      <FundsForm bussType={BussType.其他收入单} />
+      <FundsForm bussType={BussType.其他支出单} />
     </GlobalWrapper>
   );
 }

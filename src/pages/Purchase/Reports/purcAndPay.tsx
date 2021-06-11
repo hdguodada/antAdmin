@@ -72,7 +72,7 @@ export default () => {
     <ProTable
       rowKey="autoId"
       bordered
-      scroll={{ x: 1800, y: 600 }}
+      scroll={{ x: 1800, y: 550 }}
       options={false}
       pagination={false}
       columns={columns}

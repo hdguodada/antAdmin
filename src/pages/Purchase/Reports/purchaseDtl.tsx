@@ -1,8 +1,12 @@
 import { purchaseDtl } from '@/services/Purchase';
 import {
   billDescColumns,
+  billNoColumns,
+  bussTypeColumns,
   dateRangeColumns,
+  indexColumns,
   memoColumns,
+  moneyColumns,
   skuCodeColumns,
   skuIdColumns,
   spuCodeColumns,
@@ -16,34 +20,31 @@ import {
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, Table, Typography } from 'antd';
+import { Button } from 'antd';
 import React from 'react';
 import { useModel, useRequest } from 'umi';
-import { BussTypeComponentUrl, BussTypeEnum } from '../components';
+import { BussTypeComponentUrl } from '../components';
+import { transProTableParamsToMyRequest } from '@/utils/utils';
+import { StatisticCard } from '@ant-design/pro-card';
 
-const { Text } = Typography;
 export default () => {
   const { storeEnum } = useModel('store', (model) => ({ storeEnum: model.valueEnum }));
   const { useTax } = useModel('params', (model) => ({ useTax: model.sysParams?.useTax || 0 }));
   const columns: ProColumns<PUR.PurchaseOrder>[] = [
+    indexColumns,
     dateRangeColumns({
       dataIndex: 'dateStr',
       title: '采购日期',
     }),
-    {
-      title: '采购单据号',
-      dataIndex: 'billNo',
-    },
-    {
-      title: '业务类别',
-      dataIndex: 'bussType',
-      valueType: 'select',
-      valueEnum: BussTypeEnum,
+    billNoColumns(),
+    bussTypeColumns({
       search: false,
-    },
+    }),
     suppColumns(),
     spuCodeColumns,
-    skuIdColumns(),
+    skuIdColumns({
+      fixed: false,
+    }),
     skuCodeColumns,
     unitIdColumns,
     storeColumns({
@@ -59,24 +60,21 @@ export default () => {
       search: false,
       dataIndex: 'qty',
     },
-    {
+    moneyColumns({
       title: '单价',
-      search: false,
       dataIndex: 'price',
-      valueType: 'money',
-    },
+    }),
+
     {
       title: '税率',
       search: false,
       dataIndex: 'taxRate',
       valueType: 'percent',
     },
-    {
+    moneyColumns({
       title: '采购金额',
-      search: false,
       dataIndex: 'amount',
-      valueType: 'money',
-    },
+    }),
     ...TaxColumns(useTax),
     srcOrderColumns(
       {
@@ -92,11 +90,7 @@ export default () => {
   ];
   const { run, data } = useRequest(
     async (params) => {
-      const response = await purchaseDtl({
-        ...params,
-        pageNumber: params.current,
-        queryFilter: params,
-      });
+      const response = await purchaseDtl(transProTableParamsToMyRequest(params));
       return {
         data: {
           data: response.data.rows.rows,
@@ -115,29 +109,50 @@ export default () => {
       rowKey="autoId"
       options={false}
       bordered
-      scroll={{ x: 2000, y: 500 }}
+      scroll={{ x: 2300, y: 550 }}
       columns={columns}
-      summary={() => (
-        <Table.Summary.Row>
-          <Table.Summary.Cell index={0} colSpan={8}>
-            合计
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={2}>
-            <Text type="danger">¥{data?.summary?.qty}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={3} colSpan={3}></Table.Summary.Cell>
-          <Table.Summary.Cell index={4}>
-            <Text type="danger">¥{data?.summary?.amount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={5}>
-            <Text type="danger">¥{data?.summary?.tax}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={6}>
-            <Text type="danger">¥{data?.summary?.taxAmount}</Text>
-          </Table.Summary.Cell>
-          <Table.Summary.Cell index={7} colSpan={4}></Table.Summary.Cell>
-        </Table.Summary.Row>
-      )}
+      footer={() => {
+        return (
+          !(data?.summary instanceof Array) && (
+            <StatisticCard.Group>
+              <StatisticCard
+                statistic={{
+                  title: '采购数量',
+                  value: data?.summary?.qty,
+                }}
+              />
+              <StatisticCard.Divider />
+              <StatisticCard
+                statistic={{
+                  title: '采购总金额',
+                  value: data?.summary?.amount,
+                  suffix: '元',
+                }}
+              />
+              {!!useTax && (
+                <>
+                  <StatisticCard.Divider />
+                  <StatisticCard
+                    statistic={{
+                      title: '税额',
+                      value: data?.summary?.tax,
+                      suffix: '元',
+                    }}
+                  />
+                  <StatisticCard.Divider />
+                  <StatisticCard
+                    statistic={{
+                      title: '价税合计',
+                      value: data?.summary?.taxAmount,
+                      suffix: '元',
+                    }}
+                  />
+                </>
+              )}
+            </StatisticCard.Group>
+          )
+        );
+      }}
       pagination={{
         pageSize: 500,
       }}

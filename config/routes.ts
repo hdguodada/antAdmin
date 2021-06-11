@@ -223,6 +223,20 @@
     ],
   },
   {
+    name: 'produce',
+    path: '/produce',
+    icon: 'PayCircleFilled',
+    routes: [
+      { name: 'produceInStore', path: 'produceInStore', component: './Produce/produceInStore' },
+      {
+        name: 'produceInStore',
+        path: 'produceInStore/:id',
+        component: './Produce/produceInStore/detail',
+        hideInMenu: true,
+      },
+    ],
+  },
+  {
     name: 'bas',
     icon: 'SafetyOutlined',
     path: '/bas',

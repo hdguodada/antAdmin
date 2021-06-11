@@ -8,6 +8,7 @@ import {
   dateColumns,
   indexColumns,
   isDeafultColumns,
+  moneyColumns,
   optionColumns,
   stateColumns,
   tableAlertOptionRenderDom,
@@ -38,24 +39,18 @@ export default () => {
     },
     isDeafultColumns(),
     dateColumns({ title: '余额日期', dataIndex: 'balanceDate' }),
-    {
+    moneyColumns({
       title: '期初余额',
       dataIndex: 'initBalance',
-      search: false,
-      valueType: 'money',
-    },
-    {
+    }),
+    moneyColumns({
       title: '当前余额',
       dataIndex: 'currentBalance',
-      search: false,
-      valueType: 'money',
-    },
-    {
+    }),
+    moneyColumns({
       title: '上次结账后余额',
       dataIndex: 'lastSettBalance',
-      search: false,
-      valueType: 'money',
-    },
+    }),
     {
       title: '结算账户类别',
       dataIndex: 'accountTypeId',

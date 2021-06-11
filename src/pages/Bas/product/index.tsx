@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { history } from 'umi';
-import { Image } from 'antd';
+import { Image, Tree } from 'antd';
 import { delProduct, queryProducts } from '@/services/Bas';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
@@ -17,7 +17,8 @@ import BatchDel from '@/components/DelPopconfirm';
 import GlobalWrapper from '@/components/GlobalWrapper';
 import { Typography } from 'antd';
 import ProCard from '@ant-design/pro-card';
-import ProdcutTypeTable from '../productType';
+import { useModel } from '@@/plugin-model/useModel';
+import { BasOtherButton } from '@/components/CheckButton';
 
 const { Link } = Typography;
 const ProductsTable: React.FC<{
@@ -79,6 +80,7 @@ const ProductsTable: React.FC<{
         options={false}
         search={baseSearch({
           url: `/bas/product/new?cateId=${cateId}`,
+          jsxList: [<BasOtherButton url="/bas/basOthers?tab=product" key="basOther" />],
         })}
         rowSelection={{}}
         tableAlertOptionRender={({ selectedRowKeys }) => {
@@ -114,16 +116,25 @@ const ProductsTable: React.FC<{
 };
 export default () => {
   const [cateId, setCateId] = useState<K>();
-  console.log(cateId);
+  const { productTypeTree } = useModel('productType', (model) => ({
+    productTypeTree: model.leafCanClickTreeData,
+  }));
   return (
     <GlobalWrapper type="list">
       <PageContainer
         title={false}
         content={
           <ProCard split="vertical">
-            <ProCard colSpan="384px">
-              <div style={{ height: 25 }} />
-              <ProdcutTypeTable inSpuPage cateId={cateId} setcateId={setCateId} />
+            <ProCard colSpan="328px">
+              <Tree
+                treeData={productTypeTree}
+                defaultExpandAll
+                showLine
+                showIcon
+                onSelect={(selectedKes) => {
+                  setCateId(selectedKes[0]);
+                }}
+              />
             </ProCard>
             <ProCard>
               <ProductsTable cateId={cateId} />

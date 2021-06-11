@@ -293,5 +293,30 @@
         }
       ]
     }
+  },
+  "account": {
+    "code": 200,
+    "msg": "success",
+    "data": {
+      "rows|5": [
+        {
+          "autoId": "@id",
+          "accountId": "@id",
+          "accountName": "现金",
+          "balance": 0, // 账户余额
+          "billId": 0,
+          "billNo": "@id", // 单据编号
+          "bussType": 20,
+          "bussTypeName": "",
+          "contactName": "", // 往来单位
+          "date": "@date",
+          "operName": "",
+          "operId": "@id", //s 收付款人
+          "expenditure": 0, // 支出
+          "income": 0, // 收入
+          "memo": "" // 备注
+        }
+      ]
+    }
   }
 }

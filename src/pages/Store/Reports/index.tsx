@@ -1,4 +1,4 @@
-import ProCard from '@ant-design/pro-card';
+import ProCard, { StatisticCard } from '@ant-design/pro-card';
 import React, { useState } from 'react';
 import GlobalWrapper from '@/components/GlobalWrapper';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -20,6 +20,7 @@ import {
   storeColumns,
   bussTypeColumns,
   dateRangeColumns,
+  moneyColumns,
 } from '@/utils/columns';
 import { Table, Typography } from 'antd';
 import { transProTableParamsToMyRequest } from '@/utils/utils';
@@ -39,7 +40,7 @@ export const InBalance: React.FC = () => {
     }),
     indexColumns,
     skuCodeColumns,
-    skuIdColumns({}),
+    skuIdColumns(),
     cateIdColumns(),
     baseUnitIdColumns,
     secondUnitColumns,
@@ -48,7 +49,6 @@ export const InBalance: React.FC = () => {
   const [columns, setColumns] = useState<ProColumns<PUR.PurchaseOrder>[]>(baseColumns);
   const [scrollX, setScrollX] = useState<number>(2500);
   const [summary, setSummary] = useState<Record<string, number>[]>();
-  const [stockColumns, setStockColumns] = useState<string[]>();
   return (
     <ProTable
       rowKey="autoId"
@@ -62,9 +62,7 @@ export const InBalance: React.FC = () => {
       scroll={{ x: scrollX }}
       request={async (params) => {
         const response = await storeReports(
-          {
-            queryFilter: params,
-          },
+          transProTableParamsToMyRequest(params),
           undefined,
           '/report/stock/invBalanceDetail',
         );
@@ -72,13 +70,19 @@ export const InBalance: React.FC = () => {
           ? response.data.columns.map((s, _index) => {
               return _index === 0
                 ? {
+                    dataIndex: 'storeList',
                     title: s,
+                    search: false,
                     children: [
                       {
                         dataIndex: ['storeList', _index, 'qty'],
                         search: false,
                         title: '基本数量',
                         width: 105,
+                        sorter: (a, b) => {
+                          return a.storeList?.[0].qty - b.storeList?.[0].qty;
+                        },
+                        sortDirections: ['descend'],
                       },
                       {
                         dataIndex: ['storeList', _index, 'secondQty'],
@@ -86,22 +90,20 @@ export const InBalance: React.FC = () => {
                         title: '副单位数',
                         width: 105,
                       },
-                      {
+                      moneyColumns({
                         dataIndex: ['storeList', _index, 'unitCost'],
-                        search: false,
                         title: '单位成本',
-                        width: 105,
-                      },
-                      {
+                      }),
+                      moneyColumns({
                         dataIndex: ['storeList', _index, 'cost'],
-                        search: false,
                         title: '成本',
-                        width: 105,
-                      },
+                      }),
                     ],
                   }
                 : {
+                    dataIndex: 'storeList',
                     title: s,
+                    search: false,
                     children: [
                       {
                         dataIndex: ['storeList', _index, 'qty'],
@@ -119,7 +121,6 @@ export const InBalance: React.FC = () => {
                   };
             })
           : [];
-        setStockColumns(response.data.columns);
         setColumns(baseColumns.concat(scs));
         setScrollX(scs.length * 400 + 1000);
         if (response.data.summary instanceof Array) {
@@ -131,36 +132,32 @@ export const InBalance: React.FC = () => {
           total: response.data.total,
         };
       }}
-      summary={() => {
+      footer={() => {
         return (
-          <Table.Summary.Row>
-            <Table.Summary.Cell index={0}>合计</Table.Summary.Cell>
-            <Table.Summary.Cell index={1}>合计</Table.Summary.Cell>
-            <Table.Summary.Cell index={2} colSpan={4} />
-            {stockColumns?.map((s, i) =>
-              i === 0 ? (
-                <>
-                  <Table.Summary.Cell index={10 + i}>
-                    <Text type="danger">{summary?.[i].qty}</Text>
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={10 + i} />
-                  <Table.Summary.Cell index={10 + i}>
-                    <Text type="danger">{summary?.[i].unitCost}</Text>
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={10 + i}>
-                    <Text type="danger">{summary?.[i].cost}</Text>
-                  </Table.Summary.Cell>
-                </>
-              ) : (
-                <>
-                  <Table.Summary.Cell index={10 + i}>
-                    <Text type="danger">{summary?.[i].qty}</Text>
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={10 + i} />
-                </>
-              ),
-            )}
-          </Table.Summary.Row>
+          <StatisticCard.Group>
+            <StatisticCard
+              statistic={{
+                title: '总库存',
+                value: summary?.[0].qty,
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '单位成本',
+                value: summary?.[0].unitCost,
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '成本',
+                value: summary?.[0].cost,
+                suffix: '元',
+              }}
+            />
+          </StatisticCard.Group>
         );
       }}
     />
@@ -278,11 +275,7 @@ export const DeliverDetail: React.FC = () => {
       columns={columns}
       request={async (params) => {
         const response = await storeRowResponseReports(
-          {
-            pageNumber: params.current,
-            pageSize: params.pageSize,
-            queryFilter: params,
-          },
+          transProTableParamsToMyRequest(params),
           undefined,
           '/report/stock/deliverDetail',
         );
@@ -547,13 +540,13 @@ export const SerNumStatus: React.FC = () => {
 
 export default () => {
   return (
-    <GlobalWrapper type={'list'}>
+    <GlobalWrapper type="list">
       <PageContainer
         title={false}
         content={
           <ProCard
             tabs={{
-              defaultActiveKey: 'tab5',
+              defaultActiveKey: 'tab4',
             }}
           >
             <ProCard.TabPane key="tab1" tab="商品库存余额表">

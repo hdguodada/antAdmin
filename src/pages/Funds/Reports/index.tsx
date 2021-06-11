@@ -3,6 +3,7 @@ import type { BussType } from '@/pages/Purchase/components';
 import { PageContainer } from '@ant-design/pro-layout';
 import React from 'react';
 import AccountsPayableDetail from './AccountsPayableDetail';
+import BankBalance from './BankBalance';
 import CustomerBalance from './CustomerBalance';
 import FundBalance from './FundBalance';
 import OriDetail from './OriDetail';
@@ -24,12 +25,13 @@ export default () => {
       <PageContainer
         title={false}
         tabProps={{
-          defaultActiveKey: 'OriDetail',
+          defaultActiveKey: 'BankBalance',
         }}
         tabList={[
           {
             tab: '现金银行报表',
-            key: 'xjyhbb',
+            key: 'BankBalance',
+            children: <BankBalance />,
           },
           {
             tab: '应付账款明细表',

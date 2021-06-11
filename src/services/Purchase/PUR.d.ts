@@ -43,6 +43,8 @@ declare namespace PUR {
     summary?: any[];
     statusName?: string;
     suppTypeName?: string;
+    storeList?: Record<string, any>[];
+    [key: string]: any;
   };
 
   export type serItem = {
@@ -67,7 +69,7 @@ declare namespace PUR {
     code?: K;
     skuImageUrl?: string;
     spec?: string;
-    skuId: K;
+    skuId?: K;
     skuName?: string;
     unitId?: K;
     unitList?: BAS.Unit[];
@@ -100,11 +102,14 @@ declare namespace PUR {
     taxAmount?: number; // 价税合计
     inStoreCd?: K; // 入库仓库；
     outStoreCd?: K; // 出库仓库
+    unitCost?: number; // 单位成本
     inStoreName?: string;
     outStoreName?: string;
     srcGhdBillNo?: { billId: K; billNo: K }[]; // 关联购货单
     srcThdBillNo?: { billId: K; billNo: K }[]; // 关联购货订单
     srcGhddBillNo?: { billId: K; billNo: K }[]; // 关联退货单
+    srcXhddBillNo?: { billId: K; billNo: K }[];
+    srcXhdBillNo?: { billId: K; billNo: K }[];
   };
   export type Account = {
     accId: K; //  付款id

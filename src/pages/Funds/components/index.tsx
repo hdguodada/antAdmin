@@ -79,9 +79,11 @@ export const HxTypeEnum = new Map([
   [4, { text: '应收转应收' }],
   [5, { text: '应付转应付' }],
 ]);
-export const FundsTable: React.FC<{
-  bussType: BussType;
-}> = ({ bussType }) => {
+export const FundsTable: React.FC<
+  {
+    bussType: BussType;
+  } & ProTableProps<FUND.fundItem, any>
+> = ({ bussType, ...rest }) => {
   const { run, loading, error } = useRequest(
     (params) => {
       return {
@@ -185,7 +187,7 @@ export const FundsTable: React.FC<{
         },
 
         moneyColumns({
-          title: '本次预收款',
+          title: bussType === BussType.付款单 ? '本次预付款' : '本次预收款',
           dataIndex: 'deAmount',
           width: 135,
         }),
@@ -232,7 +234,7 @@ export const FundsTable: React.FC<{
           render: (_, record) => (
             <ProCard ghost split="horizontal">
               {record.accounts?.map((item) => (
-                <ProCard layout="center" ghost style={{ padding: '3px' }} key={item.autoId}>
+                <ProCard ghost style={{ padding: '3px' }} key={item.autoId}>
                   {item.payAccountName}
                 </ProCard>
               ))}
@@ -247,7 +249,7 @@ export const FundsTable: React.FC<{
           render: (_, record) => (
             <ProCard ghost split="horizontal">
               {record.accounts?.map((item) => (
-                <ProCard ghost layout="center" style={{ padding: '3px' }} key={item.autoId}>
+                <ProCard ghost style={{ padding: '3px' }} key={item.autoId}>
                   {item.recAccountName}
                 </ProCard>
               ))}
@@ -274,159 +276,124 @@ export const FundsTable: React.FC<{
     }
     return [];
   }
-
-  return (
-    <ProTable<FUND.fundItem>
-      loading={loading}
-      request={async (params) => {
-        const res = await run(transProTableParamsToMyRequest(params));
-        return {
-          data: res.rows,
-          success: !error,
-        };
-      }}
-      actionRef={actionRef}
-      rowSelection={{}}
-      tableAlertOptionRender={({ selectedRowKeys }) => {
-        return (
-          <Space size={16}>
-            <CheckButton
-              url={`${BussTypeComponentUrl[BussType[bussType]]}/check`}
-              selectedRowKeys={selectedRowKeys}
-              actionRef={actionRef}
-            />
-            <Button
-              danger
-              onClick={async () => {
-                const res = await delPurchase(
-                  selectedRowKeys,
-                  `${BussTypeApiUrl[BussType[bussType]]}/del`,
-                );
-                showSysInfo(res);
-                actionRef.current?.reload();
-              }}
-            >
-              批量删除
-            </Button>
-          </Space>
-        );
-      }}
-      expandable={
-        bussType === BussType.资金转账单
-          ? undefined
-          : {
-              expandedRowRender: (record) => {
-                return (
-                  <ProCard>
-                    <ProList<FUND.Accounts>
-                      style={{ width: 800 }}
-                      columns={[
-                        {
-                          title: '结算账户',
-                          search: false,
-                          width: 105,
-                          dataIndex: 'accountId',
-                          valueType: 'select',
-                          valueEnum: accountEnum,
-                        },
-                        moneyColumns({
-                          title: BussType.收款单 === bussType ? '收款金额' : '付款金额',
-                          dataIndex: 'payment',
-                        }),
-                        {
-                          title: BussType.收款单 === bussType ? '收款方式' : '付款方式',
-                          search: false,
-                          dataIndex: 'settlementId',
-                          valueType: 'select',
-                          valueEnum: settlementIdEnum,
-                        },
-                        {
-                          title: '结算号',
-                          search: false,
-                          dataIndex: 'settlementNo',
-                        },
-                        {
-                          title: '分录备注',
-                          search: false,
-                          dataIndex: 'remark',
-                        },
-                      ]}
-                      rowKey="autoId"
-                      dataSource={record.accounts}
-                      metas={{
-                        title: {
-                          dataIndex: 'accountId',
-                          valueType: 'select',
-                          valueEnum: accountEnum,
-                        },
-                        content: {
-                          dataIndex: 'settlementNo',
-                          render: (_, r) => (
-                            <Space size={0}>
-                              <Tag color="blue">{r.settlementNo}</Tag>
-                              <Tag color="#5BD8A6">￥{r.payment}</Tag>
-                              <Text>{r.remark}</Text>
-                            </Space>
-                          ),
-                        },
-                        subTitle: {
-                          dataIndex: 'settlementId',
-                          valueType: 'select',
-                          valueEnum: settlementIdEnum,
-                        },
-                      }}
-                    />
-                  </ProCard>
-                );
-              },
-            }
+  const initProps: ProTableProps<FUND.fundItem, any> = {
+    loading,
+    request: async (params) => {
+      const res = await run(transProTableParamsToMyRequest(params));
+      return {
+        data: res.rows,
+        success: !error,
+      };
+    },
+    actionRef,
+    rowSelection: {},
+    tableAlertOptionRender: ({ selectedRowKeys }) => {
+      return (
+        <Space size={16}>
+          <CheckButton
+            url={`${BussTypeComponentUrl[BussType[bussType]]}/check`}
+            selectedRowKeys={selectedRowKeys}
+            actionRef={actionRef}
+          />
+          <Button
+            danger
+            onClick={async () => {
+              const res = await delPurchase(
+                selectedRowKeys,
+                `${BussTypeApiUrl[BussType[bussType]]}/del`,
+              );
+              showSysInfo(res);
+              actionRef.current?.reload();
+            }}
+          >
+            批量删除
+          </Button>
+        </Space>
+      );
+    },
+    expandable:
+      bussType === BussType.资金转账单
+        ? undefined
+        : {
+            expandedRowRender: (record) => {
+              return (
+                <ProList<FUND.Accounts>
+                  grid={{ gutter: 16, column: 4 }}
+                  rowKey="autoId"
+                  dataSource={record.accounts}
+                  metas={{
+                    title: {
+                      dataIndex: 'accountId',
+                      valueType: 'select',
+                      valueEnum: accountEnum,
+                    },
+                    content: {
+                      dataIndex: 'settlementNo',
+                      render: (_, r) => (
+                        <Space size={0}>
+                          <Tag color="blue">{r.settlementNo}</Tag>
+                          <Tag color="error">￥{r.payment}</Tag>
+                          <Text>{r.remark}</Text>
+                        </Space>
+                      ),
+                    },
+                    subTitle: {
+                      dataIndex: 'settlementId',
+                      valueType: 'select',
+                      valueEnum: settlementIdEnum,
+                    },
+                    avatar: {},
+                  }}
+                />
+              );
+            },
+          },
+    options: false,
+    search: baseSearch({
+      url: `${BussTypeComponentUrl[BussType[bussType]]}/new`,
+    }),
+    columns: FundsColumns(),
+    rowKey: 'billId',
+    pagination: false,
+    scroll: { x: 1500 },
+    footer: (recordList) => {
+      if (bussType === BussType.资金转账单) {
+        return undefined;
       }
-      className="proCardNoPadding"
-      options={false}
-      search={baseSearch({
-        url: `${BussTypeComponentUrl[BussType[bussType]]}/new`,
-      })}
-      columns={FundsColumns()}
-      rowKey="billId"
-      pagination={false}
-      scroll={{ x: 1500 }}
-      footer={(recordList) => {
-        if (bussType === BussType.资金转账单) {
-          return undefined;
-        }
-        const amountTotal = recordList.reduce((a, b) => a + (b.amount || 0), 0);
-        const bDeAmountTotal = recordList.reduce((a, b) => a + (b.bDeAmount || 0), 0);
-        const deAmountTotal = recordList.reduce((a, b) => a + (b.deAmount || 0), 0);
-        return (
-          <StatisticCard.Group>
-            <StatisticCard
-              statistic={{
-                title: BussType.收款单 === bussType ? '收款合计' : '付款合计',
-                value: amountTotal,
-                status: 'default',
-              }}
-            />
-            <StatisticCard.Divider />
-            <StatisticCard
-              statistic={{
-                title: '核销金额合计',
-                value: bDeAmountTotal,
-                status: 'processing',
-              }}
-            />
-            <StatisticCard.Divider />
-            <StatisticCard
-              statistic={{
-                title: '预付款合计',
-                value: deAmountTotal,
-                status: 'success',
-              }}
-            />
-          </StatisticCard.Group>
-        );
-      }}
-    />
-  );
+      const amountTotal = recordList.reduce((a, b) => a + (b.amount || 0), 0);
+      const bDeAmountTotal = recordList.reduce((a, b) => a + (b.bDeAmount || 0), 0);
+      const deAmountTotal = recordList.reduce((a, b) => a + (b.deAmount || 0), 0);
+      return (
+        <StatisticCard.Group>
+          <StatisticCard
+            statistic={{
+              title: BussType.收款单 === bussType ? '收款合计' : '付款合计',
+              value: amountTotal,
+              status: 'default',
+            }}
+          />
+          <StatisticCard.Divider />
+          <StatisticCard
+            statistic={{
+              title: '核销金额合计',
+              value: bDeAmountTotal,
+              status: 'processing',
+            }}
+          />
+          <StatisticCard.Divider />
+          <StatisticCard
+            statistic={{
+              title: '预付款合计',
+              value: deAmountTotal,
+              status: 'success',
+            }}
+          />
+        </StatisticCard.Group>
+      );
+    },
+  };
+  const props = { ...initProps, ...rest };
+  return <ProTable<FUND.fundItem> {...props} />;
 };
 
 export function FindUnHxListColumns(select = true): ProColumns<FUND.Entries>[] {
@@ -997,7 +964,11 @@ export const FundsForm: React.FC<{
                       indexColumns,
                       {
                         dataIndex: 'accountId',
-                        title: <Text type="danger">* 结算账户</Text>,
+                        title: (
+                          <Text type="danger">
+                            {bussType === BussType.收款单 ? '*收款账户' : '*付款账户'}
+                          </Text>
+                        ),
                         valueType: 'select',
                         valueEnum: accountEnum,
                       },
@@ -1183,7 +1154,7 @@ export const FundsForm: React.FC<{
                               ￥{d.reduce((a, b) => a + (b?.amount || 0), 0)}
                             </Text>
                           </Table.Summary.Cell>
-                          <Table.Summary.Cell index={2} colSpan={3}></Table.Summary.Cell>
+                          <Table.Summary.Cell index={2} colSpan={3} />
                         </Table.Summary.Row>
                       );
                     }}

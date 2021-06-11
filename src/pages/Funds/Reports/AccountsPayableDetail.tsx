@@ -9,16 +9,28 @@ import {
 import FundReportTable from './components';
 import { StatisticCard } from '@ant-design/pro-card';
 import _ from 'lodash';
+import { patternMsg } from '@/utils/validator';
 
 export default function AccountsPayableDetail() {
   return (
     <FundReportTable
       url="/report/fund/accountPayableDetail"
+      form={{
+        ignoreRules: false,
+      }}
       columns={[
         indexColumns,
-        suppColumns({
-          renderName: 'contactName',
-        }),
+        suppColumns(
+          {
+            renderName: 'contactName',
+            multiple: false,
+          },
+          {
+            formItemProps: {
+              rules: patternMsg.select(''),
+            },
+          },
+        ),
         dateRangeColumns(),
         billNoColumns(),
         bussTypeColumns({

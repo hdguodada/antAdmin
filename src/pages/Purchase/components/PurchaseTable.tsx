@@ -24,9 +24,6 @@ export type OrderTableProps<T> = {
   initSearch?: AdvancedSearchFormField; // 初始化搜索条件
   dev?: string;
   bussType: BussType;
-  initParams?: {
-    suppId?: React.Key;
-  };
 };
 
 export default function OrderTable<T extends Record<string, unknown>>(props: OrderTableProps<T>) {

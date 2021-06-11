@@ -3,47 +3,85 @@ import {
   bussTypeColumns,
   customerColumns,
   dateRangeColumns,
+  indexColumns,
   memoColumns,
+  moneyColumns,
 } from '@/utils/columns';
+import { patternMsg } from '@/utils/validator';
+import { StatisticCard } from '@ant-design/pro-card';
+import { useModel } from 'umi';
 import FundReportTable from './components';
+import _ from 'lodash';
 
 export default function AccountsPayableDetail() {
+  const { userEnum } = useModel('user', (model) => ({ userEnum: model.valueEnum }));
   return (
     <FundReportTable
-      url="/funds/reports/fundBalance"
+      url="/report/fund/accountReceivableDetail"
       columns={[
-        customerColumns(),
+        indexColumns,
+        customerColumns(undefined, {
+          formItemProps: {
+            rules: patternMsg.select(''),
+          },
+        }),
         dateRangeColumns(),
         billNoColumns(),
-        bussTypeColumns(),
-        {
-          title: '增加应付款',
+        bussTypeColumns({
+          search: false,
+        }),
+        moneyColumns({
+          title: '增加应收款',
           dataIndex: 'income',
-          search: false,
-          valueType: 'money',
-          width: 105,
-        },
-        {
-          title: '增加预付款',
+        }),
+        moneyColumns({
+          title: '增加预收款',
           dataIndex: 'expenditure',
-          search: false,
-          valueType: 'money',
-          width: 105,
-        },
-        {
-          title: '应付款余额',
+        }),
+        moneyColumns({
+          title: '应收款余额',
           dataIndex: 'balance',
-          search: false,
-          valueType: 'money',
-          width: 105,
-        },
+        }),
         {
+          dataIndex: 'operId',
           title: '销售人员',
-          dataIndex: 'operName',
-          width: 105,
+          valueType: 'select',
+          fieldProps: {
+            mode: 'multiple',
+          },
+          valueEnum: userEnum,
         },
         memoColumns(),
       ]}
+      footer={(recordList) => {
+        return (
+          <StatisticCard.Group>
+            <StatisticCard
+              statistic={{
+                title: '增加应收款',
+                value: recordList.reduce((a, b) => _.add(a, b.income || 0), 0),
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '增加预收款',
+                value: recordList.reduce((a, b) => _.add(a, b.expenditure || 0), 0),
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '应收款余额',
+                value: recordList.reduce((a, b) => _.add(a, b.balance || 0), 0),
+                suffix: '元',
+              }}
+            />
+          </StatisticCard.Group>
+        );
+      }}
     />
   );
 }

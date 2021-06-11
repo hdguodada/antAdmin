@@ -1,6 +1,6 @@
 import { DownOutlined, EditFilled, PlusOutlined } from '@ant-design/icons';
 import type { ProColumns, ProColumnType } from '@ant-design/pro-table';
-import type { FormInstance } from 'antd';
+import { FormInstance, Typography } from 'antd';
 import { message } from 'antd';
 import { Button, Dropdown, Menu, Space, Tooltip } from 'antd';
 import React, { useRef } from 'react';
@@ -31,6 +31,7 @@ import { ProductTypeTreeSelect, UserSelect } from './form';
 import moment from 'moment';
 import { delPurchase } from '@/services/Purchase';
 import { showSysInfo } from '@/components/SysInfo';
+import type { CustomerSelectProps } from '@/pages/Bas/customer/customerSelect';
 import CustomerSelect from '@/pages/Bas/customer/customerSelect';
 import { SN } from '@/pages/Store/serNum/serNumDetail';
 
@@ -137,7 +138,6 @@ export const memoColumns = <T extends unknown>(): ProColumns<T> => ({
   dataIndex: 'memo',
   search: false,
   index: 200,
-  width: 200,
 });
 
 export const fixWdithColumns = <T extends unknown>(): ProColumns<T> => ({
@@ -292,6 +292,7 @@ export function qtyWithSNColumns(
       }
       return <div />;
     },
+    render: (_, record) => <Typography.Text type="danger">{record.qty}</Typography.Text>,
     ...props,
   };
 }
@@ -299,6 +300,7 @@ export function qtyWithSNColumns(
 export function customerColumns(
   { title = '客户', dataIndex = 'custId' } = {},
   props?: ProColumnType,
+  c?: CustomerSelectProps,
 ): ProColumns {
   return {
     title,
@@ -308,13 +310,13 @@ export function customerColumns(
       <Button
         type="link"
         onClick={() => {
-          history.push(`/bas/supplier/${(record as any).custId}`);
+          history.push(`/bas/customer/${(record as any).custId}`);
         }}
       >
         {record.custName || record.contactName || '-'}
       </Button>
     ),
-    renderFormItem: () => <CustomerSelect multiple />,
+    renderFormItem: () => <CustomerSelect {...c} />,
     ...props,
   };
 }
@@ -462,7 +464,7 @@ export function bussTypeColumns(props?: ProColumnType): ProColumns {
 export const srcOrderColumns = <T extends unknown>(
   props: ProColumnType<T>,
   dataIndex: K,
-  url: string,
+  url?: string,
 ): ProColumns<T> => {
   return {
     dataIndex,
@@ -477,7 +479,9 @@ export const srcOrderColumns = <T extends unknown>(
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => {
-                    history.push(`${url}/${item.billId}`);
+                    if (url) {
+                      history.push(`${url}/${item.billId}`);
+                    }
                     return false;
                   }}
                 >
@@ -519,6 +523,7 @@ export const totalAmountColumns = (
     dataIndex,
     search: false,
     valueType: 'money',
+    className: Style['error-color'],
     hideInTable,
     width: 105,
     ...props,
@@ -544,6 +549,7 @@ export function TaxColumns<T extends unknown>(useTax: number): ProColumnType<T>[
       dataIndex: 'taxPrice',
       editable: false,
       hideInTable: !useTax,
+      search: false,
     }),
     {
       title: '税率',
@@ -551,18 +557,21 @@ export function TaxColumns<T extends unknown>(useTax: number): ProColumnType<T>[
       valueType: 'percent',
       hideInTable: !useTax,
       width: 105,
+      search: false,
     },
     moneyColumns({
       title: '税额',
       dataIndex: 'tax',
       editable: false,
       hideInTable: !useTax,
+      search: false,
     }),
     moneyColumns({
       title: '价税合计',
       dataIndex: 'taxAmount',
       editable: false,
       hideInTable: !useTax,
+      search: false,
     }),
   ];
 }
@@ -672,7 +681,7 @@ export function optionColumns({
     title: '操作',
     valueType: 'option',
     fixed: 'right',
-    width: 105,
+    width: 55,
     render: (_, record, _index, action) => [
       <div key="modify">
         {modify && (
@@ -760,7 +769,7 @@ export const baseSearch = ({
           )}
         </div>,
       ];
-      return jsxList ? base.concat(jsxList) : base;
+      return [...(jsxList || []), ...base];
     },
   };
 };
@@ -777,6 +786,7 @@ export type AdvancedSearchFormField = Partial<{
   endArriveDate: string;
   bussType: BussType[];
   suppId: K[];
+  custId: K[];
   skuId: K;
   storeCd: K;
   status: number;
@@ -844,13 +854,12 @@ export const AdvancedSearchForm = (props: AdvancedSearchFormProps) => {
         return true;
       }}
     >
-      <ProFormText name="beginDate" hidden />
-      <ProFormText name="endDate" hidden />
       <ProFormText name="suppId" hidden />
       <ProFormText name="suppName" hidden />
+      <ProFormText name="custId" hidden />
+      <ProFormText name="custName" hidden />
       <ProFormText name="skuId" hidden />
       <ProForm.Group>
-        <ProFormDateRangePicker width="md" label="单据日期" name="date" />
         <ProFormText label="分录备注" width="md" name="entryDesc" />
         {getOrderType(OrderType.其他出入库).indexOf(bussType) < 0 && (
           <ProFormSelect

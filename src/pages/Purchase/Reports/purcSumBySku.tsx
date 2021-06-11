@@ -38,21 +38,25 @@ export default () => {
       title: '副单位',
       dataIndex: 'secondUnit',
       search: false,
+      width: 105,
     },
     {
       title: '副单位数',
       dataIndex: 'secondQty',
       search: false,
+      width: 105,
     },
     {
       title: '基本单位',
       dataIndex: 'baseUnitId',
       search: false,
+      width: 105,
       render: (_, record) => <div>{record.baseUnitName}</div>,
     },
     {
       title: '基本数量',
       search: false,
+      width: 105,
       dataIndex: 'baseQty',
     },
     moneyColumns({
@@ -66,12 +70,12 @@ export default () => {
     moneyColumns({
       title: '税额',
       dataIndex: 'tax',
-      hideInTable: !!useTax,
+      hideInTable: !useTax,
     }),
     moneyColumns({
       title: '价税合计',
       dataIndex: 'taxAmount',
-      hideInTable: !!useTax,
+      hideInTable: !useTax,
     }),
     memoColumns(),
   ];
@@ -152,21 +156,26 @@ export default () => {
                   suffix: '元',
                 }}
               />
-              <StatisticCard.Divider />
-              <StatisticCard
-                statistic={{
-                  title: '总税额',
-                  value: data?.summary?.tax,
-                  suffix: '元',
-                }}
-              />
-              <StatisticCard
-                statistic={{
-                  title: '总价税合计',
-                  value: data?.summary?.taxAmount,
-                  suffix: '元',
-                }}
-              />
+              {useTax && (
+                <>
+                  <StatisticCard.Divider />
+                  <StatisticCard
+                    statistic={{
+                      title: '总税额',
+                      value: data?.summary?.tax,
+                      suffix: '元',
+                    }}
+                  />
+                  <StatisticCard.Divider />
+                  <StatisticCard
+                    statistic={{
+                      title: '总价税合计',
+                      value: data?.summary?.taxAmount,
+                      suffix: '元',
+                    }}
+                  />
+                </>
+              )}
             </StatisticCard.Group>
           )
         );

@@ -2,7 +2,15 @@ import React, { useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { baseSearch, fixWdithColumns, indexColumns, optionColumns } from '@/utils/columns';
+import {
+  baseSearch,
+  cateIdColumns,
+  dateRangeColumns,
+  fixWdithColumns,
+  indexColumns,
+  optionColumns,
+  storeColumns,
+} from '@/utils/columns';
 import type { FormInstance } from 'antd';
 import { Button, Dropdown, Menu, Space } from 'antd';
 import { TreeSelect } from 'antd';
@@ -14,52 +22,24 @@ import { BussTypeComponentUrl } from '@/pages/Purchase/components';
 import { DownOutlined } from '@ant-design/icons';
 import { showSysInfo } from '@/components/SysInfo';
 import { delPurchase } from '@/services/Purchase';
+import { transProTableParamsToMyRequest } from '@/utils/utils';
 
 export const InventoryTable: React.FC = () => {
-  const { treeDataSimpleMode } = useModel('productType', (model) => ({
-    treeDataSimpleMode: model.treeDataSimpleMode,
-  }));
   const { storeEnum } = useModel('store', (model) => ({ storeEnum: model.valueEnum }));
   const columns: ProColumns<STORE.invOiForm>[] = [
     indexColumns,
-    {
+    dateRangeColumns({
       dataIndex: 'pdDate',
       title: '盘点时间',
-      valueType: 'dateRange',
-      initialValue: [moment().startOf('month'), moment()],
-      render: (_, record) => <div>{record.pdDateStr}</div>,
-      search: {
-        transform: (value) => ({
-          beginDate: value[0],
-          endDate: value[1],
-        }),
-      },
-      width: 105,
-    },
-    {
-      title: '仓库',
-      dataIndex: 'storeCd',
-      editable: false,
-      render: (_, record) => <div>{record.storeName}</div>,
-      width: 105,
+    }),
+    storeColumns({
       valueEnum: storeEnum,
       valueType: 'select',
-    },
-    {
-      dataIndex: 'cateId',
-      title: '商品类别',
+    }),
+    cateIdColumns({
       hideInTable: true,
-      renderFormItem: () => (
-        <TreeSelect
-          showSearch
-          style={{ width: '100%' }}
-          dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-          allowClear
-          treeDefaultExpandAll
-          treeData={treeDataSimpleMode}
-        />
-      ),
-    },
+    }),
+
     {
       dataIndex: 'billNo',
       title: '盘点编号',
@@ -149,7 +129,7 @@ export const InventoryTable: React.FC = () => {
       }}
       pagination={{ pageSize: 10 }}
       request={async (params) => {
-        const res = await queryPdRecordList(params);
+        const res = await queryPdRecordList(transProTableParamsToMyRequest(params));
         return {
           data: res.data.rows,
           success: res.code === 0,

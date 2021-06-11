@@ -374,7 +374,7 @@ export const SN: React.FC<{
               width={1000}
               onOk={handleOk}
               onCancel={handleCancel}
-              title={stockType === StockType.入库 ? `录入${skuName}的序列号` : '请选择序列号'}
+              title={stockType === StockType.入库 ? `录入序列号` : '请选择序列号'}
             >
               <ProCard ghost>
                 <Space direction={'vertical'}>

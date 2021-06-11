@@ -1,152 +1,122 @@
 import {
   billNoColumns,
   bussTypeColumns,
-  cateIdColumns,
   customerColumns,
   dateRangeColumns,
+  indexColumns,
   memoColumns,
   moneyColumns,
-  skuCodeColumns,
-  skuIdColumns,
-  spuCodeColumns,
-  srcOrderColumns,
-  unitIdColumns,
 } from '@/utils/columns';
-import type { ProColumnType, ProTableProps } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
+import type { ProColumnType } from '@ant-design/pro-table';
 import React from 'react';
 import FundReportTable from './components';
-import { BussType, BussTypeComponentUrl } from '@/pages/Purchase/components';
-import ProCard from '@ant-design/pro-card';
 import { patternMsg } from '@/utils/validator';
-
-type CustomerBalanceEntriesProps = { bussType: BussType } & ProTableProps<any, any>;
-export const CustomerBalanceEntries: React.FC<CustomerBalanceEntriesProps> = ({
-  bussType,
-  ...rest
-}) => {
-  const columns: ProColumnType<any>[] = [
-    cateIdColumns({ search: false }),
-    spuCodeColumns,
-    skuCodeColumns,
-    skuIdColumns(),
-    unitIdColumns,
-    moneyColumns({
-      title: '单价',
-      dataIndex: 'price',
-    }),
-    moneyColumns({
-      title: '含税单价',
-      dataIndex: 'taxPrice',
-    }),
-    moneyColumns({
-      title: '折扣额',
-      dataIndex: 'deduction',
-    }),
-    moneyColumns({
-      title: '折后金额',
-      dataIndex: 'beforeDisAmount',
-    }),
-    moneyColumns({
-      title: '不含税金额',
-      dataIndex: 'amount',
-    }),
-    moneyColumns({
-      title: '税额',
-      dataIndex: 'tax',
-    }),
-    moneyColumns({
-      title: '销售金额',
-      dataIndex: 'taxAmount',
-    }),
-    memoColumns(),
-    srcOrderColumns(
-      {
-        title: '源销货订单号',
-      },
-      'srcXhddBillNo',
-      BussTypeComponentUrl[BussType[bussType]],
-    ),
-  ];
-  return <ProTable options={false} pagination={false} search={false} columns={columns} {...rest} />;
-};
+import { StatisticCard } from '@ant-design/pro-card';
+import _ from 'lodash';
 
 export default function CustomerBalance() {
   const columns: ProColumnType<any>[] = [
-    customerColumns(undefined, {
-      hideInTable: true,
-      formItemProps: {
-        rules: patternMsg.select(''),
+    indexColumns,
+    customerColumns(
+      undefined,
+      {
+        hideInTable: true,
+        formItemProps: {
+          rules: patternMsg.select(''),
+        },
       },
-    }),
+      { multiple: false },
+    ),
     dateRangeColumns(),
     billNoColumns(),
-    bussTypeColumns(),
-    {
+    bussTypeColumns({
+      search: false,
+    }),
+    moneyColumns({
       title: '增加应付款',
       dataIndex: 'totalAmount',
-      search: false,
-      valueType: 'money',
-      width: 105,
-    },
-    {
+    }),
+    moneyColumns({
       title: '优惠金额',
       dataIndex: 'disAmount',
-      search: false,
-      valueType: 'money',
-      width: 105,
-    },
-    {
+    }),
+    moneyColumns({
       title: '客户承担费用',
       dataIndex: 'postfee',
-      search: false,
-      valueType: 'money',
-      width: 105,
-    },
-    {
+    }),
+    moneyColumns({
       title: '应收金额',
       dataIndex: 'amount',
-      search: false,
-      valueType: 'money',
-      width: 105,
-    },
-    {
+    }),
+    moneyColumns({
       title: '实际收款金额',
       dataIndex: 'rpAmount',
-      search: false,
-      valueType: 'money',
-      width: 105,
-    },
-    {
+    }),
+    moneyColumns({
       title: '应收款余额',
       dataIndex: 'inAmount',
-      search: false,
-      valueType: 'money',
-      width: 105,
-    },
+    }),
     memoColumns(),
   ];
   return (
     <FundReportTable
-      url="/funds/reports/customerBalance"
+      url="/report/fund/customerBalance"
       columns={columns}
       form={{
         ignoreRules: false,
       }}
-      expandable={{
-        expandedRowRender: (record) => {
-          return (
-            record.bussType && (
-              <ProCard>
-                <CustomerBalanceEntries
-                  bussType={record.bussType}
-                  dataSource={record.entries}
-                  bordered
-                />
-              </ProCard>
-            )
-          );
-        },
+      footer={(recordList) => {
+        return (
+          <StatisticCard.Group>
+            <StatisticCard
+              statistic={{
+                title: '应付款',
+                value: recordList.reduce((a, b) => _.add(a, b.totalAmount || 0), 0),
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '优惠金额',
+                value: recordList.reduce((a, b) => _.add(a, b.disAmount || 0), 0),
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '客户承担费用',
+                value: recordList.reduce((a, b) => _.add(a, b.postfee || 0), 0),
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '应收金额',
+                value: recordList.reduce((a, b) => _.add(a, b.amount || 0), 0),
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '实际收款金额',
+                value: recordList.reduce((a, b) => _.add(a, b.rpAmount || 0), 0),
+                suffix: '元',
+              }}
+            />
+            <StatisticCard.Divider />
+            <StatisticCard
+              statistic={{
+                title: '应收款余额',
+                value: recordList.reduce((a, b) => _.add(a, b.inAmount || 0), 0),
+                suffix: '元',
+              }}
+            />
+          </StatisticCard.Group>
+        );
       }}
     />
   );

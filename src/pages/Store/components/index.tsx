@@ -1,4 +1,5 @@
 import type { FormInstance } from 'antd';
+import { Table, Typography } from 'antd';
 import { Button, message, Select, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRequest, history, useModel } from 'umi';
@@ -101,32 +102,28 @@ export const StoreTableColumns = ({
     }),
   ];
   return bussType === BussType.调拨单
-    ? base.concat([
-        {
-          title: '调拨信息',
-          children: [
-            { k: 'skuName', t: '商品' },
-            { k: 'qty', t: '数量' },
-            { k: 'unitName', t: '单位' },
-            { k: 'inStoreName', t: '调入仓库' },
-            { k: 'outStoreName', t: '调出仓库' },
-            { k: 'memo', t: '分录备注' },
-          ].map((i) => ({
-            title: i.t,
-            dataIndex: 'items',
-            align: 'center',
-            render: (_, record) => (
-              <ProCard ghost split="horizontal">
-                {record.items?.map((item) => (
-                  <ProCard layout="center" ghost style={{ padding: '3px' }} key={item[i.k]}>
-                    {item[i.k]}
-                  </ProCard>
-                ))}
-              </ProCard>
-            ),
-          })),
-        },
-      ])
+    ? base.concat(
+        [
+          { k: 'skuName', t: '商品' },
+          { k: 'qty', t: '数量' },
+          { k: 'unitName', t: '单位' },
+          { k: 'inStoreName', t: '调入仓库' },
+          { k: 'outStoreName', t: '调出仓库' },
+          { k: 'memo', t: '分录备注' },
+        ].map((i) => ({
+          title: i.t,
+          dataIndex: 'items',
+          render: (_, record) => (
+            <ProCard ghost split="horizontal">
+              {record.items?.map((item) => (
+                <ProCard ghost style={{ padding: '3px' }} key={item[i.k]}>
+                  {item[i.k]}
+                </ProCard>
+              ))}
+            </ProCard>
+          ),
+        })),
+      )
     : base.concat([
         bussTypeColumns(),
         {
@@ -153,8 +150,9 @@ export function StoreTable(props: StoreTableProps) {
     bussType,
   });
   const actionRef = useRef<ActionType>();
-  const [advancedSearchFormValues, setAdvancedSearchFormValues] =
-    useState<AdvancedSearchFormField | undefined>(initSearch);
+  const [advancedSearchFormValues, setAdvancedSearchFormValues] = useState<
+    AdvancedSearchFormField | undefined
+  >(initSearch);
   return (
     <PageContainer
       title={false}
@@ -169,7 +167,6 @@ export function StoreTable(props: StoreTableProps) {
             }
             return '';
           }}
-          bordered
           scroll={{ x: 2500 }}
           params={advancedSearchFormValues}
           actionRef={actionRef}
@@ -273,14 +270,8 @@ export type StoreFormProps = {
   query: Record<string, string>;
   inventoryInfo?: STORE.invOiForm;
 };
-export const StoreEntries = ({
-  bussType,
-  checked,
-  formRef,
-  value,
-  onChange,
-  rest,
-}: XhddEntriesProps) => {
+export const StoreEntries = (props: XhddEntriesProps) => {
+  const { bussType, checked, formRef, value, onChange, rest } = props;
   const actionRef = useRef<ActionType>();
   const [editableKeys, setEditableKeys] = useState<React.Key[]>();
   const { storeEnum } = useModel('store', (model) => ({ storeEnum: model.valueEnum }));
@@ -441,6 +432,50 @@ export const StoreEntries = ({
           },
         }))
       }
+      summary={() => (
+        <Table.Summary.Row>
+          {columns
+            .filter((i) => !i.hideInTable)
+            .map((item, index) => {
+              if (index === 0) {
+                return (
+                  <Table.Summary.Cell index={index} key={+index}>
+                    合计
+                  </Table.Summary.Cell>
+                );
+              }
+              if (item.dataIndex === 'qtyMid') {
+                return (
+                  <Table.Summary.Cell
+                    index={index}
+                    key={+index}
+                    children={
+                      <Typography.Text
+                        type="danger"
+                        children={formRef.current?.getFieldValue('totalQty')}
+                      />
+                    }
+                  />
+                );
+              }
+              if (item.dataIndex === 'amount') {
+                return (
+                  <Table.Summary.Cell
+                    index={index}
+                    key={+index}
+                    children={
+                      <Typography.Text
+                        type="danger"
+                        children={formRef.current?.getFieldValue('totalAmount')}
+                      />
+                    }
+                  />
+                );
+              }
+              return <Table.Summary.Cell index={index} key={+index} />;
+            })}
+        </Table.Summary.Row>
+      )}
       value={value}
       {...rest}
     />
@@ -648,6 +683,8 @@ export const StoreForm = (props: StoreFormProps) => {
         }}
       >
         <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
+        <ProFormDigit hidden width="sm" name="totalQty" label="单据数量" disabled />
+        <ProFormDigit hidden width="sm" name="totalAmount" label="单据总额" disabled />
         <ProForm.Group>
           <ProFormDependency name={['contactName']}>
             {({ contactName }) => {
@@ -664,7 +701,7 @@ export const StoreForm = (props: StoreFormProps) => {
             {({ contactName }) => {
               return (
                 bussType === BussType.其他入库单 && (
-                  <ProForm.Item name="custId" label="供应商">
+                  <ProForm.Item name="suppId" label="供应商" style={{ width: '328px' }}>
                     <SupplierSelect suppName={contactName} disabled={checked} />
                   </ProForm.Item>
                 )
@@ -682,7 +719,7 @@ export const StoreForm = (props: StoreFormProps) => {
         </ProForm.Group>
         <ProForm.Group>
           <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
-            <SkuSelect disabled={checked} multiple labelInValue accumulate />
+            <SkuSelect disabled={checked} multiple labelInValue accumulate needTaxRate={false} />
           </ProForm.Item>
           {
             // 其他入库单 盘盈 ,其他入库
@@ -731,18 +768,6 @@ export const StoreForm = (props: StoreFormProps) => {
           <StoreEntries bussType={bussType} checked={checked} formRef={formRef} />
         </ProForm.Item>
         <ProFormTextArea name="memo" label="备注" disabled={checked} />
-        <ProFormDependency name={['totalQty', 'totalAmount']}>
-          {({ totalQty, totalAmount }) => (
-            <Space size={32}>
-              {totalQty > 0 && (
-                <ProFormDigit width="sm" name="totalQty" label="单据数量" disabled />
-              )}
-              {totalAmount > 0 && (
-                <ProFormDigit width="sm" name="totalAmount" label="单据总额" disabled />
-              )}
-            </Space>
-          )}
-        </ProFormDependency>
       </ProForm>
     </ProCard>
   );

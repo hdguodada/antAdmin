@@ -1,6 +1,11 @@
-import { ProFormRadio, ProFormSelect } from '@ant-design/pro-form';
-import React from 'react';
-import type { TreeSelectProps } from 'antd';
+import {
+  ProFormRadio,
+  ProFormSelect,
+  ProFormText,
+  ProFormUploadButton,
+} from '@ant-design/pro-form';
+import React, { useEffect } from 'react';
+import { Space, TreeSelectProps } from 'antd';
 import { Button, Divider, TreeSelect } from 'antd';
 import { useModel } from 'umi';
 import { PlusOutlined } from '@ant-design/icons';
@@ -15,6 +20,8 @@ import ProductTypeForm from '@/pages/Bas/productType/form';
 import StoreForm from '@/pages/Bas/store/form';
 import CustTypeForm from '@/pages/Bas/custType/form';
 import { history } from 'umi';
+import type { UploadFile } from 'antd/lib/upload/interface';
+import { upload } from '@/services/Sys';
 
 export const StateForm = (
   <ProFormRadio.Group
@@ -37,8 +44,10 @@ export const StateForm = (
 interface UserSelectProps extends ProFormSelectProps {
   formRef?: any;
   showNew?: boolean;
+  depId?: K;
 }
 export const UserSelect = (props: UserSelectProps) => {
+  const { formRef, showNew, depId, ...rest } = props;
   const { options, queryUsers } = useModel('user', (model) => ({
     options: model.options,
     queryUsers: model.query,
@@ -56,7 +65,7 @@ export const UserSelect = (props: UserSelectProps) => {
             return (
               <div>
                 {menu}
-                {props.showNew && (
+                {showNew && (
                   <>
                     <Divider style={{ margin: '4px 0' }} />
                     <Button
@@ -75,10 +84,16 @@ export const UserSelect = (props: UserSelectProps) => {
             );
           },
         }}
-        options={options}
-        {...props}
+        options={depId ? options?.filter((i) => i.depId === depId) : options}
+        {...rest}
       />
-      <UserForm action="add" setVisible={setModalVisit} visible={modalVisit} refresh={queryUsers} />
+      <UserForm
+        action="add"
+        setVisible={setModalVisit}
+        visible={modalVisit}
+        refresh={queryUsers}
+        depId={depId}
+      />
     </>
   );
 };
@@ -469,3 +484,61 @@ export const DepSelect = ({ fieldProps, showNew, isLeaf, ...rest }: MyTreeSelect
     </>
   );
 };
+type MyProFormUploadProps = {
+  value?: UploadFile[];
+  onChange?: (value: MyProFormUploadProps['value']) => void;
+};
+export function MyProFormUpload(props: MyProFormUploadProps) {
+  const { value, onChange } = props;
+  useEffect(() => {
+    console.log(value);
+  }, [value]);
+  return (
+    <Space align="start">
+      <ProFormUploadButton
+        action={`${BASE_URL}/sys/upload/upload?type=logo`}
+        fieldProps={{
+          onChange: (info) => {
+            if (info.file.status === 'done') {
+              const t = info.fileList.map((file) => {
+                if (file.response) {
+                  return {
+                    ...file,
+                    url: file.response.data.path,
+                    thumbUrl: BASE_URL + file.response.data.path,
+                  };
+                }
+                return file;
+              });
+              props.onChange?.(value?.concat(...t));
+            }
+          },
+          fileList: value,
+        }}
+      />
+      <ProFormText
+        width="md"
+        placeholder="请在此处粘贴上传"
+        fieldProps={{
+          onPaste: async (e) => {
+            const data = e.clipboardData;
+            const blob = data.items[0].getAsFile();
+            if (blob?.type.startsWith('image')) {
+              const formData = new FormData();
+              formData.append(blob.name, blob);
+              const res = await upload('logo', formData);
+              const t = (value || []).concat({
+                ...res.data,
+                url: res.data.path,
+                name: res.data.newFileName,
+                thumbUrl: BASE_URL + res.data.path,
+                uid: +(Math.random() * 1000000).toFixed(0),
+              });
+              onChange?.(t);
+            }
+          },
+        }}
+      />
+    </Space>
+  );
+}

@@ -82,10 +82,11 @@ export async function getCodeList(
   });
 }
 
-export async function upload(type: string, headers = { modId: '92' }) {
+export async function upload(type: string, data: any, headers = { modId: '92' }) {
   return request('/sys/upload/upload', {
     method: 'POST',
     params: { type },
     headers,
+    data,
   });
 }

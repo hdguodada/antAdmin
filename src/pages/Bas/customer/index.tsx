@@ -14,10 +14,12 @@ import {
   tableAlertOptionRenderDom,
 } from '@/utils/columns';
 import BatchDel from '@/components/DelPopconfirm';
-import { Button, Tree } from 'antd';
+import { Button } from 'antd';
 import { copyFilterObjWithWhiteList } from '@/utils/utils';
 import ProCard from '@ant-design/pro-card';
 import GlobalWrapper from '@/components/GlobalWrapper';
+import SearchTreeList from '@/components/SearchTreeList';
+import Style from '@/global.less';
 
 type CustomerTableProps = {
   selectParams?: { state?: number; custTypeId?: K };
@@ -26,7 +28,7 @@ type CustomerTableProps = {
   multiple?: boolean;
 };
 export const CustomerTable = forwardRef((props: CustomerTableProps, ref) => {
-  const { selectParams, onChange, multiple, select } = props;
+  const { selectParams, onChange, select, multiple } = props;
   const actionRef = useRef<ActionType>();
   useImperativeHandle(ref, () => ({
     clearSelected: () => {
@@ -74,7 +76,7 @@ export const CustomerTable = forwardRef((props: CustomerTableProps, ref) => {
     width: 120,
     fixed: 'right',
     render: (_, entity) => {
-      return select && !multiple
+      return select
         ? [
             <a
               key="editable"
@@ -118,10 +120,22 @@ export const CustomerTable = forwardRef((props: CustomerTableProps, ref) => {
           fn: () => {
             setModalVisit(true);
           },
+          jsxList: [
+            <Button
+              key="fzzl"
+              type="primary"
+              className={Style.buttonColorPurple}
+              onClick={() => {
+                history.push('/bas/basOthers?tab=customer');
+              }}
+            >
+              辅助资料
+            </Button>,
+          ],
         })}
         columns={columns}
         params={selectParams}
-        rowSelection={{}}
+        rowSelection={multiple ? {} : undefined}
         tableAlertOptionRender={({ selectedRowKeys, selectedRows }) => {
           return select
             ? tableAlertOptionRenderDom([
@@ -132,7 +146,12 @@ export const CustomerTable = forwardRef((props: CustomerTableProps, ref) => {
                   onClick={() => {
                     onChange?.(
                       selectedRows.map((i) =>
-                        copyFilterObjWithWhiteList(i, ['custCd', 'custId', 'accountPayableSum']),
+                        copyFilterObjWithWhiteList(i, [
+                          'custCd',
+                          'custId',
+                          'accountPayableSum',
+                          'custName',
+                        ]),
                       ),
                     );
                   }}
@@ -179,13 +198,15 @@ export default () => {
         content={
           <ProCard split="vertical">
             <ProCard style={{ width: '328px' }}>
-              <Tree
-                treeData={custTypeTree?.[0].children}
-                defaultExpandAll
-                showLine
-                showIcon
-                onSelect={(selectedKes) => {
-                  setcustTypeId(selectedKes[0]);
+              <SearchTreeList
+                t={{
+                  treeData: custTypeTree?.[0].children,
+                  defaultExpandAll: true,
+                  showLine: true,
+                  showIcon: true,
+                  onSelect: (selectedKes) => {
+                    setcustTypeId(selectedKes[0]);
+                  },
                 }}
               />
             </ProCard>

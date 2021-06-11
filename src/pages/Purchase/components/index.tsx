@@ -6,7 +6,7 @@ import { useState } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import Modal from 'antd/lib/modal/Modal';
-import type { FormInstance } from 'antd';
+import { FormInstance, Table, Typography } from 'antd';
 import { Button, Input, message, Select, Space } from 'antd';
 import { ClearOutlined, SearchOutlined } from '@ant-design/icons';
 import {
@@ -46,6 +46,7 @@ import { queryPurchaseUnStockIn } from '@/services/Purchase';
 import { getCurrentStock, getSkuStock } from '@/services/Store';
 import ProCard from '@ant-design/pro-card';
 import GlobalWrapper from '@/components/GlobalWrapper';
+import { EntriesSummary } from '@/components';
 
 export const CheckAudit = ({ checkStatus }: { checkStatus: boolean }) => {
   return checkStatus ? <img src={AuditImage} alt="" style={{ marginRight: '100px' }} /> : <div />;
@@ -107,7 +108,7 @@ export const SupplierSelect: React.FC<{
           />
         }
       />
-      <Modal visible={visible} width={1000} footer={false} onCancel={handleCancel}>
+      <Modal visible={visible} width={1200} footer={false} onCancel={handleCancel}>
         <Supplier
           select={true}
           onChange={handleChange}
@@ -129,7 +130,17 @@ export const SkuSelect: React.FC<{
   multiple?: boolean;
   labelInValue?: boolean;
   accumulate?: boolean; // 是否累加
-}> = ({ value, onChange, disabled, type = 'button', multiple, labelInValue, accumulate }) => {
+  needTaxRate?: boolean;
+}> = ({
+  value,
+  onChange,
+  disabled,
+  type = 'button',
+  multiple,
+  labelInValue,
+  accumulate,
+  needTaxRate = true,
+}) => {
   const [visible, setVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   const [inputValue, setInputValue] = useState<string | undefined>(() => {
@@ -153,7 +164,7 @@ export const SkuSelect: React.FC<{
         unitId: item.inLocationUnitId,
         rate: item.inLocationUnitRate,
         discountRate: 0,
-        taxRate: useTax ? tax : 0,
+        taxRate: useTax && needTaxRate ? tax : 0,
         outStoreCd: item.storeCd,
       })) || [];
     if (labelInValue) {
@@ -179,7 +190,7 @@ export const SkuSelect: React.FC<{
       placeholder: '请输入商品名称或编码',
     }),
     indexColumns,
-    skuIdColumns({ search: false }),
+    skuIdColumns({ search: false, fixed: false }),
     skuCodeColumns,
     cateIdColumns({ search: false }),
     currentQtyColumns(),
@@ -192,6 +203,11 @@ export const SkuSelect: React.FC<{
         [false, { text: '否', status: 'Error' }],
         [true, { text: '是', status: 'Success' }],
       ]),
+      search: {
+        transform: (v) => ({
+          isSerNum: v ? 1 : 0,
+        }),
+      },
     },
     {
       title: '操作',
@@ -264,7 +280,7 @@ export const SkuSelect: React.FC<{
             };
           }}
           actionRef={actionRef}
-          scroll={{ x: 900, y: 350 }}
+          scroll={{ x: 1000, y: 350 }}
           rowSelection={multiple ? {} : false}
           rowKey="skuId"
           options={false}
@@ -321,7 +337,8 @@ export enum BussType {
   核销单 = 53,
   其他收入单 = 54,
   其他支出单 = 55,
-  资金转账单 = 56,
+  资金转账单 = 52,
+  生产入库 = 55,
   盘点 = 100,
 }
 
@@ -367,6 +384,7 @@ export enum BussTypeApiUrl {
   销售单 = '/sales/xhd',
   销售退货单 = '/sales/thd',
   盘点 = '/bis/stockInventory',
+  生产入库 = '/produce/produceInStore',
 }
 
 export enum BussTypeComponentUrl {
@@ -386,6 +404,7 @@ export enum BussTypeComponentUrl {
   销售订单 = '/sales/xhdd',
   销售单 = '/sales/xhd',
   销售退货单 = '/sales/xhthd',
+  生产入库 = '/produce/produceInStore',
 }
 
 export function getOrderType(orderType: OrderType) {
@@ -744,13 +763,8 @@ export type PurchaseEntriesProps = {
   checked: boolean;
   formRef: any;
 };
-export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
-  bussType,
-  checked,
-  formRef,
-  value,
-  onChange,
-}) => {
+export const PurchaseEntries: React.FC<PurchaseEntriesProps> = (props: PurchaseEntriesProps) => {
+  const { bussType, checked, formRef, value, onChange } = props;
   const actionRef = useRef<ActionType>();
   const [editableKeys, setEditableKeys] = useState<React.Key[]>();
   const { sysParams } = useModel('params', (model) => ({ sysParams: model.sysParams }));
@@ -908,15 +922,6 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
       }
       recordCreatorProps={false}
       columns={columns}
-      postData={(v) =>
-        v.map((i) => ({
-          ...i,
-          qtyMid: {
-            qty: i.qty,
-            serNumList: i.serNumList,
-          },
-        }))
-      }
       editable={{
         type: 'multiple',
         editableKeys,
@@ -941,7 +946,28 @@ export const PurchaseEntries: React.FC<PurchaseEntriesProps> = ({
           );
         },
       }}
-      value={value}
+      value={value?.map((i: any) => ({
+        ...i,
+        qtyMid: {
+          qty: i.qty,
+          serNumList: i.serNumList,
+        },
+      }))}
+      summary={(recordList) => (
+        <EntriesSummary
+          columns={columns}
+          calFields={[
+            'amount',
+            'deduction',
+            'beforeDisAmount',
+            'rate',
+            'taxAmount',
+            'basQty',
+            'qtyMid',
+          ]}
+          data={recordList}
+        />
+      )}
     />
   );
 };
@@ -1073,7 +1099,7 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
   return (
     <GlobalWrapper type="descriptions">
       <PageContainer title={initialValues.title}>
-        <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }}>
+        <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }} title={data?.billNo}>
           <ProForm<PUR.Purchase>
             onFinish={async (values) => {
               // 新增或修改时,对序列号商品进行基本单位判断.购货订单无需序列号
@@ -1162,6 +1188,8 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
             }}
           >
             <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
+            <ProFormDigit hidden width="sm" name="totalQty" label="单据数量" disabled />
+            <ProFormDigit hidden width="sm" name="totalAmount" label="单据总额" disabled />
             <ProForm.Group>
               {[BussType.其他入库单, ...getOrderType(OrderType.购货)].indexOf(bussType) > -1 && (
                 <ProFormDependency name={['contactName']}>
@@ -1221,18 +1249,7 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
               <PurchaseEntries formRef={formRef} checked={checked} bussType={bussType} />
             </ProForm.Item>
             <ProFormTextArea name="memo" label="备注" disabled={checked} />
-            <ProFormDependency name={['totalQty', 'totalAmount']}>
-              {({ totalQty, totalAmount }) => (
-                <Space size={32}>
-                  {totalQty > 0 && (
-                    <ProFormDigit width="sm" name="totalQty" label="单据数量" disabled />
-                  )}
-                  {totalAmount > 0 && (
-                    <ProFormDigit width="sm" name="totalAmount" label="单据总额" disabled />
-                  )}
-                </Space>
-              )}
-            </ProFormDependency>
+
             {!([BussType.调拨单, getOrderType(OrderType.其他出入库)].indexOf(bussType) > -1) && (
               <>
                 <ProForm.Group>

@@ -1,0 +1,331 @@
+"filename", "language", "Less", "JSON", "JavaScript", "Markdown", "XML", "TypeScript", "TypeScript React", "JSON with Comments", "HTML", "Ignore", "comment", "blank", "total"
+"d:\qsa2020\04_pc\myapp\.eslintrc.js", "JavaScript", 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9
+"d:\qsa2020\04_pc\myapp\.prettierignore", "Ignore", 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 23
+"d:\qsa2020\04_pc\myapp\.prettierrc.js", "JavaScript", 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"d:\qsa2020\04_pc\myapp\.stylelintrc.js", "JavaScript", 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"d:\qsa2020\04_pc\myapp\README.md", "Markdown", 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 22, 58
+"d:\qsa2020\04_pc\myapp\config\config.dev.ts", "TypeScript", 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 3, 2, 20
+"d:\qsa2020\04_pc\myapp\config\config.ts", "TypeScript", 0, 0, 0, 0, 0, 46, 0, 0, 0, 0, 11, 3, 60
+"d:\qsa2020\04_pc\myapp\config\defaultSettings.ts", "TypeScript", 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 3, 21
+"d:\qsa2020\04_pc\myapp\config\proxy.ts", "TypeScript", 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 7, 1, 48
+"d:\qsa2020\04_pc\myapp\config\routes.ts", "TypeScript", 0, 0, 0, 0, 0, 368, 0, 0, 0, 0, 10, 4, 382
+"d:\qsa2020\04_pc\myapp\jest.config.js", "JavaScript", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 1, 11
+"d:\qsa2020\04_pc\myapp\jsconfig.json", "JSON", 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 11
+"d:\qsa2020\04_pc\myapp\mock\listTableList.ts", "TypeScript", 0, 0, 0, 0, 0, 154, 0, 0, 0, 0, 3, 15, 172
+"d:\qsa2020\04_pc\myapp\mock\notices.ts", "TypeScript", 0, 0, 0, 0, 0, 105, 0, 0, 0, 0, 0, 3, 108
+"d:\qsa2020\04_pc\myapp\mock\route.ts", "TypeScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 6
+"d:\qsa2020\04_pc\myapp\mock\user.ts", "TypeScript", 0, 0, 0, 0, 0, 184, 0, 0, 0, 0, 8, 9, 201
+"d:\qsa2020\04_pc\myapp\package.json", "JSON", 0, 38, 0, 0, 0, 0, 0, 0, 0, 0, 70, 0, 108
+"d:\qsa2020\04_pc\myapp\public\logo.svg", "XML", 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"d:\qsa2020\04_pc\myapp\public\pro_icon.svg", "XML", 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 5
+"d:\qsa2020\04_pc\myapp\src\access.ts", "TypeScript", 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 1, 8
+"d:\qsa2020\04_pc\myapp\src\app.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 136, 0, 0, 0, 30, 13, 179
+"d:\qsa2020\04_pc\myapp\src\components\CheckButton\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 136, 0, 0, 0, 0, 4, 140
+"d:\qsa2020\04_pc\myapp\src\components\DelPopconfirm\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 6, 43
+"d:\qsa2020\04_pc\myapp\src\components\DelPopconfirm\next.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 6, 43
+"d:\qsa2020\04_pc\myapp\src\components\Footer\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 91, 0, 0, 0, 27, 2, 120
+"d:\qsa2020\04_pc\myapp\src\components\GlobalWrapper\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 3, 16
+"d:\qsa2020\04_pc\myapp\src\components\HeaderDropdown\index.less", "Less", 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 17
+"d:\qsa2020\04_pc\myapp\src\components\HeaderDropdown\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 4, 18
+"d:\qsa2020\04_pc\myapp\src\components\HeaderSearch\index.less", "Less", 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 26
+"d:\qsa2020\04_pc\myapp\src\components\HeaderSearch\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 82, 0, 0, 0, 0, 9, 91
+"d:\qsa2020\04_pc\myapp\src\components\NoticeIcon\NoticeIcon.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 117, 0, 0, 0, 0, 10, 127
+"d:\qsa2020\04_pc\myapp\src\components\NoticeIcon\NoticeList.less", "Less", 96, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 104
+"d:\qsa2020\04_pc\myapp\src\components\NoticeIcon\NoticeList.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 108, 0, 0, 0, 1, 5, 114
+"d:\qsa2020\04_pc\myapp\src\components\NoticeIcon\index.less", "Less", 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 36
+"d:\qsa2020\04_pc\myapp\src\components\NoticeIcon\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 134, 0, 0, 0, 0, 19, 153
+"d:\qsa2020\04_pc\myapp\src\components\RightContent\AvatarDropdown.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 91, 0, 0, 0, 4, 12, 107
+"d:\qsa2020\04_pc\myapp\src\components\RightContent\index.less", "Less", 58, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 63
+"d:\qsa2020\04_pc\myapp\src\components\RightContent\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 6, 75
+"d:\qsa2020\04_pc\myapp\src\components\SearchTreeList\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 2, 14
+"d:\qsa2020\04_pc\myapp\src\components\SysInfo\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 4, 41
+"d:\qsa2020\04_pc\myapp\src\components\index.md", "Markdown", 0, 0, 0, 241, 0, 0, 0, 0, 0, 0, 0, 30, 271
+"d:\qsa2020\04_pc\myapp\src\components\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 2, 55
+"d:\qsa2020\04_pc\myapp\src\e2e\baseLayout.e2e.js", "JavaScript", 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 7, 58
+"d:\qsa2020\04_pc\myapp\src\global.less", "Less", 194, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 40, 236
+"d:\qsa2020\04_pc\myapp\src\global.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 9, 6, 86
+"d:\qsa2020\04_pc\myapp\src\layouts\BaseLayout.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 3, 13
+"d:\qsa2020\04_pc\myapp\src\locales\en-US.ts", "TypeScript", 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 2, 25
+"d:\qsa2020\04_pc\myapp\src\locales\en-US\component.ts", "TypeScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 6
+"d:\qsa2020\04_pc\myapp\src\locales\en-US\globalHeader.ts", "TypeScript", 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 1, 18
+"d:\qsa2020\04_pc\myapp\src\locales\en-US\menu.ts", "TypeScript", 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 1, 53
+"d:\qsa2020\04_pc\myapp\src\locales\en-US\pages.ts", "TypeScript", 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 0, 1, 69
+"d:\qsa2020\04_pc\myapp\src\locales\en-US\pwa.ts", "TypeScript", 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 1, 7
+"d:\qsa2020\04_pc\myapp\src\locales\en-US\settingDrawer.ts", "TypeScript", 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 1, 32
+"d:\qsa2020\04_pc\myapp\src\locales\en-US\settings.ts", "TypeScript", 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 1, 61
+"d:\qsa2020\04_pc\myapp\src\locales\id-ID.ts", "TypeScript", 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 2, 26
+"d:\qsa2020\04_pc\myapp\src\locales\id-ID\component.ts", "TypeScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 6
+"d:\qsa2020\04_pc\myapp\src\locales\id-ID\globalHeader.ts", "TypeScript", 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 1, 18
+"d:\qsa2020\04_pc\myapp\src\locales\id-ID\menu.ts", "TypeScript", 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 1, 53
+"d:\qsa2020\04_pc\myapp\src\locales\id-ID\pages.ts", "TypeScript", 0, 0, 0, 0, 0, 70, 0, 0, 0, 0, 0, 1, 71
+"d:\qsa2020\04_pc\myapp\src\locales\id-ID\pwa.ts", "TypeScript", 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 1, 8
+"d:\qsa2020\04_pc\myapp\src\locales\id-ID\settingDrawer.ts", "TypeScript", 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 1, 33
+"d:\qsa2020\04_pc\myapp\src\locales\id-ID\settings.ts", "TypeScript", 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 1, 61
+"d:\qsa2020\04_pc\myapp\src\locales\ja-JP.ts", "TypeScript", 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 2, 25
+"d:\qsa2020\04_pc\myapp\src\locales\ja-JP\component.ts", "TypeScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 6
+"d:\qsa2020\04_pc\myapp\src\locales\ja-JP\globalHeader.ts", "TypeScript", 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 1, 18
+"d:\qsa2020\04_pc\myapp\src\locales\ja-JP\menu.ts", "TypeScript", 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 1, 53
+"d:\qsa2020\04_pc\myapp\src\locales\ja-JP\pages.ts", "TypeScript", 0, 0, 0, 0, 0, 67, 0, 0, 0, 0, 0, 1, 68
+"d:\qsa2020\04_pc\myapp\src\locales\ja-JP\pwa.ts", "TypeScript", 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 1, 8
+"d:\qsa2020\04_pc\myapp\src\locales\ja-JP\settingDrawer.ts", "TypeScript", 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 1, 32
+"d:\qsa2020\04_pc\myapp\src\locales\ja-JP\settings.ts", "TypeScript", 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 1, 60
+"d:\qsa2020\04_pc\myapp\src\locales\pt-BR.ts", "TypeScript", 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 2, 21
+"d:\qsa2020\04_pc\myapp\src\locales\pt-BR\component.ts", "TypeScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 6
+"d:\qsa2020\04_pc\myapp\src\locales\pt-BR\globalHeader.ts", "TypeScript", 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 1, 19
+"d:\qsa2020\04_pc\myapp\src\locales\pt-BR\menu.ts", "TypeScript", 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 1, 53
+"d:\qsa2020\04_pc\myapp\src\locales\pt-BR\pwa.ts", "TypeScript", 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 1, 8
+"d:\qsa2020\04_pc\myapp\src\locales\pt-BR\settingDrawer.ts", "TypeScript", 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 1, 33
+"d:\qsa2020\04_pc\myapp\src\locales\pt-BR\settings.ts", "TypeScript", 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 1, 61
+"d:\qsa2020\04_pc\myapp\src\locales\zh-CN.ts", "TypeScript", 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 2, 25
+"d:\qsa2020\04_pc\myapp\src\locales\zh-CN\component.ts", "TypeScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 6
+"d:\qsa2020\04_pc\myapp\src\locales\zh-CN\globalHeader.ts", "TypeScript", 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 1, 18
+"d:\qsa2020\04_pc\myapp\src\locales\zh-CN\menu.ts", "TypeScript", 0, 0, 0, 0, 0, 159, 0, 0, 0, 0, 0, 1, 160
+"d:\qsa2020\04_pc\myapp\src\locales\zh-CN\pages.ts", "TypeScript", 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 1, 66
+"d:\qsa2020\04_pc\myapp\src\locales\zh-CN\pwa.ts", "TypeScript", 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 1, 7
+"d:\qsa2020\04_pc\myapp\src\locales\zh-CN\settingDrawer.ts", "TypeScript", 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 1, 32
+"d:\qsa2020\04_pc\myapp\src\locales\zh-CN\settings.ts", "TypeScript", 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 1, 56
+"d:\qsa2020\04_pc\myapp\src\locales\zh-TW.ts", "TypeScript", 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 2, 21
+"d:\qsa2020\04_pc\myapp\src\locales\zh-TW\component.ts", "TypeScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 6
+"d:\qsa2020\04_pc\myapp\src\locales\zh-TW\globalHeader.ts", "TypeScript", 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 1, 18
+"d:\qsa2020\04_pc\myapp\src\locales\zh-TW\menu.ts", "TypeScript", 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 1, 53
+"d:\qsa2020\04_pc\myapp\src\locales\zh-TW\pwa.ts", "TypeScript", 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 1, 7
+"d:\qsa2020\04_pc\myapp\src\locales\zh-TW\settingDrawer.ts", "TypeScript", 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 1, 32
+"d:\qsa2020\04_pc\myapp\src\locales\zh-TW\settings.ts", "TypeScript", 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 1, 56
+"d:\qsa2020\04_pc\myapp\src\manifest.json", "JSON", 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 23
+"d:\qsa2020\04_pc\myapp\src\models\account.ts", "TypeScript", 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 3, 34
+"d:\qsa2020\04_pc\myapp\src\models\attr.ts", "TypeScript", 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 1, 2, 20
+"d:\qsa2020\04_pc\myapp\src\models\brand.ts", "TypeScript", 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 3, 20
+"d:\qsa2020\04_pc\myapp\src\models\custArea.ts", "TypeScript", 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 4, 31
+"d:\qsa2020\04_pc\myapp\src\models\custLevel.ts", "TypeScript", 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 1, 2, 24
+"d:\qsa2020\04_pc\myapp\src\models\custType.ts", "TypeScript", 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 3, 30
+"d:\qsa2020\04_pc\myapp\src\models\dep.ts", "TypeScript", 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 1, 2, 30
+"d:\qsa2020\04_pc\myapp\src\models\options.ts", "TypeScript", 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 1, 2, 25
+"d:\qsa2020\04_pc\myapp\src\models\params.ts", "TypeScript", 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 1, 3, 18
+"d:\qsa2020\04_pc\myapp\src\models\productType.ts", "TypeScript", 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 2, 27
+"d:\qsa2020\04_pc\myapp\src\models\store.ts", "TypeScript", 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 3, 23
+"d:\qsa2020\04_pc\myapp\src\models\suppType.ts", "TypeScript", 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 5, 43
+"d:\qsa2020\04_pc\myapp\src\models\unit.ts", "TypeScript", 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 3, 20
+"d:\qsa2020\04_pc\myapp\src\models\user.ts", "TypeScript", 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 2, 28
+"d:\qsa2020\04_pc\myapp\src\models\userRole.ts", "TypeScript", 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 1, 3, 24
+"d:\qsa2020\04_pc\myapp\src\pages\404.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 3, 19
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\account\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 94, 0, 0, 0, 0, 2, 96
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\account\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 124, 0, 0, 0, 0, 2, 126
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\attr\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 3, 61
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\attr\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 2, 130
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\basOthers\cust.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 2, 25
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\basOthers\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 2, 35
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\basOthers\product.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 2, 30
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\basOthers\supply.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 2, 24
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\brand\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 82, 0, 0, 0, 0, 3, 85
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\brand\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 85, 0, 0, 0, 0, 2, 87
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\custArea\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 63, 0, 0, 0, 0, 3, 66
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\custArea\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 77, 0, 0, 0, 0, 3, 80
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\custLevel\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 3, 58
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\custLevel\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 86, 0, 0, 0, 0, 3, 89
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\custType\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 3, 53
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\custType\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 3, 79
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\cusAddress.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 207, 0, 0, 0, 1, 3, 211
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\cusRecordForm.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 112, 0, 0, 0, 0, 2, 114
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\custDoc.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 90, 0, 0, 0, 0, 2, 92
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\custDocForm.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 90, 0, 0, 0, 0, 2, 92
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\custFinanceForm.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 166, 0, 0, 0, 0, 2, 168
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\custRecord.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 2, 101
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\customer.json", "JSON", 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 56
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\customerSelect.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 3, 103
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 449, 0, 0, 0, 0, 3, 452
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 171, 0, 0, 0, 0, 4, 175
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 218, 0, 0, 0, 0, 4, 222
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\customer\updForm.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 164, 0, 0, 0, 0, 3, 167
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\employ\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 74, 0, 0, 0, 0, 4, 78
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\employ\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 248, 0, 0, 0, 0, 5, 253
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\productType\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 122, 0, 0, 0, 0, 3, 125
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\productType\index.less", "Less", 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\productType\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 113, 0, 0, 0, 0, 2, 115
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\product\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 1081, 0, 0, 0, 31, 14, 1126
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\product\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 0, 3, 149
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\product\json.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 550, 0, 0, 9, 28, 587
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\product\prodAdd.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 361, 0, 0, 10, 2, 373
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\store\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 87, 0, 0, 0, 0, 3, 90
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\store\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 122, 0, 0, 0, 0, 3, 125
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\suppType\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 79, 0, 0, 0, 0, 2, 81
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\suppType\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 84, 0, 0, 0, 0, 4, 88
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\supplier\addForm.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 231, 0, 0, 0, 0, 5, 236
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\supplier\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 469, 0, 0, 0, 0, 6, 475
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\supplier\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 266, 0, 0, 0, 0, 3, 269
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\supplier\supplier.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 1, 39
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\unit\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 3, 51
+"d:\qsa2020\04_pc\myapp\src\pages\Bas\unit\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 62, 0, 0, 0, 0, 2, 64
+"d:\qsa2020\04_pc\myapp\src\pages\Desktop.less", "Less", 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5
+"d:\qsa2020\04_pc\myapp\src\pages\Desktop.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 259, 0, 0, 0, 0, 5, 264
+"d:\qsa2020\04_pc\myapp\src\pages\FullFunction.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 2, 44
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\Reports\AccountsPayableDetail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 2, 101
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\Reports\BankBalance.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 104, 0, 0, 0, 0, 2, 106
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\Reports\CustomerBalance.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 122, 0, 0, 0, 0, 2, 124
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\Reports\FundBalance.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 86, 0, 0, 0, 0, 2, 88
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\Reports\OriDetail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 2, 55
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\Reports\SuppBalance.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 187, 0, 0, 0, 0, 4, 191
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\Reports\components\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 2, 45
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\Reports\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 2, 70
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\Reports\reports.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 322, 0, 0, 0, 1, 323
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\components\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 1149, 0, 0, 0, 8, 16, 1173
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\fundTf\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\fundTf\fundsTf.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 1, 61
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\fundTf\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 2, 14
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\opm\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\opm\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 2, 14
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\ori\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\ori\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 2, 14
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\ori\ori.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 1, 42
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\payment\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\payment\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 2, 14
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\receipt\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\receipt\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 2, 14
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\receipt\receipt.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 118, 0, 0, 0, 1, 119
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\verifica\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\verifica\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 2, 14
+"d:\qsa2020\04_pc\myapp\src\pages\Funds\verifica\verifica.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 1, 34
+"d:\qsa2020\04_pc\myapp\src\pages\Produce\components\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 505, 0, 0, 0, 1, 5, 511
+"d:\qsa2020\04_pc\myapp\src\pages\Produce\produceInStore\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 2, 16
+"d:\qsa2020\04_pc\myapp\src\pages\Produce\produceInStore\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Ghd\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 2, 18
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Ghd\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 1, 2, 24
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Ghdd\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 1, 2, 19
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Ghdd\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 3, 24
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Ghdd\purchase.markdown", "Markdown", 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 12, 29
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Reports\PurcOrderTrack.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 201, 0, 0, 0, 24, 2, 227
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Reports\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 2, 49
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Reports\list.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 526, 0, 0, 10, 20, 556
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Reports\purcAndPay.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 129, 0, 0, 0, 27, 2, 158
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Reports\purcSumBySku.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 159, 0, 0, 0, 25, 2, 186
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Reports\purcSumBySupp.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 161, 0, 0, 0, 0, 3, 164
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Reports\purchaseDtl.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 176, 0, 0, 0, 0, 3, 179
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Thd\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 2, 24
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\Thd\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 3, 25
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\components\PurchaseTable.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 136, 0, 0, 0, 0, 4, 140
+"d:\qsa2020\04_pc\myapp\src\pages\Purchase\components\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 1270, 0, 0, 0, 6, 27, 1303
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\Reports\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 484, 0, 0, 0, 19, 6, 509
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\Reports\reports.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 107, 0, 0, 0, 1, 108
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\components\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 941, 0, 0, 0, 7, 11, 959
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\xhd\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 1, 2, 10
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\xhd\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\xhd\xhd.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 116, 0, 0, 3, 1, 120
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\xhdd\add.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 141, 0, 0, 0, 1, 142
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\xhdd\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 1, 2, 14
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\xhdd\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\xhdd\xhdd.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 1, 147
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\xhthd\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 1, 2, 14
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\xhthd\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Sales\xhthd\xhthd.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 62, 0, 0, 0, 1, 63
+"d:\qsa2020\04_pc\myapp\src\pages\Settings.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 2, 37
+"d:\qsa2020\04_pc\myapp\src\pages\Store\Reports\Reports.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 85, 0, 0, 0, 1, 86
+"d:\qsa2020\04_pc\myapp\src\pages\Store\Reports\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 560, 0, 0, 0, 2, 11, 573
+"d:\qsa2020\04_pc\myapp\src\pages\Store\components\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 762, 0, 0, 0, 6, 7, 775
+"d:\qsa2020\04_pc\myapp\src\pages\Store\inventory\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 370, 0, 0, 0, 3, 4, 377
+"d:\qsa2020\04_pc\myapp\src\pages\Store\inventory\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 0, 7, 153
+"d:\qsa2020\04_pc\myapp\src\pages\Store\inventory\inventory.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 1, 41
+"d:\qsa2020\04_pc\myapp\src\pages\Store\serNum\serNum.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 156, 0, 0, 0, 13, 169
+"d:\qsa2020\04_pc\myapp\src\pages\Store\serNum\serNumDetail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 546, 0, 0, 0, 31, 8, 585
+"d:\qsa2020\04_pc\myapp\src\pages\Store\stockChange\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 1, 2, 21
+"d:\qsa2020\04_pc\myapp\src\pages\Store\stockChange\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\pages\Store\stockChange\stockChange.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 1, 44
+"d:\qsa2020\04_pc\myapp\src\pages\Store\stockIn\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 1, 2, 18
+"d:\qsa2020\04_pc\myapp\src\pages\Store\stockIn\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 2, 16
+"d:\qsa2020\04_pc\myapp\src\pages\Store\stockOut\detail.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 1, 2, 21
+"d:\qsa2020\04_pc\myapp\src\pages\Store\stockOut\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 2, 16
+"d:\qsa2020\04_pc\myapp\src\pages\Store\stockOut\skuOut.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 1, 44
+"d:\qsa2020\04_pc\myapp\src\pages\Store\store.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 105, 0, 0, 2, 1, 108
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\coderule\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 109, 0, 0, 0, 0, 2, 111
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\coderule\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 85, 0, 0, 0, 0, 2, 87
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\company\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 195, 0, 0, 0, 0, 2, 197
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\dep\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 3, 59
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\dep\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0, 2, 98
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\dict(def)\DictForm.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 84, 0, 0, 0, 0, 2, 86
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\dict(def)\DictTypeForm.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 75, 0, 0, 0, 0, 3, 78
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\dict(def)\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 299, 0, 0, 0, 0, 3, 302
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\dict(type)\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 2, 78
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\exception\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 2, 53
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\fun\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 3, 72
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\fun\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 90, 0, 0, 0, 0, 2, 92
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\log\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 63, 0, 0, 0, 0, 3, 66
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\module\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 151, 0, 0, 0, 0, 4, 155
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\module\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 105, 0, 0, 0, 15, 2, 122
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\module\list.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 1403, 0, 0, 0, 1, 1404
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\print\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 223, 0, 0, 0, 1, 4, 228
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\print\print.less", "Less", 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\role\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 140, 0, 0, 0, 1, 5, 146
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\role\index.less", "Less", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\role\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 110, 0, 0, 0, 0, 3, 113
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\role\roleForm.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 85, 0, 0, 0, 0, 3, 88
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\sysParams\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 2, 12
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\user\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 124, 0, 0, 0, 0, 3, 127
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\user\index.less", "Less", 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\user\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 253, 0, 0, 0, 0, 8, 261
+"d:\qsa2020\04_pc\myapp\src\pages\Sys\ver\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 2, 46
+"d:\qsa2020\04_pc\myapp\src\pages\TableList\components\UpdateForm.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 206, 0, 0, 0, 0, 6, 212
+"d:\qsa2020\04_pc\myapp\src\pages\TableList\data.d.ts", "TypeScript", 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 4, 37
+"d:\qsa2020\04_pc\myapp\src\pages\TableList\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 328, 0, 0, 0, 18, 12, 358
+"d:\qsa2020\04_pc\myapp\src\pages\TableList\service.ts", "TypeScript", 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 5, 39
+"d:\qsa2020\04_pc\myapp\src\pages\User\login\index.less", "Less", 98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 115
+"d:\qsa2020\04_pc\myapp\src\pages\User\login\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 298, 0, 0, 0, 21, 15, 334
+"d:\qsa2020\04_pc\myapp\src\pages\document.ejs", "HTML", 0, 0, 0, 0, 0, 0, 0, 0, 198, 0, 0, 16, 214
+"d:\qsa2020\04_pc\myapp\src\pages\main\datacenter\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 2, 8
+"d:\qsa2020\04_pc\myapp\src\pages\main\healthQues\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 2, 8
+"d:\qsa2020\04_pc\myapp\src\pages\main\photo\index.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 2, 8
+"d:\qsa2020\04_pc\myapp\src\service-worker.js", "JavaScript", 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 23, 7, 67
+"d:\qsa2020\04_pc\myapp\src\services\API.d.ts", "TypeScript", 0, 0, 0, 0, 0, 207, 0, 0, 0, 0, 0, 4, 211
+"d:\qsa2020\04_pc\myapp\src\services\Bas\BAS.d.ts", "TypeScript", 0, 0, 0, 0, 0, 336, 0, 0, 0, 0, 0, 3, 339
+"d:\qsa2020\04_pc\myapp\src\services\Bas\account.ts", "TypeScript", 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 0, 6, 50
+"d:\qsa2020\04_pc\myapp\src\services\Bas\attr.ts", "TypeScript", 0, 0, 0, 0, 0, 77, 0, 0, 0, 0, 0, 8, 85
+"d:\qsa2020\04_pc\myapp\src\services\Bas\brand.ts", "TypeScript", 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 6, 59
+"d:\qsa2020\04_pc\myapp\src\services\Bas\custArea.ts", "TypeScript", 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 6, 32
+"d:\qsa2020\04_pc\myapp\src\services\Bas\custLevel.ts", "TypeScript", 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 5, 32
+"d:\qsa2020\04_pc\myapp\src\services\Bas\custType.ts", "TypeScript", 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 5, 47
+"d:\qsa2020\04_pc\myapp\src\services\Bas\customer.ts", "TypeScript", 0, 0, 0, 0, 0, 217, 0, 0, 0, 0, 0, 22, 239
+"d:\qsa2020\04_pc\myapp\src\services\Bas\employ.ts", "TypeScript", 0, 0, 0, 0, 0, 87, 0, 0, 0, 0, 0, 9, 96
+"d:\qsa2020\04_pc\myapp\src\services\Bas\index.ts", "TypeScript", 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 1, 13
+"d:\qsa2020\04_pc\myapp\src\services\Bas\product.ts", "TypeScript", 0, 0, 0, 0, 0, 111, 0, 0, 0, 0, 0, 13, 124
+"d:\qsa2020\04_pc\myapp\src\services\Bas\store.ts", "TypeScript", 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 5, 41
+"d:\qsa2020\04_pc\myapp\src\services\Bas\suppType.ts", "TypeScript", 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 0, 5, 50
+"d:\qsa2020\04_pc\myapp\src\services\Bas\supplier.ts", "TypeScript", 0, 0, 0, 0, 0, 110, 0, 0, 0, 0, 0, 11, 121
+"d:\qsa2020\04_pc\myapp\src\services\Bas\unit.ts", "TypeScript", 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 6, 49
+"d:\qsa2020\04_pc\myapp\src\services\Funds\Fund.d.ts", "TypeScript", 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 1, 61
+"d:\qsa2020\04_pc\myapp\src\services\Funds\index.ts", "TypeScript", 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 2, 21
+"d:\qsa2020\04_pc\myapp\src\services\Init\index.ts", "TypeScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 2
+"d:\qsa2020\04_pc\myapp\src\services\Init\log.ts", "TypeScript", 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 2, 13
+"d:\qsa2020\04_pc\myapp\src\services\Purchase\PUR.d.ts", "TypeScript", 0, 0, 0, 0, 0, 172, 0, 0, 0, 0, 1, 2, 175
+"d:\qsa2020\04_pc\myapp\src\services\Purchase\index.ts", "TypeScript", 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 3, 19
+"d:\qsa2020\04_pc\myapp\src\services\Purchase\purchase.ts", "TypeScript", 0, 0, 0, 0, 0, 136, 0, 0, 0, 0, 78, 13, 227
+"d:\qsa2020\04_pc\myapp\src\services\Sales\Sale.d.ts", "TypeScript", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 6
+"d:\qsa2020\04_pc\myapp\src\services\Sales\index.ts", "TypeScript", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 2
+"d:\qsa2020\04_pc\myapp\src\services\Sales\xhdd.ts", "TypeScript", 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 7, 2, 22
+"d:\qsa2020\04_pc\myapp\src\services\Store\index.ts", "TypeScript", 0, 0, 0, 0, 0, 70, 0, 0, 0, 0, 6, 10, 86
+"d:\qsa2020\04_pc\myapp\src\services\Store\serNum.ts", "TypeScript", 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 17, 5, 61
+"d:\qsa2020\04_pc\myapp\src\services\Store\store.d.ts", "TypeScript", 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 1, 66
+"d:\qsa2020\04_pc\myapp\src\services\Sys\coderule.ts", "TypeScript", 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 5, 45
+"d:\qsa2020\04_pc\myapp\src\services\Sys\company.ts", "TypeScript", 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 3, 24
+"d:\qsa2020\04_pc\myapp\src\services\Sys\dep.ts", "TypeScript", 0, 0, 0, 0, 0, 74, 0, 0, 0, 0, 0, 8, 82
+"d:\qsa2020\04_pc\myapp\src\services\Sys\dict.ts", "TypeScript", 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 10, 107
+"d:\qsa2020\04_pc\myapp\src\services\Sys\exception.ts", "TypeScript", 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 2, 11
+"d:\qsa2020\04_pc\myapp\src\services\Sys\fun.ts", "TypeScript", 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 5, 45
+"d:\qsa2020\04_pc\myapp\src\services\Sys\index.ts", "TypeScript", 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 0, 9, 92
+"d:\qsa2020\04_pc\myapp\src\services\Sys\module.ts", "TypeScript", 0, 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 6, 58
+"d:\qsa2020\04_pc\myapp\src\services\Sys\role.ts", "TypeScript", 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 7, 58
+"d:\qsa2020\04_pc\myapp\src\services\Sys\user.ts", "TypeScript", 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 10, 9, 102
+"d:\qsa2020\04_pc\myapp\src\services\Sys\ver.ts", "TypeScript", 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 3, 25
+"d:\qsa2020\04_pc\myapp\src\services\index.ts", "TypeScript", 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 2, 19
+"d:\qsa2020\04_pc\myapp\src\services\login.ts", "TypeScript", 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 5, 25
+"d:\qsa2020\04_pc\myapp\src\someJson\routers.jsonc", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 726, 0, 0, 0, 1, 727
+"d:\qsa2020\04_pc\myapp\src\typings.d.ts", "TypeScript", 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 3, 13, 144
+"d:\qsa2020\04_pc\myapp\src\utils\columns.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 1098, 0, 0, 0, 41, 46, 1185
+"d:\qsa2020\04_pc\myapp\src\utils\form.tsx", "TypeScript React", 0, 0, 0, 0, 0, 0, 469, 0, 0, 0, 0, 11, 480
+"d:\qsa2020\04_pc\myapp\src\utils\utils.less", "Less", 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 17
+"d:\qsa2020\04_pc\myapp\src\utils\utils.test.ts", "TypeScript", 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 0, 4, 38
+"d:\qsa2020\04_pc\myapp\src\utils\utils.ts", "TypeScript", 0, 0, 0, 0, 0, 200, 0, 0, 0, 0, 10, 23, 233
+"d:\qsa2020\04_pc\myapp\src\utils\validator.ts", "TypeScript", 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 2, 8
+"d:\qsa2020\04_pc\myapp\tests\PuppeteerEnvironment.js", "JavaScript", 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 4, 8, 42
+"d:\qsa2020\04_pc\myapp\tests\beforeTest.js", "JavaScript", 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 6, 5, 40
+"d:\qsa2020\04_pc\myapp\tests\getBrowser.js", "JavaScript", 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 5, 4, 46
+"d:\qsa2020\04_pc\myapp\tests\run-tests.js", "JavaScript", 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 8, 6, 53
+"d:\qsa2020\04_pc\myapp\tests\setupTests.js", "JavaScript", 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 1, 3, 11
+"d:\qsa2020\04_pc\myapp\tsconfig.json", "JSON", 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 41
+"Total", "-", 542, 155, 256, 294, 6, 5944, 21729, 5222, 198, 23, 715, 1344, 36428

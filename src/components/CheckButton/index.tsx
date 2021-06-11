@@ -1,9 +1,11 @@
 import { check } from '@/services';
 import { mapModId } from '@/utils/utils';
 import { showSysInfo } from '@/components/SysInfo';
+import type { ButtonProps } from 'antd';
 import { Button, Dropdown, Menu } from 'antd';
 import React from 'react';
-import { useModel } from '@/.umi/plugin-model/useModel';
+import Style from '@/global.less';
+import { history } from 'umi';
 
 type CheckButtonProps = {
   url: string;
@@ -116,4 +118,22 @@ export const OpenButton = ({ selectedRowKeys, actionRef, fn }: OpenButtonProps) 
   >
     关闭
   </Dropdown.Button>
+);
+
+type BasOtherButtonProps = {
+  url: string;
+  rest?: ButtonProps;
+};
+export const BasOtherButton = (props: BasOtherButtonProps) => (
+  <Button
+    key="fzzl"
+    type="primary"
+    className={Style.buttonColorPurple}
+    onClick={() => {
+      history.push(props.url);
+    }}
+    {...props.rest}
+  >
+    辅助资料
+  </Button>
 );

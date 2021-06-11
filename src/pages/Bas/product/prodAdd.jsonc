@@ -358,5 +358,15 @@
     }
   ],
   "desc": "", //富文本描述
-  "costPrice": 500 //基本价格
+  "costPrice": 500, //基本价格
+  "earlyStage": [
+    {
+      "autoId": "@id",
+      "storeCd": "@id", // 仓库
+      "qty": 5, // 期初数量
+      "serNumList": [{ "autoId": 1, "serNum": "@id", "desc": "" }], // 如果勾选启用序列号管理
+      "unitCost": 5, // 单位成本
+      "amount": 25 //期初总价
+    }
+  ]
 }

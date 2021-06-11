@@ -333,5 +333,6 @@ declare namespace BAS {
     mainRelId: string | number; // 主联系人Id
     sortNum: string; // 显示顺序
     seaId: string; // 所属公海
+    accountPayableSum: number;
   } & DefaultField;
 }
