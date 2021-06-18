@@ -156,4 +156,5 @@ export default {
   'menu.init.module': '功能模块设置',
   'menu.produce': '生产',
   'menu.produce.produceInStore': '生产入库',
+  'menu.desktop.action': '行动',
 };

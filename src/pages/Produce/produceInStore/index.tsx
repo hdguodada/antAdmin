@@ -6,7 +6,7 @@ import GlobalWrapper from '@/components/GlobalWrapper';
 export default () => {
   return (
     <GlobalWrapper type="list">
-      <ProduceTable bussType={BussType.生产入库} dev="bas" />
+      <ProduceTable bussType={BussType.生产入库} />
     </GlobalWrapper>
   );
 };

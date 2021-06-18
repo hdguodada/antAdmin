@@ -184,7 +184,7 @@ declare namespace SYS {
       UserName: string;
       UserId: number;
     };
-    msg: string;
+    msg?: string;
   };
 
   export type NoticeIconData = {

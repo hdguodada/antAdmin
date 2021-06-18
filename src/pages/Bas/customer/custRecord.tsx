@@ -10,7 +10,7 @@ interface CustRecordProps {
   customer: BAS.Customer;
   custRel?: BAS.Rel[];
 }
-export default (props: CustRecordProps): React.ReactElement => {
+export default (props: CustRecordProps) => {
   const { customer, custRel } = props;
   const CustRecordActionRef = useRef<ActionType>();
   const [modalVisit, setModalVisit] = useState(false);

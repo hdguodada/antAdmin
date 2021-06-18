@@ -84,7 +84,7 @@ const CustomerSelect: React.FC<CustomerSelectProps> = ({
           />
         }
       />
-      <Modal visible={visible} width={1000} onOk={handleOk} onCancel={handleCancel} footer={false}>
+      <Modal visible={visible} width={1200} onOk={handleOk} onCancel={handleCancel} footer={false}>
         <CustomerTable
           selectParams={{
             state: 1,

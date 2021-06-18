@@ -36,18 +36,15 @@ export const CustomerFinanceFormFields = ({
           width="md"
           name={action === 'add' ? ['basCustFinance', 'invoice'] : 'invoice'}
           label="开票名称"
-          rules={patternMsg.text('')}
         />
         <ProFormText
           width="md"
           label="开票税号"
-          rules={patternMsg.text('')}
           name={action === 'add' ? ['basCustFinance', 'taxNumber'] : 'taxNumber'}
         />
         <ProFormText
           width="md"
           label="开户地址"
-          rules={patternMsg.text('')}
           name={action === 'add' ? ['basCustFinance', 'invoiceAddress'] : 'invoiceAddress'}
         />
         {!simple && (

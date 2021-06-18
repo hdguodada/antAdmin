@@ -243,7 +243,7 @@ export function SupplierDetail() {
                       queryList={queryPurchase}
                       bussType={BussType.采购订单}
                       initSearch={{
-                        suppId: [id],
+                        suppId: [+id],
                       }}
                     />
                   </ProCard.TabPane>
@@ -257,7 +257,7 @@ export function SupplierDetail() {
                       queryList={queryPurchase}
                       bussType={BussType.采购单}
                       initSearch={{
-                        suppId: [id],
+                        suppId: [+id],
                       }}
                     />
                   </ProCard.TabPane>
@@ -271,11 +271,11 @@ export function SupplierDetail() {
                       queryList={queryPurchase}
                       bussType={BussType.采购退货单}
                       initSearch={{
-                        suppId: [id],
+                        suppId: [+id],
                       }}
                     />
                   </ProCard.TabPane>
-                  <ProCard.TabPane key="其他入库单" tab="其他入库单">
+                  {/* <ProCard.TabPane key="其他入库单" tab="其他入库单">
                     <OrderTable<PUR.Purchase>
                       url={BussTypeApiUrl.其他入库单}
                       checkUrl={`${BussTypeApiUrl.其他入库单}/check`}
@@ -285,10 +285,11 @@ export function SupplierDetail() {
                       queryList={queryPurchase}
                       bussType={BussType.其他入库单}
                       initSearch={{
-                        suppId: [id],
+                        suppId: [+id],
+                        contactName: data?.supplier.suppName,
                       }}
                     />
-                  </ProCard.TabPane>
+                  </ProCard.TabPane> */}
                 </ProCard>
                 {/* 供应商关联的表单 End */}
                 {/* 供应商联系人 Start */}
@@ -465,10 +466,10 @@ export function SupplierDetail() {
   );
 }
 
-export default () => {
+export default function SupplierDetailPage() {
   return (
     <GlobalWrapper type="descriptions">
       <SupplierDetail />
     </GlobalWrapper>
   );
-};
+}

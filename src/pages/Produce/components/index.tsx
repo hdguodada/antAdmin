@@ -370,12 +370,13 @@ export function ProduceForm(props: ProduceFormProps) {
         }}
       >
         <ProFormText hidden width="md" name="billId" label="单据编号" disabled />
+        <ProFormText hidden width="md" name="billNo" label="单据编号" disabled />
         <ProFormDigit hidden width="sm" name="totalQty" label="单据数量" disabled />
         <ProFormDigit hidden width="sm" name="totalAmount" label="单据总额" disabled />
         <ProForm.Group>
           <ProFormDatePicker width="md" name="date" label="单据日期" disabled={checked} />
           <UserSelect name="packId" label="打包员" />
-          <UserSelect name="checkId" label="验收员" />
+          <UserSelect name="inspectorId" label="验收员" />
         </ProForm.Group>
         <ProForm.Group>
           <ProForm.Item name="entries" label="商品" rules={patternMsg.select('商品')}>
@@ -407,6 +408,13 @@ export function ProduceTableColumns({
       bussType,
     }),
     crtNameColumns(),
+    {
+      title: '验收员',
+      dataIndex: 'inspectorName',
+      search: false,
+      width: 105,
+      index: 101,
+    },
     checkName(),
     memoColumns(),
     optionColumns({
@@ -451,7 +459,6 @@ export function ProduceTable(props: ProduceTableProps) {
           rowKey="billId"
           rowSelection={{}}
           options={false}
-          bordered
           params={advancedSearchFormValues}
           actionRef={actionRef}
           search={AdvancedSearch({

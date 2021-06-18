@@ -798,7 +798,6 @@ export type AdvancedSearchFormField = Partial<{
   billStatus: any[];
   suppIdMid: Partial<BAS.Supplier>[];
   custIdMid: Partial<BAS.Customer>[];
-  contactName: string;
 }>;
 type AdvancedSearchFormProps = {
   value?: AdvancedSearchFormField;

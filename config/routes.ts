@@ -1,8 +1,9 @@
 ﻿export default [
   {
     path: '/',
-    redirect: '/desktop',
     layout: false,
+    hideInMenu: true,
+    component: './Home',
   },
   // 用户登录
   {
@@ -22,10 +23,23 @@
     ],
   },
   {
-    path: '/desktop',
     name: 'desktop',
     icon: 'smile',
-    component: './Desktop',
+    path: '/desktop',
+    routes: [
+      {
+        name: 'Desktop',
+        path: '/desktop',
+        component: './Desktop',
+        hideInMenu: true,
+      },
+      {
+        name: 'action',
+        path: '/desktop/action',
+        component: './Desktop/action',
+        hideInMenu: true,
+      },
+    ],
   },
   {
     name: 'purchase',
@@ -40,7 +54,6 @@
       {
         path: 'purcOrder/:id',
         component: './Purchase/Ghdd/detail',
-        hideInMenu: true,
       },
 
       {

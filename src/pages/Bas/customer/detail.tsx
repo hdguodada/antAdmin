@@ -21,9 +21,7 @@ import { indexColumns } from '@/utils/columns';
 import CustomerFinanceForm from './custFinanceForm';
 import GlobalWrapper from '@/components/GlobalWrapper';
 import RcResizeObserver from 'rc-resize-observer';
-import OrderTable from '@/pages/Purchase/components/PurchaseTable';
-import { BussType, BussTypeApiUrl, BussTypeComponentUrl } from '@/pages/Purchase/components';
-import { delPurchase, openClosePurchase, queryPurchase } from '@/services/Purchase';
+import { BussType } from '@/pages/Purchase/components';
 import { CustAddressTable } from './cusAddress';
 import { Button } from 'antd';
 import { XhTable } from '@/pages/Sales/components';
@@ -92,7 +90,7 @@ export const relColumns: ProColumns<BAS.Rel>[] = [
     },
   },
 ];
-export default (): React.ReactNode => {
+export default () => {
   const { id } = useParams<{ id: string }>();
   const [detail, setDetail] = useState<BAS.Customer>();
   const [collapsed, setCollapsed] = useState<boolean>(true);
@@ -205,28 +203,25 @@ export default (): React.ReactNode => {
                 <ProCard collapsible title={<span>关联单据</span>} tabs={{}}>
                   <ProCard.TabPane key="销售订单" tab="销售订单">
                     <XhTable
-                      bussType={BussType.采购订单}
+                      bussType={BussType.销售订单}
                       initSearch={{
                         custId: [+id],
-                        contactName: data?.customerInfo.custName,
                       }}
                     />
                   </ProCard.TabPane>
                   <ProCard.TabPane key="销售单" tab="销售单">
                     <XhTable
-                      bussType={BussType.采购单}
+                      bussType={BussType.销售单}
                       initSearch={{
                         custId: [+id],
-                        contactName: data?.customerInfo.custName,
                       }}
                     />
                   </ProCard.TabPane>
                   <ProCard.TabPane key="销售退货单" tab="销售退货单">
                     <XhTable
-                      bussType={BussType.采购退货单}
+                      bussType={BussType.销售退货单}
                       initSearch={{
                         custId: [+id],
-                        contactName: data?.customerInfo.custName,
                       }}
                     />
                   </ProCard.TabPane>

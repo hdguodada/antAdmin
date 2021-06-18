@@ -8,7 +8,7 @@ import { OrderTableColumns } from '@/utils/columns';
 import { AdvancedSearch, AdvancedSearchForm } from '@/utils/columns';
 import { showSysInfo } from '@/components/SysInfo';
 import { CheckButton, OpenButton } from '../../../components/CheckButton';
-import { BussType } from '.';
+import { BussType, BussTypeComponentUrl } from '.';
 import Style from '@/global.less';
 import { delPurchase } from '@/services/Purchase';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -53,7 +53,14 @@ export default function OrderTable<T extends Record<string, unknown>>(props: Ord
           params={advancedSearchFormValues}
           actionRef={actionRef}
           search={AdvancedSearch({
-            url: `${componentUrl || url}/new`,
+            fn: () => {
+              history.push({
+                pathname: `${BussTypeComponentUrl[BussType[bussType]]}/new`,
+                query: {
+                  suppId: (initSearch?.suppId?.[0] || '').toString(),
+                },
+              });
+            },
             jsxList: [
               <AdvancedSearchForm
                 key="AdvancedSearchForm"

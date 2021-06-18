@@ -52,7 +52,7 @@ import {
   userColumns,
 } from '@/utils/columns';
 import { AccountSelect, DepSelect, MyProFormUpload, UserSelect } from '@/utils/form';
-import { calPrice, transProTableParamsToMyRequest } from '@/utils/utils';
+import { calPrice, transProTableParamsToMyRequest, useQuery } from '@/utils/utils';
 import { patternMsg } from '@/utils/validator';
 import ProCard from '@ant-design/pro-card';
 import ProForm, {
@@ -114,6 +114,7 @@ export const XhTableColumns = ({
       search: false,
       valueType: 'date',
       width: 105,
+      hideInTable: bussType !== BussType.销售订单,
     },
     srcOrderColumns(
       {
@@ -121,22 +122,6 @@ export const XhTableColumns = ({
         hideInTable: [BussType.销售订单].indexOf(bussType) > -1,
       },
       'srcXhddBillNo',
-      BussTypeComponentUrl[BussType[bussType]],
-    ),
-    srcOrderColumns(
-      {
-        title: '关联销售单',
-        hideInTable: bussType === BussType.销售单,
-      },
-      'srcXhdBillNo',
-      BussTypeComponentUrl[BussType[bussType]],
-    ),
-    srcOrderColumns(
-      {
-        title: '关联退货单',
-        hideInTable: [BussType.销售退货单].indexOf(bussType) > -1,
-      },
-      'srcThdBillNo',
       BussTypeComponentUrl[BussType[bussType]],
     ),
     bussTypeColumns({
@@ -184,6 +169,22 @@ export const XhTableColumns = ({
     }),
     crtNameColumns(),
     checkName(),
+    srcOrderColumns(
+      {
+        title: '关联销售单',
+        hideInTable: bussType === BussType.销售单,
+      },
+      'srcXhdBillNo',
+      BussTypeComponentUrl[BussType[bussType]],
+    ),
+    srcOrderColumns(
+      {
+        title: '关联退货单',
+        hideInTable: [BussType.销售退货单].indexOf(bussType) > -1,
+      },
+      'srcThdBillNo',
+      BussTypeComponentUrl[BussType[bussType]],
+    ),
     memoColumns(),
     optionColumns({
       modify: async ({ record }) => {
@@ -235,7 +236,14 @@ export function XhTable(props: XhTableProps) {
           params={advancedSearchFormValues}
           actionRef={actionRef}
           search={AdvancedSearch({
-            url: `${BussTypeComponentUrl[BussType[bussType]]}/new`,
+            fn: () => {
+              history.push({
+                pathname: `${BussTypeComponentUrl[BussType[bussType]]}/new`,
+                query: {
+                  custId: (initSearch?.custId?.[0] || '').toString(),
+                },
+              });
+            },
             jsxList: [
               <AdvancedSearchForm
                 key="AdvancedSearchForm"
@@ -565,6 +573,7 @@ export const XhForm = (props: XhFormProps) => {
     const cust = (await queryCustomerInfo(custId)).data;
     formRef.current?.setFieldsValue({
       accountPayableSum: cust.accountPayableSum,
+      contactName: cust.custName,
     });
   };
   const { run, refresh, data } = useRequest(
@@ -572,7 +581,7 @@ export const XhForm = (props: XhFormProps) => {
       setIsInfo(id !== 'new');
       if (id === 'new') {
         const billNo = (await getCode(BussCodeId[BussType[bussType]])).data;
-        const { suppId, contactName, custId } = (location as any).query;
+        const { suppId, custId } = (location as any).query;
         let res: PUR.Purchase = {
           billId: '',
           billNo,
@@ -583,7 +592,6 @@ export const XhForm = (props: XhFormProps) => {
           rpAmount: 0,
           suppId,
           custId,
-          contactName,
         };
         if ([BussType.销售单, BussType.销售退货单].indexOf(bussType) > -1) {
           const { srcXhddBillId, srcXhdBillId } = (location as any).query;
@@ -668,6 +676,7 @@ export const XhForm = (props: XhFormProps) => {
       return {
         data: {
           ...info,
+          attachment: JSON.parse(info.attachment),
           entries,
         },
       };
@@ -736,9 +745,14 @@ export const XhForm = (props: XhFormProps) => {
       <ProCard bordered style={{ boxShadow: ' 0 1px 3px rgb(0 0 0 / 20%)' }} title={data?.billNo}>
         <ProForm<PUR.Purchase>
           onFinish={async (values) => {
+            // 上传前，对表单一些特殊的字段的修改
+            const submitForm = values;
+            if (values.attachment) {
+              submitForm.attachment = JSON.stringify(values.attachment);
+            }
             // 新增或修改时,对序列号商品进行基本单位判断.购货订单无需序列号
             if (bussType !== BussType.销售订单) {
-              const ttt = values?.entries?.filter((item) => {
+              const ttt = submitForm?.entries?.filter((item) => {
                 if (item.isSerNum) {
                   if (item.unitId !== item.baseUnitId) {
                     message.error(`商品${item.skuName}录入序列号时，请选择基本计量单位！`);
@@ -760,7 +774,7 @@ export const XhForm = (props: XhFormProps) => {
               message.success(res.msg);
               history.push(`${BussTypeComponentUrl[BussType[bussType]]}/${res.data.id}`);
             } else {
-              await updPurchase({ ...values, dev }, `${BussTypeApiUrl[BussType[bussType]]}/upd`);
+              await updPurchase(submitForm, `${BussTypeApiUrl[BussType[bussType]]}/upd`);
               refresh();
             }
             return false;
@@ -802,8 +816,8 @@ export const XhForm = (props: XhFormProps) => {
           <ProFormDigit hidden width="sm" name="totalQty" label="单据数量" disabled />
           <ProFormDigit hidden width="sm" name="totalAmount" label="单据总额" disabled />
           <ProForm.Group>
-            <ProFormDependency name={['custName']}>
-              {({ custName }) => {
+            <ProFormDependency name={['contactName']}>
+              {({ contactName }) => {
                 return (
                   <ProForm.Item
                     name="custId"
@@ -811,7 +825,7 @@ export const XhForm = (props: XhFormProps) => {
                     rules={patternMsg.text('客户')}
                     style={{ width: '328px' }}
                   >
-                    <CustomerSelect custName={custName} disabled={checked} multiple={false} />
+                    <CustomerSelect custName={contactName} disabled={checked} multiple={false} />
                   </ProForm.Item>
                 );
               }}

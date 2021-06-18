@@ -384,7 +384,7 @@ export enum BussTypeApiUrl {
   销售单 = '/sales/xhd',
   销售退货单 = '/sales/thd',
   盘点 = '/bis/stockInventory',
-  生产入库 = '/produce/produceInStore',
+  生产入库 = '/bis/stockProd',
 }
 
 export enum BussTypeComponentUrl {
@@ -985,6 +985,7 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
     const supp = (await querySuppliersInfo(suppId)).data;
     formRef.current?.setFieldsValue({
       accountPayableSum: supp.accountPayableSum,
+      contactName: supp.suppName,
     });
   };
   const { run, refresh, data } = useRequest(
@@ -992,7 +993,7 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
       setIsInfo(id !== 'new');
       if (id === 'new') {
         const billNo = (await getCode(initialValues.codeId)).data;
-        const { suppId, contactName, custId } = (location as any).query;
+        const { suppId, custId } = (location as any).query;
         let res: PUR.Purchase = {
           billId: '',
           billNo,
@@ -1003,7 +1004,6 @@ export const PurchaseForm = (props: PurchaseFormProps) => {
           rpAmount: 0,
           suppId,
           custId,
-          contactName,
         };
         if ([BussType.采购单, BussType.采购退货单].indexOf(bussType) > -1) {
           const { srcGhddBillId, srcGhdBillId } = (location as any).query;

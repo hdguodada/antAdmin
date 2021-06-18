@@ -12,19 +12,104 @@ import sk from '@/images/sk.png';
 import fk from '@/images/fk.png';
 import tbck from '@/images/tbck.png';
 import tbrk from '@/images/tbrk.png';
-import { Divider, Space, Typography } from 'antd';
+import { Space, Typography } from 'antd';
 import GlobalWrapper from '@/components/GlobalWrapper';
-import Avatar from 'antd/lib/avatar/avatar';
-import { history, useModel } from 'umi';
+import { history, useModel, useRequest } from 'umi';
 import { BussTypeComponentUrl } from '../Purchase/components';
-import {
-  BankFilled,
-  BankOutlined,
-  PayCircleFilled,
-  PropertySafetyFilled,
-  RocketFilled,
-} from '@ant-design/icons';
+import { BankFilled, PayCircleFilled, PropertySafetyFilled, RocketFilled } from '@ant-design/icons';
+import Style from '@/global.less';
+import ProList from '@ant-design/pro-list';
+import { queryCustRecord } from '@/services/Bas';
+import Tag from 'antd/es/tag';
+import moment from 'moment';
+import { Bar, Line, Pie } from '@ant-design/charts';
+/**
+ * 商品分类销售情况
+ * @returns
+ */
+export const DemoPie: React.FC = () => {
+  const data = [
+    {
+      cateTypeName: '分类一',
+      value: 27,
+    },
+    {
+      cateTypeName: '分类二',
+      value: 25,
+    },
+    {
+      cateTypeName: '分类三',
+      value: 18,
+    },
+    {
+      cateTypeName: '分类四',
+      value: 15,
+    },
+    {
+      cateTypeName: '分类五',
+      value: 10,
+    },
+    {
+      cateTypeName: '其他',
+      value: 5,
+    },
+  ];
+  const config = {
+    appendPadding: 10,
+    data,
+    angleField: 'value',
+    colorField: 'cateTypeName',
+    radius: 0.9,
+    label: {
+      type: 'inner',
+      offset: '-30%',
+      content: function content(_ref: any) {
+        const { percent } = _ref;
+        return ''.concat((percent * 100).toFixed(0), '%');
+      },
+      style: {
+        fontSize: 14,
+        textAlign: 'center',
+      },
+    },
+    interactions: [{ type: 'element-active' }],
+  };
+  return <Pie {...config} />;
+};
 
+export const DemoBar: React.FC = () => {
+  const data = [
+    {
+      skuName: '1951 年',
+      value: 38,
+    },
+    {
+      skuName: '1952 年',
+      value: 52,
+    },
+    {
+      skuName: '1956 年',
+      value: 61,
+    },
+    {
+      skuName: '1957 年',
+      value: 145,
+    },
+    {
+      skuName: '1958 年',
+      value: 48,
+    },
+  ];
+  const config = {
+    data,
+    xField: 'value',
+    yField: 'skuName',
+    seriesField: 'skuName',
+  };
+  return <Bar {...config} />;
+};
+
+const { Statistic } = StatisticCard;
 const imgStyle = {
   display: 'block',
   width: 42,
@@ -57,28 +142,30 @@ export const CurrentUser: React.FC = () => {
 export const QuickGo: React.FC = () => {
   const quickFeatures = [
     {
-      icon: <BankFilled style={{ fontSize: '32px' }} />,
+      icon: <BankFilled style={{ fontSize: '32px' }} className={Style.primaryFontColor} />,
       title: '客户',
       href: '/bas/customer',
     },
     {
-      icon: <PayCircleFilled style={{ fontSize: '32px' }} />,
+      icon: <PayCircleFilled style={{ fontSize: '32px' }} className={Style.primaryFontColor} />,
       title: '供应商',
       href: '/bas/supplier',
     },
     {
-      icon: <RocketFilled style={{ fontSize: '32px' }} />,
-      title: '代办任务/行动',
-      href: '/bas/action',
+      icon: <RocketFilled style={{ fontSize: '32px' }} className={Style.primaryFontColor} />,
+      title: '待办任务/行动',
+      href: '/Desktop/action',
     },
     {
-      icon: <PropertySafetyFilled style={{ fontSize: '32px' }} />,
+      icon: (
+        <PropertySafetyFilled style={{ fontSize: '32px' }} className={Style.primaryFontColor} />
+      ),
       title: '销售报表',
       href: '/sales/Reports',
     },
   ];
   return (
-    <ProCard colSpan={24}>
+    <ProCard>
       {quickFeatures.map((item) => (
         <ProCard colSpan={2} ghost key={item.href}>
           <div
@@ -124,33 +211,105 @@ export function QuickUse() {
   );
 }
 
-export function Todo() {
+export const ActionTodo: React.FC = () => {
+  const { data, loading } = useRequest(async () => {
+    const response = await queryCustRecord({
+      pageNumber: -1,
+    });
+    return {
+      data: response.data.rows,
+      success: response.code === 0,
+      total: response.data.total,
+    };
+  });
   return (
-    <ProCard colSpan={24} tabs={{}}>
+    <ProCard title="待办任务">
+      <ProList
+        loading={loading}
+        rowKey="recordId"
+        showActions="hover"
+        showExtra="hover"
+        metas={{
+          title: {
+            dataIndex: 'realName',
+          },
+          description: {
+            dataIndex: 'content',
+          },
+          subTitle: {
+            render: (_, record) => {
+              return (
+                <Space size={0}>
+                  <Tag color="blue">{record.custName}</Tag>
+                  <Tag color="#5BD8A6">{record.exeDate}</Tag>
+                </Space>
+              );
+            },
+          },
+        }}
+        dataSource={data?.filter((i) => {
+          return moment(i.exeDate).isAfter(moment());
+        })}
+      />
+    </ProCard>
+  );
+};
+
+export const Remind: React.FC = () => {
+  return (
+    <ProCard tabs={{}}>
       <ProCard.TabPane tab="销售待办" key="销售待办">
         <StatisticCard.Group>
           <StatisticCard
             statistic={{
               title: '销售订单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '销售出库/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '销售退货/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '待出库/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
         </StatisticCard.Group>
@@ -161,24 +320,52 @@ export function Todo() {
             statistic={{
               title: '采购订单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '采购入库单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '采购退货单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '订单在途',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
         </StatisticCard.Group>
@@ -189,24 +376,52 @@ export function Todo() {
             statistic={{
               title: '其他出库单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '其他入库单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '调拨出库单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '调拨入库单',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
         </StatisticCard.Group>
@@ -217,32 +432,85 @@ export function Todo() {
             statistic={{
               title: '收款单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '付款单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '预收款单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
           <StatisticCard
             statistic={{
               title: '预付款单/待审核',
               value: 1,
+              icon: (
+                <img
+                  style={imgStyle}
+                  src="https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ"
+                  alt="icon"
+                />
+              ),
             }}
           />
         </StatisticCard.Group>
       </ProCard.TabPane>
     </ProCard>
   );
-}
+};
 
+export const XhLine: React.FC = () => {
+  const data = [
+    { month: '1', value: 3 },
+    { month: '2', value: 4 },
+    { month: '3', value: 3.5 },
+    { month: '4', value: 5 },
+    { month: '5', value: 4.9 },
+    { month: '6', value: 6 },
+    { month: '7', value: 7 },
+    { month: '8', value: 9 },
+    { month: '9', value: 13 },
+  ];
+
+  const config = {
+    data,
+    height: 500,
+    xField: 'month',
+    yField: 'value',
+    point: {
+      size: 5,
+      shape: 'diamond',
+    },
+  };
+  return <Line {...config} />;
+};
 export function SaleData() {
   const [responsive, setResponsive] = useState(false);
   return (
@@ -252,56 +520,81 @@ export function SaleData() {
         setResponsive(offset.width < 596);
       }}
     >
-      <StatisticCard.Group title="核心指标" direction={responsive ? 'column' : 'row'}>
-        <StatisticCard
-          statistic={{
-            title: '销售订单',
-            value: 79,
-            suffix: '单',
-            icon: <Avatar icon="销" />,
-          }}
-        />
-        <Divider type={responsive ? 'horizontal' : 'vertical'} />
-        <StatisticCard
-          statistic={{
-            title: '销售出库',
-            value: 112893,
-            suffix: '单',
-            icon: <Avatar icon="出" />,
-          }}
-        />
-        <Divider type={responsive ? 'horizontal' : 'vertical'} />
-        <StatisticCard
-          statistic={{
-            title: '销售退货',
-            value: 112893,
-            suffix: '单',
-            icon: <Avatar icon="退" />,
-          }}
-        />
-        <StatisticCard
-          statistic={{
-            title: '新增客户',
-            value: 112893,
-            icon: <Avatar icon="客" />,
-          }}
-        />
-      </StatisticCard.Group>
+      <ProCard
+        title="数据概览"
+        extra={moment().format('llll')}
+        split={responsive ? 'horizontal' : 'vertical'}
+        headerBordered
+        bordered
+      >
+        <ProCard split="horizontal">
+          <ProCard split="horizontal">
+            <ProCard split="vertical">
+              <StatisticCard
+                statistic={{
+                  title: '昨日销售金额',
+                  value: 234,
+                  description: <Statistic title="较本月平均销售金额" value="8.04%" trend="down" />,
+                }}
+              />
+              <StatisticCard
+                statistic={{
+                  title: '本月累计销售金额',
+                  value: 234,
+                  description: <Statistic title="月同比" value="8.04%" trend="up" />,
+                }}
+              />
+            </ProCard>
+            <ProCard split="vertical">
+              <StatisticCard
+                statistic={{
+                  title: '销售订单数量',
+                  value: '50',
+                  description: <Statistic title="较本月平均销售数量" value="8.04%" trend="down" />,
+                }}
+              />
+              <StatisticCard
+                statistic={{
+                  title: '本月销售订单数量',
+                  value: '134',
+                  description: <Statistic title="月同比" value="8.04%" trend="up" />,
+                }}
+              />
+            </ProCard>
+          </ProCard>
+          <StatisticCard title="销售额走势" chart={<XhLine />} />
+        </ProCard>
+        <ProCard direction="column">
+          <StatisticCard title="商品分类销售情况" chart={<DemoPie />} />
+          <StatisticCard title="商品销售情况" chart={<DemoBar />} />
+        </ProCard>
+      </ProCard>
     </RcResizeObserver>
   );
 }
+
 export default function Desktop() {
   return (
     <GlobalWrapper type="descriptions">
-      <PageContainer title={false}>
-        <ProCard ghost>
-          <QuickGo />
-          <div style={{ height: '20px' }}></div>
-          <QuickUse />
-          <div style={{ height: '20px' }}></div>
-          <Todo />
-          <div style={{ height: '20px' }}></div>
-          <SaleData />
+      <PageContainer title={'工作台'}>
+        <ProCard ghost direction="column" gutter={[0, 8]}>
+          <ProCard ghost>
+            <QuickGo />
+          </ProCard>
+          <ProCard ghost>
+            <QuickUse />
+          </ProCard>
+          <ProCard ghost direction="row" gutter={[8, 0]}>
+            <ProCard colSpan={8}>
+              <ActionTodo />
+            </ProCard>
+            <ProCard colSpan={16}>
+              <Remind />
+            </ProCard>
+          </ProCard>
+          <ProCard ghost>
+            <SaleData />
+          </ProCard>
         </ProCard>
       </PageContainer>
     </GlobalWrapper>

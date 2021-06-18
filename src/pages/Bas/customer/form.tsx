@@ -120,7 +120,6 @@ const CustomerForm: React.FC<FormProps> = (props) => {
               width="md"
               name={['basCustomer', 'salesmanId']}
               label={'营销员'}
-              rules={patternMsg.select('')}
               request={async () => {
                 return (await queryUsers({ pageNumber: -1 })).data.rows.map((item) => ({
                   label: item.realName,
@@ -132,7 +131,6 @@ const CustomerForm: React.FC<FormProps> = (props) => {
               name={['basCustomer', 'custAreaId']}
               label="所属区域"
               style={{ width: '328px' }}
-              rules={patternMsg.select('')}
             >
               <CustAreaSelect isLeaf showNew />
             </Form.Item>

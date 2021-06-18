@@ -235,7 +235,7 @@ export const Supplier = forwardRef((props: SupplierProps, ref) => {
   );
 });
 
-export default () => {
+export default function SupplierPage() {
   const { suppType } = useModel('suppType', (model) => ({ suppType: model.leafCanClickTreeData }));
   const [suppTypeId, setSuppTypeId] = useState<K>();
   return (
@@ -265,4 +265,4 @@ export default () => {
       />
     </GlobalWrapper>
   );
-};
+}

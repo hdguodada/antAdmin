@@ -170,5 +170,6 @@ declare namespace PUR {
       outStoreName: string;
       memo: string;
     }[];
+    attachment?: any;
   } & DefaultField;
 }

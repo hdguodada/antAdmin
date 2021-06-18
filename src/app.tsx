@@ -8,30 +8,6 @@ import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import type { RequestOptionsInit, ResponseError } from 'umi-request';
 import { queryCurrent, queryRouters } from './services/Sys/user';
-// import {
-//   SmileOutlined,
-//   HeartOutlined,
-//   ShoppingCartOutlined,
-//   AppstoreOutlined,
-//   SafetyOutlined,
-//   GlobalOutlined,
-//   SettingFilled,
-//   MoneyCollectOutlined,
-//   SettingOutlined,
-// } from '@ant-design/icons';
-import _ from 'lodash';
-
-// const IconMap: any = {
-//   smile: <SmileOutlined style={{ fontSize: '16px' }} />,
-//   heart: <HeartOutlined style={{ fontSize: '16px' }} />,
-//   ShoppingCartOutlined: <ShoppingCartOutlined style={{ fontSize: '16px' }} />,
-//   AppstockOutlined: <AppstoreOutlined style={{ fontSize: '16px' }} />,
-//   SafetyOutlined: <SafetyOutlined style={{ fontSize: '16px' }} />,
-//   GlobalOutlined: <GlobalOutlined style={{ fontSize: '16px' }} />,
-//   SettingFilled: <SettingFilled style={{ fontSize: '16px' }} />,
-//   MoneyCollectOutlined: <MoneyCollectOutlined style={{ fontSize: '16px' }} />,
-//   SettingOutlined: <SettingOutlined style={{ fontSize: '16px' }} />,
-// };
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
