@@ -1,0 +1,155 @@
+{
+  "code": 0,
+  "data": {
+    "actions|5": [
+      {
+        "realName": "@cname", //
+        "custName": "@cname",
+        "avatar": "@string", // 头像
+        "exeDate": "@date", // 执行日期 因为是代办任务，这里要过滤， 执行日期 >= 今天
+        "content": "@string" // 行动描述
+      }
+    ],
+    "OrderTodo": [
+      {
+        "titile": "销售待办",
+        "content": [
+          {
+            "bussType": 20,
+            "value": 1 // 待审核数量
+          },
+          {
+            "bussType": 21,
+            "value": 1 // 待审核数量
+          },
+          {
+            "bussType": 22,
+            "value": 1 // 待审核数量
+          }
+        ]
+      },
+      {
+        "titile": "采购待办",
+        "content": [
+          {
+            "bussType": 20,
+            "value": 1 // 待审核数量
+          }
+        ]
+      },
+      {
+        "titile": "仓管待办",
+        "content": [
+          {
+            "bussType": 20,
+            "value": 1 // 待审核数量
+          }
+        ]
+      },
+      {
+        "titile": "资金待办",
+        "content": [
+          {
+            "bussType": 20,
+            "value": 1 // 待审核数量
+          }
+        ]
+      }
+    ],
+    "saleData": {
+      "saleMoney": [
+        [
+          {
+            "title": "昨日销售金额",
+            "value": "234",
+            "subTitle": "较本月平均销售金额",
+            "subValue": "8.04%",
+            "trend": "down"
+          },
+          {
+            "title": "本月累计销售金额",
+            "value": "234",
+            "subTitle": "月同比",
+            "subValue": "8.04%",
+            "trend": "up"
+          }
+        ],
+        [
+          {
+            "title": "销售订单数量",
+            "value": "50",
+            "subTitle": "较本月平均销售数量",
+            "subValue": "8.04%",
+            "trend": "down"
+          },
+          {
+            "title": "本月销售订单数量",
+            "value": "234",
+            "subTitle": "月同比",
+            "subValue": "8.04%",
+            "trend": "up"
+          }
+        ]
+      ],
+      "saleMoneyLine": [
+        { "month": "1", "value": 3 },
+        { "month": "2", "value": 4 },
+        { "month": "3", "value": 3.5 },
+        { "month": "4", "value": 5 },
+        { "month": "5", "value": 4.9 },
+        { "month": "6", "value": 6 },
+        { "month": "7", "value": 7 },
+        { "month": "8", "value": 9 },
+        { "month": "9", "value": 13 }
+      ],
+      "saleCateTypePie": [
+        {
+          "cateTypeName": "分类一",
+          "value": 27
+        },
+        {
+          "cateTypeName": "分类二",
+          "value": 25
+        },
+        {
+          "cateTypeName": "分类三",
+          "value": 18
+        },
+        {
+          "cateTypeName": "分类四",
+          "value": 15
+        },
+        {
+          "cateTypeName": "分类五",
+          "value": 10
+        },
+        {
+          "cateTypeName": "其他",
+          "value": 5
+        }
+      ],
+      "saleSkuNameBar": [
+        {
+          "skuName": "1951 年",
+          "value": 38
+        },
+        {
+          "skuName": "1952 年",
+          "value": 52
+        },
+        {
+          "skuName": "1956 年",
+          "value": 61
+        },
+        {
+          "skuName": "1957 年",
+          "value": 145
+        },
+        {
+          "skuName": "1958 年",
+          "value": 48
+        }
+      ]
+    }
+  }
+}
